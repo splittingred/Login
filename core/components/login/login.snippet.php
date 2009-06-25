@@ -27,7 +27,7 @@
  * location if specified in the POST.
  *
  * @version 2.0.0
- * @author opengeek <jason@collabpad.com>
+ * @author Jason Coward <jason@collabpad.com>
  * @author Shaun McCormick <shaun@collabpad.com>
  * @copyright Copyright &copy; 2009
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU General Public License
@@ -139,11 +139,13 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
 
 $tpl = $authenticated ? $logoutTpl : $loginTpl;
 $actionMsg = $authenticated
-    ? !empty($logoutMsg) ? $logoutMsg : $modx->lexicon('login.logout')
-    : !empty($loginMsg) ? $loginMsg : $modx->lexicon('login');
+    ? (!empty($logoutMsg) ? $logoutMsg : $modx->lexicon('login.logout'))
+    : (!empty($loginMsg) ? $loginMsg : $modx->lexicon('login'));
+
 $modx->setPlaceholder('actionMsg', $actionMsg);
 $phs = $authenticated ? $scriptProperties : array_merge($scriptProperties, $_POST);
-$phs['request_uri'] = $_SERVER['REQUEST_URI'];
+/* make sure to strip out logout GET parameter to prevent ghost logout */
+$phs['request_uri'] = str_replace(array('?service=logout','&service=logout'),'',$_SERVER['REQUEST_URI']);
 
 switch ($tplType) {
     case 'embedded':

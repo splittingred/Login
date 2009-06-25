@@ -41,7 +41,7 @@ $sources= array (
     'source_core' => $root.'core/components/login',
     'source_assets' => $root.'assets/components/login',
     'docs' => $root.'core/components/login/docs/',
-    'lexicon' => $roo.'core/components/login/lexicon/',
+    'lexicon' => $root.'core/components/login/lexicon/',
 );
 unset($root);
 
@@ -51,6 +51,7 @@ require_once MODX_CORE_PATH . 'model/modx/modx.class.php';
 
 $modx= new modX();
 $modx->initialize('mgr');
+echo '<pre>';
 $modx->setLogLevel(MODX_LOG_LEVEL_INFO);
 $modx->setLogTarget('ECHO');
 
@@ -108,6 +109,10 @@ $vehicle->resolve('file',array(
     'target' => "return MODX_CORE_PATH . 'components/';",
 ));
 $builder->putVehicle($vehicle);
+
+
+/* load lexicon strings */
+$builder->buildLexicon($sources['lexicon']);
 
 /* now pack in the license file, readme and setup options */
 $builder->setPackageAttributes(array(
