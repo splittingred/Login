@@ -16,7 +16,7 @@
             <input class="returnUrl" type="hidden" name="returnUrl" value="[[+loginfp.request_uri]]" />
             
             <input class="loginFPService" type="hidden" name="login_fp_service" value="forgotpassword" />
-            <span class="loginFPButton"><input type="submit" name="login_fp" value="[[%login.retrieve_password]]" /></span>
+            <span class="loginFPButton"><input type="submit" name="login_fp" value="[[%login.reset_password]]" /></span>
         </fieldset>
     </form>
 </div>

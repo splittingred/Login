@@ -67,9 +67,9 @@ if (!empty($_POST['login_fp_service'])) {
 
         /* generate a password and encode it and the username into the url */
         $pword = $Login->generatePassword();
-        $confirmUrl = ($resetResourceId != 1 ? MODX_SITE_URL : '').$modx->makeUrl($resetResourceId);
-        $confirmUrl .= '?lp='.urlencode(base64_encode($pword));
-        $confirmUrl .= '&lu='.urlencode(base64_encode($user->get('username')));
+        $confirmParams = 'lp='.urlencode(base64_encode($pword));
+        $confirmParams .= '&lu='.urlencode(base64_encode($user->get('username')));
+        $confirmUrl = ($resetResourceId != 1 ? MODX_SITE_URL : '').$modx->makeUrl($resetResourceId,'',$confirmParams);
 
         /* set the email properties */
         $emailProperties = $user->toArray();

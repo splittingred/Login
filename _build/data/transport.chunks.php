@@ -66,7 +66,7 @@ $chunks[4]->fromArray(array(
 $chunks[5]= $modx->newObject('modChunk');
 $chunks[5]->fromArray(array(
     'id' => 5,
-    'name' => 'lgnForgotPassSent',
+    'name' => 'lgnForgotPassSentTpl',
     'description' => '',
     'snippet' => file_get_contents($sources['source_core'].'/chunks/lgnforgotpasssenttpl.chunk.tpl'),
     'properties' => '',

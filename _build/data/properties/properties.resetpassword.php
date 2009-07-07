@@ -51,7 +51,7 @@ $properties = array(
         'desc' => 'The resource to direct users to on successful confirmation.',
         'type' => 'textfield',
         'options' => '',
-        'value' => '0',
+        'value' => '1',
     ),
 );
 
