@@ -40,6 +40,7 @@ $Login = $modx->getService('login','Login',$model_path,$scriptProperties);
 $tpl = !empty($tpl) ? $tpl : 'lgnResetPassTpl';
 $tplType = !empty($tplType) ? $tplType : 'modChunk';
 $loginResourceId = !empty($loginResourceId) ? $loginResourceId : 1;
+$debug = isset($debug) ? $debug : false;
 
 /* get user from query params */
 $username = base64_decode(urldecode($_REQUEST['lu']));
@@ -57,7 +58,9 @@ $modx->cacheManager->delete($cacheKey);
 
 /* change password */
 $user->set('password',md5($password));
-//if ($user->save() == false) return '';
+if (!$debug) {
+    if ($user->save() == false) return '';
+}
 
 $modx->invokeEvent('OnWebChangePassword', array (
     'userid' => $user->get('id'),
