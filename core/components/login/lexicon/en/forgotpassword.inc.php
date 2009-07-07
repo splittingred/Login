@@ -21,21 +21,16 @@
  * @package login
  */
 /**
- * Default English language strings for Login
+ * Forgot Password English lexicon for Login
+ *
  * @package login
  * @subpackage lexicon
  */
-$_lang['login'] = 'Login';
-$_lang['login.invalid_post'] = 'WebLogin invalid POST action: [[+action]]';
-$_lang['login.login_err'] = 'Unknown error logging in!';
-$_lang['login.logout'] = 'Logout';
-$_lang['login.logout_err'] = 'Unknown error logging out!';
-$_lang['login.password'] = 'Password';
+$_lang['login.email'] = 'Email';
+$_lang['login.forgot_password'] = 'Forgot Password';
+$_lang['login.forgot_password_email_subject'] = 'Password Retrieval Email';
+$_lang['login.or_forgot_username'] = 'Or, forgot your username?';
+$_lang['login.reset_password'] = 'Reset Password';
 $_lang['login.username'] = 'Username';
-
-
-
-$_lang['setting_login.forgot_password_confirm_resource'] = 'Forgot Password Confirmation Resource ID';
-$_lang['setting_login.forgot_password_confirm_resource_desc'] = 'Enter the ID of the Resource where resides your confirmation page for changing a lost password.';
-$_lang['setting_login.forgot_password_email_subject'] = 'Forgot Password Email Subject';
-$_lang['setting_login.forgot_password_email_subject_desc'] = 'The email subject line for the forgotten password email.';
+$_lang['login.user_err_nf_email'] = 'A user was not found with that email.';
+$_lang['login.user_err_nf_username'] = 'A user was not found with that username.';

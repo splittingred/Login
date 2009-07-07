@@ -57,7 +57,7 @@ $modx->setLogTarget('ECHO');
 
 $modx->loadClass('transport.modPackageBuilder','',false, true);
 $builder = new modPackageBuilder($modx);
-$builder->createPackage('login','1.0','beta1');
+$builder->createPackage('login','1.0','beta2');
 $builder->registerNamespace('login',false,true,'{core_path}components/login/');
 
 /* create category */
@@ -65,17 +65,12 @@ $category= $modx->newObject('modCategory');
 $category->set('id',1);
 $category->set('category','Login');
 
-
-/* create the snippet */
-$snippet= $modx->newObject('modSnippet');
-$snippet->set('id',0);
-$snippet->set('name', 'Login');
-$snippet->set('description', 'Displays a login and logout form.');
-$snippet->set('snippet',file_get_contents($sources['source_core'].'/login.snippet.php'));
-
-$properties = include $sources['data'].'properties.inc.php';
-$snippet->setProperties($properties);
-$category->addMany($snippet);
+/* add snippets */
+$modx->log(MODX_LOG_LEVEL_INFO,'Adding in snippets.');
+$snippets = include $sources['data'].'transport.snippets.php';
+if (is_array($snippets)) {
+    $category->addMany($snippets);
+} else { $modx->log(MODX_LOG_LEVEL_FATAL,'Adding snippets failed.'); }
 
 /* add chunks */
 $modx->log(MODX_LOG_LEVEL_INFO,'Adding in chunks.');
@@ -110,6 +105,20 @@ $vehicle->resolve('file',array(
 ));
 $builder->putVehicle($vehicle);
 
+/* load system settings */
+$settings = array();
+include_once $sources['data'].'transport.settings.php';
+
+$attributes= array(
+    XPDO_TRANSPORT_UNIQUE_KEY => 'key',
+    XPDO_TRANSPORT_PRESERVE_KEYS => true,
+    XPDO_TRANSPORT_UPDATE_OBJECT => false,
+);
+foreach ($settings as $setting) {
+    $vehicle = $builder->createVehicle($setting,$attributes);
+    $builder->putVehicle($vehicle);
+}
+unset($settings,$setting,$attributes);
 
 /* load lexicon strings */
 $builder->buildLexicon($sources['lexicon']);

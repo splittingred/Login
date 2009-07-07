@@ -147,6 +147,13 @@ $phs = $authenticated ? $scriptProperties : array_merge($scriptProperties, $_POS
 /* make sure to strip out logout GET parameter to prevent ghost logout */
 $phs['request_uri'] = str_replace(array('?service=logout','&service=logout'),'',$_SERVER['REQUEST_URI']);
 
+/* properly build logout url */
+if ($authenticated) {
+    $phs['logoutUrl'] = $phs['request_uri'];
+    $phs['logoutUrl'] .= strpos($phs['logoutUrl'],'?') ? '&' : '?';
+    $phs['logoutUrl'] .= $phs['actionKey'].'='.$phs['logoutKey'];
+}
+
 switch ($tplType) {
     case 'embedded':
         if (!$authenticated) $modx->setPlaceholders($phs);

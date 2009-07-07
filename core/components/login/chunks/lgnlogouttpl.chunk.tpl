@@ -2,6 +2,6 @@
 <br />
 <div class="loginLogin">
     <div class="loginRegister">
-        <a href="[[+request_uri]]&[[+actionKey]]=[[+logoutKey]]" title="[[+actionMsg]]">[[+actionMsg]]</a>
+        <a href="[[+logoutUrl]]" title="[[+actionMsg]]">[[+actionMsg]]</a>
     </div>
 </div>

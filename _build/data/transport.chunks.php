@@ -54,4 +54,40 @@ $chunks[3]->fromArray(array(
     'properties' => '',
 ),'',true,true);
 
+$chunks[4]= $modx->newObject('modChunk');
+$chunks[4]->fromArray(array(
+    'id' => 4,
+    'name' => 'lgnForgotPassEmail',
+    'description' => '',
+    'snippet' => file_get_contents($sources['source_core'].'/chunks/lgnforgotpassemail.chunk.tpl'),
+    'properties' => '',
+),'',true,true);
+
+$chunks[5]= $modx->newObject('modChunk');
+$chunks[5]->fromArray(array(
+    'id' => 5,
+    'name' => 'lgnForgotPassSent',
+    'description' => '',
+    'snippet' => file_get_contents($sources['source_core'].'/chunks/lgnforgotpasssenttpl.chunk.tpl'),
+    'properties' => '',
+),'',true,true);
+
+$chunks[6]= $modx->newObject('modChunk');
+$chunks[6]->fromArray(array(
+    'id' => 6,
+    'name' => 'lgnForgotPassTpl',
+    'description' => '',
+    'snippet' => file_get_contents($sources['source_core'].'/chunks/lgnforgotpasstpl.chunk.tpl'),
+    'properties' => '',
+),'',true,true);
+
+$chunks[7]= $modx->newObject('modChunk');
+$chunks[7]->fromArray(array(
+    'id' => 7,
+    'name' => 'lgnResetPassTpl',
+    'description' => '',
+    'snippet' => file_get_contents($sources['source_core'].'/chunks/lgnresetpasstpl.chunk.tpl'),
+    'properties' => '',
+),'',true,true);
+
 return $chunks;
