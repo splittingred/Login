@@ -120,6 +120,13 @@ $properties = array(
         'options' => '',
         'value' => '',
     ),
+    array(
+        'name' => 'redirectToPrior',
+        'desc' => 'If true, will redirect to the referring page (HTTP_REFERER) on successful login.',
+        'type' => 'combo-boolean',
+        'options' => '',
+        'value' => false,
+    ),
 );
 
 return $properties;
