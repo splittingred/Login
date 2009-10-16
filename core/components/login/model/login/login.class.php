@@ -30,25 +30,42 @@
  * version 2 or (at your option) any later version.
  * @package login
  */
-class login {
+class Login {
 
-    /**#@+
+    /**
      * Creates an instance of the Login class.
      *
      * @param modX &$modx A reference to the modX instance.
      * @param array $config An array of configuration parameters.
      * @return Login
      */
-    function Login(&$modx,$config = array()) {
-        $this->__construct($modx,$config);
-    }
-    /** @ignore */
-    function __construct(&$modx,$config = array()) {
+    function __construct(modX &$modx,array $config = array()) {
         $this->modx =& $modx;
+        $corePath = dirname(dirname(dirname(__FILE__))).'/';
         $this->config = array_merge(array(
+            'corePath' => $corePath,
+            'modelPath' => $corePath.'model/',
+            'chunksPath' => $corePath.'chunks/',
+            'processorsPath' => $corePath.'processors/',
         ),$config);
     }
-    /**#@-*/
+
+    /**
+     * Loads the Validator class.
+     *
+     * @access public
+     * @param $config array An array of configuration parameters for the
+     * lgnValidator class
+     * @return lgnValidator An instance of the lgnValidator class.
+     */
+    public function loadValidator($config = array()) {
+        if (!$this->modx->loadClass('login.lgnValidator',$this->config['modelPath'],true,true)) {
+            $this->modx->log(MODX_LOG_LEVEL_ERROR,'[Login] Could not load Validator class.');
+            return false;
+        }
+        $this->validator = new lgnValidator($this,$config);
+        return $this->validator;
+    }
 
     /**
      * Gets the current Request URI.
@@ -56,7 +73,7 @@ class login {
      * @access public
      * @return string The request URI, with Login-specific code stripped.
      */
-    function getRequestURI() {
+    public function getRequestURI() {
         return str_replace(array('?service=logout','&service=logout'),'',$_SERVER['REQUEST_URI']);
     }
 
@@ -71,7 +88,7 @@ class login {
      * @return modUser/null Returns a modUser object if successfull; null if
      * not.
      */
-    function getUserByField($field,$value,$alias = 'modUser') {
+    public function getUserByField($field,$value,$alias = 'modUser') {
         $c = $this->modx->newQuery('modUser');
         $c->select('modUser.*, modUserProfile.email AS email');
         $c->innerJoin('modUserProfile','modUserProfile');
@@ -91,7 +108,7 @@ class login {
      * @param array $properties A collection of properties.
      * @return array
      */
-    function sendEmail($email,$name,$subject,$properties = array()) {
+    public function sendEmail($email,$name,$subject,$properties = array()) {
         if (empty($properties['tpl'])) $properties['tpl'] = 'lgnForgotPassEmail';
         if (empty($properties['tplType'])) $properties['tplType'] = 'modChunk';
 
@@ -105,6 +122,7 @@ class login {
         $this->modx->mail->set(MODX_MAIL_SUBJECT, $subject);
         $this->modx->mail->address('to', $email, $name);
         $this->modx->mail->address('reply-to', $this->modx->getOption('emailsender'));
+        $this->modx->mail->setHTML(true);
         $sent = $this->modx->mail->send();
         $this->modx->mail->reset();
 
@@ -118,7 +136,7 @@ class login {
      * @param integer $length The length of the generated password.
      * @return string The newly-generated password.
      */
-    function generatePassword($length=8) {
+    public function generatePassword($length=8) {
         $pword = '';
         $charmap = '0123456789bcdfghjkmnpqrstvwxyz';
         $i = 0;
@@ -142,7 +160,7 @@ class login {
      * modChunk, file, or inline. Defaults to modChunk.
      * @return string The processed tpl/chunk.
      */
-    function getChunk($name,$properties,$type = 'modChunk') {
+    public function getChunk($name,$properties,$type = 'modChunk') {
         $output = '';
         switch ($type) {
             case 'embedded':
@@ -154,6 +172,15 @@ class login {
                 $output .= $this->modx->getChunk($name, $properties);
                 break;
             case 'file':
+                $name = str_replace(array(
+                    '{base_path}',
+                    '{assets_path}',
+                    '{core_path}',
+                ),array(
+                    $this->modx->getOption('base_path'),
+                    $this->modx->getOption('assets_path'),
+                    $this->modx->getOption('core_path'),
+                ),$name);
                 $output .= file_get_contents($name);
                 $this->modx->setPlaceholders($properties);
                 break;

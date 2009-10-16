@@ -48,4 +48,26 @@ $properties = include $sources['data'].'properties/properties.resetpassword.php'
 $snippets[2]->setProperties($properties);
 unset($properties);
 
+$snippets[3]= $modx->newObject('modSnippet');
+$snippets[3]->fromArray(array(
+    'id' => 3,
+    'name' => 'Register',
+    'description' => 'Handles forms for registering users on the front-end.',
+    'snippet' => getSnippetContent($sources['source_core'].'/register.snippet.php'),
+),'',true,true);
+$properties = include $sources['data'].'properties/properties.register.php';
+$snippets[3]->setProperties($properties);
+unset($properties);
+
+$snippets[4]= $modx->newObject('modSnippet');
+$snippets[4]->fromArray(array(
+    'id' => 4,
+    'name' => 'ConfirmRegister',
+    'description' => 'Handles activation of registered user.',
+    'snippet' => getSnippetContent($sources['source_core'].'/confirmregister.snippet.php'),
+),'',true,true);
+$properties = include $sources['data'].'properties/properties.confirmregister.php';
+$snippets[4]->setProperties($properties);
+unset($properties);
+
 return $snippets;

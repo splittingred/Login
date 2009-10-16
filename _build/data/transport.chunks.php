@@ -90,4 +90,22 @@ $chunks[7]->fromArray(array(
     'properties' => '',
 ),'',true,true);
 
+$chunks[8]= $modx->newObject('modChunk');
+$chunks[8]->fromArray(array(
+    'id' => 8,
+    'name' => 'lgnRegisterForm',
+    'description' => '',
+    'snippet' => file_get_contents($sources['source_core'].'/chunks/lgnregisterformtpl.chunk.tpl'),
+    'properties' => '',
+),'',true,true);
+
+$chunks[9]= $modx->newObject('modChunk');
+$chunks[9]->fromArray(array(
+    'id' => 9,
+    'name' => 'lgnActivateEmailTpl',
+    'description' => '',
+    'snippet' => file_get_contents($sources['source_core'].'/chunks/lgnactivateemailtpl.chunk.tpl'),
+    'properties' => '',
+),'',true,true);
+
 return $chunks;

@@ -1,14 +1,14 @@
-[[+username]],
+<p>[[+username]],</p>
 
-To activate your new password, please click on the following link:
+<p>To activate your new password, please click on the following link:</p>
 
-[[+confirmUrl]]
+<p><a href="[[+confirmUrl]]">[[+confirmUrl]]</a></p>
 
-If successful you can use the following password to login:
+<p>If successful you can use the following password to login:</p>
 
-Password: [[+password]]
+<p><strong>Password:</strong> [[+password]]</p>
 
-If you did not request this message, please ignore it.
+<p>If you did not request this message, please ignore it.</p>
 
-Thanks.
-Site Administrator
+<p>Thanks,<br />
+<em>Site Administrator</em></p>
