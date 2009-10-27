@@ -106,7 +106,7 @@ class lgnValidator {
 
         } else {
             /* no validator found */
-            $this->modx->log(MODX_LOG_LEVEL_ERROR,'[Register] Could not find validator "'.$type.'" for field "'.$key.'".');
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Register] Could not find validator "'.$type.'" for field "'.$key.'".');
             $validated = true;
         }
 

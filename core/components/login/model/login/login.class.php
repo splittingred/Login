@@ -60,7 +60,7 @@ class Login {
      */
     public function loadValidator($config = array()) {
         if (!$this->modx->loadClass('login.lgnValidator',$this->config['modelPath'],true,true)) {
-            $this->modx->log(MODX_LOG_LEVEL_ERROR,'[Login] Could not load Validator class.');
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not load Validator class.');
             return false;
         }
         $this->validator = new lgnValidator($this,$config);
@@ -115,11 +115,11 @@ class Login {
         $msg = $this->getChunk($properties['tpl'],$properties,$properties['tplType']);
 
         $this->modx->getService('mail', 'mail.modPHPMailer');
-        $this->modx->mail->set(MODX_MAIL_BODY, $msg);
-        $this->modx->mail->set(MODX_MAIL_FROM, $this->modx->getOption('emailsender'));
-        $this->modx->mail->set(MODX_MAIL_FROM_NAME, $this->modx->getOption('site_name'));
-        $this->modx->mail->set(MODX_MAIL_SENDER, $this->modx->getOption('emailsender'));
-        $this->modx->mail->set(MODX_MAIL_SUBJECT, $subject);
+        $this->modx->mail->set(modMail::MAIL_BODY, $msg);
+        $this->modx->mail->set(modMail::MAIL_FROM, $this->modx->getOption('emailsender'));
+        $this->modx->mail->set(modMail::MAIL_FROM_NAME, $this->modx->getOption('site_name'));
+        $this->modx->mail->set(modMail::MAIL_SENDER, $this->modx->getOption('emailsender'));
+        $this->modx->mail->set(modMail::MAIL_SUBJECT, $subject);
         $this->modx->mail->address('to', $email, $name);
         $this->modx->mail->address('reply-to', $this->modx->getOption('emailsender'));
         $this->modx->mail->setHTML(true);

@@ -98,7 +98,7 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                 }
             }
         } else {
-            $modx->log(MODX_LOG_LEVEL_ERROR,$modx->lexicon('login.invalid_post',array(
+            $modx->log(modX::LOG_LEVEL_ERROR,$modx->lexicon('login.invalid_post',array(
                 'action' => $_POST[$actionKey],
             )));
         }

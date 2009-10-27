@@ -47,17 +47,17 @@ unset($root);
 
 /* override with your own defines here (see build.config.sample.php) */
 require_once dirname(__FILE__) . '/build.config.php';
-require_once MODX_CORE_PATH . 'model/modx/modx.class.php';
+require_once modX::CORE_PATH . 'model/modx/modx.class.php';
 
 $modx= new modX();
 $modx->initialize('mgr');
 echo '<pre>';
-$modx->setLogLevel(MODX_LOG_LEVEL_INFO);
+$modx->setLogLevel(modX::LOG_LEVEL_INFO);
 $modx->setLogTarget('ECHO');
 
 $modx->loadClass('transport.modPackageBuilder','',false, true);
 $builder = new modPackageBuilder($modx);
-$builder->createPackage('login','1.0','beta4');
+$builder->createPackage('login','1.0','beta5');
 $builder->registerNamespace('login',false,true,'{core_path}components/login/');
 
 /* create category */
@@ -66,42 +66,42 @@ $category->set('id',1);
 $category->set('category','Login');
 
 /* add snippets */
-$modx->log(MODX_LOG_LEVEL_INFO,'Adding in snippets.');
+$modx->log(modX::LOG_LEVEL_INFO,'Adding in snippets.');
 $snippets = include $sources['data'].'transport.snippets.php';
 if (is_array($snippets)) {
     $category->addMany($snippets);
-} else { $modx->log(MODX_LOG_LEVEL_FATAL,'Adding snippets failed.'); }
+} else { $modx->log(modX::LOG_LEVEL_FATAL,'Adding snippets failed.'); }
 
 /* add chunks */
-$modx->log(MODX_LOG_LEVEL_INFO,'Adding in chunks.');
+$modx->log(modX::LOG_LEVEL_INFO,'Adding in chunks.');
 $chunks = include $sources['data'].'transport.chunks.php';
 if (is_array($chunks)) {
     $category->addMany($chunks);
-} else { $modx->log(MODX_LOG_LEVEL_FATAL,'Adding chunks failed.'); }
+} else { $modx->log(modX::LOG_LEVEL_FATAL,'Adding chunks failed.'); }
 
 /* create category vehicle */
 $attr = array(
-    XPDO_TRANSPORT_UNIQUE_KEY => 'category',
-    XPDO_TRANSPORT_PRESERVE_KEYS => false,
-    XPDO_TRANSPORT_UPDATE_OBJECT => true,
-    XPDO_TRANSPORT_RELATED_OBJECTS => true,
-    XPDO_TRANSPORT_RELATED_OBJECT_ATTRIBUTES => array (
+    xPDOTransport::UNIQUE_KEY => 'category',
+    xPDOTransport::PRESERVE_KEYS => false,
+    xPDOTransport::UPDATE_OBJECT => true,
+    xPDOTransport::RELATED_OBJECTS => true,
+    xPDOTransport::RELATED_OBJECT_ATTRIBUTES => array (
         'modSnippet' => array(
-            XPDO_TRANSPORT_PRESERVE_KEYS => false,
-            XPDO_TRANSPORT_UPDATE_OBJECT => true,
-            XPDO_TRANSPORT_UNIQUE_KEY => 'name',
+            xPDOTransport::PRESERVE_KEYS => false,
+            xPDOTransport::UPDATE_OBJECT => true,
+            xPDOTransport::UNIQUE_KEY => 'name',
         ),
         'modChunk' => array(
-            XPDO_TRANSPORT_PRESERVE_KEYS => false,
-            XPDO_TRANSPORT_UPDATE_OBJECT => true,
-            XPDO_TRANSPORT_UNIQUE_KEY => 'name',
+            xPDOTransport::PRESERVE_KEYS => false,
+            xPDOTransport::UPDATE_OBJECT => true,
+            xPDOTransport::UNIQUE_KEY => 'name',
         ),
     )
 );
 $vehicle = $builder->createVehicle($category,$attr);
 $vehicle->resolve('file',array(
     'source' => $sources['source_core'],
-    'target' => "return MODX_CORE_PATH . 'components/';",
+    'target' => "return modX::CORE_PATH . 'components/';",
 ));
 $builder->putVehicle($vehicle);
 
@@ -110,9 +110,9 @@ $settings = array();
 include_once $sources['data'].'transport.settings.php';
 
 $attributes= array(
-    XPDO_TRANSPORT_UNIQUE_KEY => 'key',
-    XPDO_TRANSPORT_PRESERVE_KEYS => true,
-    XPDO_TRANSPORT_UPDATE_OBJECT => false,
+    xPDOTransport::UNIQUE_KEY => 'key',
+    xPDOTransport::PRESERVE_KEYS => true,
+    xPDOTransport::UPDATE_OBJECT => false,
 );
 foreach ($settings as $setting) {
     $vehicle = $builder->createVehicle($setting,$attributes);
@@ -138,6 +138,6 @@ $tend= $mtime;
 $totalTime= ($tend - $tstart);
 $totalTime= sprintf("%2.4f s", $totalTime);
 
-$modx->log(MODX_LOG_LEVEL_INFO,"\n<br />Package Built.<br />\nExecution time: {$totalTime}\n");
+$modx->log(modX::LOG_LEVEL_INFO,"\n<br />Package Built.<br />\nExecution time: {$totalTime}\n");
 
 exit ();

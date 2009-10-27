@@ -60,7 +60,7 @@ $result = $modx->invokeEvent('OnBeforeUserActivate',array(
     'user' => &$user,
 ));
 if (!empty($result)) {
-    $modx->log(MODX_LOG_LEVEL_ERROR,'[Register] OnBeforeUserActivate event prevented activation for "'.$user->get('username').'" by returning false.');
+    $modx->log(modX::LOG_LEVEL_ERROR,'[Register] OnBeforeUserActivate event prevented activation for "'.$user->get('username').'" by returning false.');
     $modx->sendErrorPage();
 }
 
