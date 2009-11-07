@@ -41,7 +41,7 @@ $properties = array(
         'value' => 'lgnForgotPassEmail',
     ),
     array(
-        'name' => 'tplType',
+        'name' => 'emailTplType',
         'desc' => 'The type of tpl being provided for the emailTpl property. Defaults to a Chunk.',
         'type' => 'list',
         'options' => $tplTypeOptions,
