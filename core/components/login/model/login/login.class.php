@@ -90,8 +90,8 @@ class Login {
      */
     public function getUserByField($field,$value,$alias = 'modUser') {
         $c = $this->modx->newQuery('modUser');
-        $c->select('modUser.*, modUserProfile.email AS email');
-        $c->innerJoin('modUserProfile','modUserProfile');
+        $c->select('modUser.*, Profile.email AS email');
+        $c->innerJoin('modUserProfile','Profile');
         $c->where(array(
             $alias.'.'.$field => $value,
         ));

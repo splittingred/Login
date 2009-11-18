@@ -55,7 +55,7 @@ if (!empty($_POST['login_fp_service'])) {
     $alias = 'modUser';
     if (empty($_POST['username']) && !empty($_POST['email'])) {
         $field = 'email';
-        $alias = 'modUserProfile';
+        $alias = 'Profile';
     }
 
     /* get the user dependent on the retrieval method */

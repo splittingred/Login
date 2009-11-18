@@ -1,0 +1,6 @@
+Changelog file for Login component.
+
+Login 1.0 ($LastChangedRevision$, $LastChangedDate$)
+====================================
+- Fixed alias issue in ForgotPassword snippet
+- Added changelog.txt
