@@ -37,6 +37,7 @@ $_lang['register.max_value'] = 'This field cannot be larger than [[+value]].';
 $_lang['register.min_length'] = 'This field must be at least [[+length]] characters long.';
 $_lang['register.min_value'] = 'This field cannot be smaller than [[+value]].';
 $_lang['register.password'] = 'Password';
+$_lang['register.password_confirm'] = 'Confirm Password';
 $_lang['register.password_dont_match'] = 'Your passwords do not match.';
 $_lang['register.password_not_confirmed'] = 'Please confirm your password.';
 $_lang['register.register'] = 'Register';

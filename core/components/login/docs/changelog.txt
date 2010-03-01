@@ -2,5 +2,9 @@ Changelog file for Login component.
 
 Login 1.0 ($LastChangedRevision$, $LastChangedDate$)
 ====================================
+- [#ADDON-106] Fixed incorrect plugin event invoking
+- [#ADDON-107] Added missing lexicon entry register.password_confirm
+- [#ADDON-103] Fixed context-specific issue with register email
+- [#ADDON-118] Force lexicon topic to load on lgnRegisterForm
 - Fixed alias issue in ForgotPassword snippet
 - Added changelog.txt

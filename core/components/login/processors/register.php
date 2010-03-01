@@ -43,7 +43,7 @@ if (!empty($usergroups)) {
 }
 
 /* invoke OnUserCreate event */
-$modx->invokeEvent('OnUserCreate',array(
+$modx->invokeEvent('OnCreateUser',array(
     'fromRegister' => true,
     'user' => &$user,
     'postFields' => $fields,
@@ -59,7 +59,7 @@ if ($activation && !empty($email) && !empty($activateResourceId)) {
     $pword = $login->generatePassword();
     $confirmParams = 'lp='.urlencode(base64_encode($pword));
     $confirmParams .= '&lu='.urlencode(base64_encode($user->get('username')));
-    $confirmUrl = MODX_SITE_URL.$modx->makeUrl($activateResourceId,'',$confirmParams);
+    $confirmUrl = $modx->makeUrl($activateResourceId,'',$confirmParams,'full');
 
     /* set the email properties */
     $emailTpl = $modx->getOption('activationEmailTpl',$scriptProperties,'lgnActivateEmail');

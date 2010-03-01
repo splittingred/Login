@@ -4,7 +4,7 @@
     <form class="form" action="[[~[[*id]]]]" method="post">
         <input type="hidden" name="nospam:blank" value="" />
         
-        <label for="username">[[%register.username]]
+        <label for="username">[[%register.username? &namespace=`login` &topic=`register`]]
             <span class="error">[[+error.username]]</span>
         </label>
         <input type="text" name="username:required:minLength=6" id="username" value="[[+username]]" />
