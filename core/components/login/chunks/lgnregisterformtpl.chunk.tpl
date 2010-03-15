@@ -32,7 +32,7 @@
         <br class="clear" />
         
         <div class="form-buttons">
-            <input type="submit" value="Register" />
+            <input type="submit" name="login-register-btn" value="Register" />
         </div>
     </form>
 </div>

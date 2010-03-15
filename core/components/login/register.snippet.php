@@ -37,7 +37,7 @@ $modx->lexicon->load('login:register');
 /* set default properties */
 $properties = array();
 
-$submitVar = $modx->getOption('submitVar',$scriptProperties,'');
+$submitVar = $modx->getOption('submitVar',$scriptProperties,'login-register-btn');
 if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     /* handle validation */
     $login->loadValidator();
