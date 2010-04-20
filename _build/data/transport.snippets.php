@@ -70,4 +70,16 @@ $properties = include $sources['data'].'properties/properties.confirmregister.ph
 $snippets[4]->setProperties($properties);
 unset($properties);
 
+$snippets[5]= $modx->newObject('modSnippet');
+$snippets[5]->fromArray(array(
+    'id' => 5,
+    'name' => 'UpdateProfile',
+    'description' => 'Allows front-end updating of a users own profile.',
+    'snippet' => getSnippetContent($sources['source_core'].'/updateprofile.snippet.php'),
+),'',true,true);
+$properties = include $sources['data'].'properties/properties.updateprofile.php';
+$snippets[5]->setProperties($properties);
+unset($properties);
+
+
 return $snippets;

@@ -42,13 +42,6 @@ if (!empty($usergroups)) {
     }
 }
 
-/* invoke OnUserCreate event */
-$modx->invokeEvent('OnCreateUser',array(
-    'fromRegister' => true,
-    'user' => &$user,
-    'postFields' => $fields,
-));
-
 /* send activation email (if chosen) */
 $email = $user->get('email');
 $activation = $modx->getOption('activation',$scriptProperties,true);
