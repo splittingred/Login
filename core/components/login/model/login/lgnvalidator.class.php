@@ -102,6 +102,7 @@ class lgnValidator {
                 'param' => $param,
                 'type' => $type,
                 'validator' => &$this,
+                'errors' => &$this->errors,
             ));
 
         } else {
@@ -113,7 +114,7 @@ class lgnValidator {
         if (is_array($validated) && !empty($validated)) {
             $this->errors = array_merge($this->errors,$validated);
             $validated = false;
-        } else if ($validated !== true) {
+        } else if ($validated != true) {
             $this->errors[$key] .= ' '.$validated;
             $validated = false;
         }

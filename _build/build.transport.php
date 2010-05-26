@@ -57,7 +57,7 @@ $modx->setLogTarget('ECHO');
 
 $modx->loadClass('transport.modPackageBuilder','',false, true);
 $builder = new modPackageBuilder($modx);
-$builder->createPackage('login','1.0.1','pl');
+$builder->createPackage('login','1.0.2','rc1');
 $builder->registerNamespace('login',false,true,'{core_path}components/login/');
 
 /* create category */

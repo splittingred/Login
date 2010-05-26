@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.0 ($LastChangedRevision$, $LastChangedDate$)
 ====================================
+- Added extra checks and fixes to lgnValidator class
 - Added UpdateProfile snippet to enable updating of profile from front-end
 - [#ADDON-129] Added name to default Register form
 - [#ADDON-106] Fixed incorrect plugin event invoking
