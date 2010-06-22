@@ -30,8 +30,10 @@
  * version 2 or (at your option) any later version.
  * @package login
  */
-$model_path = $modx->getOption('core_path').'components/login/model/login/';
-$login = $modx->getService('login','Login',$model_path,$scriptProperties);
+$corePath = $modx->getOption('login.core_path',$config,$modx->getOption('core_path',null,MODX_CORE_PATH).'components/login/');
+$login = $modx->getService('login','Login',$corePath.'model/login/',$scriptProperties);
+if (!is_object($login) || !($login instanceof Login)) return '';
+
 $modx->lexicon->load('login:register');
 
 /* set default properties */
@@ -43,17 +45,28 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     $login->loadValidator();
     $fields = $login->validator->validateFields($_POST);
 
-    /* make sure username isnt taken */
-    $alreadyExists = $modx->getObject('modUser',array('username' => $fields['username']));
-    if ($alreadyExists) {
-        if ($alreadyExists->get('active') == 0) {
-            /* if inactive, probably an expired activation account, so
-             * let's remove it and let user re-register
-             */
-            $alreadyExists->remove();
-        } else {
-            $login->validator->errors['username'] = $modx->lexicon('register.username_taken');
+    if (empty($fields['username'])) {
+        $login->validator->errors['username'] = $modx->lexicon('register.field_required');
+    } else {
+        /* make sure username isnt taken */
+        $alreadyExists = $modx->getObject('modUser',array('username' => $fields['username']));
+        if ($alreadyExists) {
+            if ($alreadyExists->get('active') == 0) {
+                /* if inactive, probably an expired activation account, so
+                 * let's remove it and let user re-register
+                 */
+                $alreadyExists->remove();
+            } else {
+                $login->validator->errors['username'] = $modx->lexicon('register.username_taken');
+            }
         }
+    }
+    
+    if (empty($fields['password'])) {
+        $login->validator->errors['password'] = $modx->lexicon('register.field_required');
+    }
+    if (empty($fields['email'])) {
+        $login->validator->errors['email'] = $modx->lexicon('register.field_required');
     }
 
     if (empty($login->validator->errors)) {

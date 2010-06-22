@@ -5,7 +5,6 @@
  * @package login
  * @subpackage processors
  */
-
 /* create user and profile */
 $user = $modx->newObject('modUser');
 $user->fromArray($fields);

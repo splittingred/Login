@@ -31,7 +31,6 @@
  * @package login
  */
 class Login {
-
     /**
      * Creates an instance of the Login class.
      *
@@ -41,7 +40,7 @@ class Login {
      */
     function __construct(modX &$modx,array $config = array()) {
         $this->modx =& $modx;
-        $corePath = dirname(dirname(dirname(__FILE__))).'/';
+        $corePath = $modx->getOption('login.core_path',$config,$modx->getOption('core_path',null,MODX_CORE_PATH).'components/login/');
         $this->config = array_merge(array(
             'corePath' => $corePath,
             'modelPath' => $corePath.'model/',

@@ -32,16 +32,23 @@ $mtime = $mtime[1] + $mtime[0];
 $tstart = $mtime;
 set_time_limit(0);
 
+/* define version */
+define('PKG_NAME','Login');
+define('PKG_NAME_LOWER','login');
+define('PKG_VERSION','1.0.2');
+define('PKG_RELEASE','rc1');
+
+/* define sources */
 $root = dirname(dirname(__FILE__)).'/';
 $sources= array (
     'root' => $root,
     'build' => $root .'_build/',
     'resolvers' => $root . '_build/resolvers/',
     'data' => $root . '_build/data/',
-    'source_core' => $root.'core/components/login',
-    'source_assets' => $root.'assets/components/login',
-    'docs' => $root.'core/components/login/docs/',
-    'lexicon' => $root.'core/components/login/lexicon/',
+    'source_core' => $root.'core/components/'.PKG_NAME_LOWER,
+    'source_assets' => $root.'assets/components/'.PKG_NAME_LOWER,
+    'docs' => $root.'core/components/'.PKG_NAME_LOWER.'/docs/',
+    'lexicon' => $root.'core/components/'.PKG_NAME_LOWER.'/lexicon/',
 );
 unset($root);
 
@@ -57,8 +64,8 @@ $modx->setLogTarget('ECHO');
 
 $modx->loadClass('transport.modPackageBuilder','',false, true);
 $builder = new modPackageBuilder($modx);
-$builder->createPackage('login','1.0.2','rc1');
-$builder->registerNamespace('login',false,true,'{core_path}components/login/');
+$builder->createPackage(PKG_NAME_LOWER,PKG_VERSION,PKG_RELEASE);
+$builder->registerNamespace(PKG_NAME_LOWER,false,true,'{core_path}components/'.PKG_NAME_LOWER.'/');
 
 /* create category */
 $category= $modx->newObject('modCategory');
@@ -135,6 +142,6 @@ $tend= $mtime;
 $totalTime= ($tend - $tstart);
 $totalTime= sprintf("%2.4f s", $totalTime);
 
-$modx->log(modX::LOG_LEVEL_INFO,"\n<br />Package Built.<br />\nExecution time: {$totalTime}\n");
+$modx->log(modX::LOG_LEVEL_INFO,"\n<br />".PKG_NAME." package built.<br />\nExecution time: {$totalTime}\n");
 
 exit ();
