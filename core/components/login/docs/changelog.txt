@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.0 ($LastChangedRevision$, $LastChangedDate$)
 ====================================
+- Updated copyright information
 - Ensure username,password and email are always passed to register snippet to prevent blank logins
 - Consolidated elements into own dir
 - Added extra checks and fixes to lgnValidator class
