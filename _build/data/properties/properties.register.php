@@ -49,6 +49,27 @@ $properties = array(
         'value' => '',
     ),
     array(
+        'name' => 'usernameField',
+        'desc' => 'The name of the field to use for the new User&apos;s username.',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 'username',
+    ),
+    array(
+        'name' => 'passwordField',
+        'desc' => 'The name of the field to use for the new User&apos;s password.',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 'password',
+    ),
+    array(
+        'name' => 'emailField',
+        'desc' => 'The name of the field to use for the new User&apos;s email address.',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 'email',
+    ),
+    array(
         'name' => 'successMsg',
         'desc' => 'Optional. If not redirecting using the submittedResourceId parameter, will display this message instead.',
         'type' => 'textfield',

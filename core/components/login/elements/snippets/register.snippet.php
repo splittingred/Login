@@ -30,26 +30,29 @@
  * version 2 or (at your option) any later version.
  * @package login
  */
-$corePath = $modx->getOption('login.core_path',$config,$modx->getOption('core_path',null,MODX_CORE_PATH).'components/login/');
+$corePath = $modx->getOption('login.core_path',$scriptProperties,$modx->getOption('core_path',null,MODX_CORE_PATH).'components/login/');
 $login = $modx->getService('login','Login',$corePath.'model/login/',$scriptProperties);
 if (!is_object($login) || !($login instanceof Login)) return '';
 
-$modx->lexicon->load('login:register');
-
-/* set default properties */
-$properties = array();
-
 $submitVar = $modx->getOption('submitVar',$scriptProperties,'login-register-btn');
 if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
+    $modx->lexicon->load('login:register');
+
+    /* set default properties */
+    $usernameField = $modx->getOption('usernameField',$scriptProperties,'username');
+    $emailField = $modx->getOption('emailField',$scriptProperties,'email');
+    $passwordField = $modx->getOption('passwordField',$scriptProperties,'password');
+    $properties = array();
+
     /* handle validation */
     $login->loadValidator();
     $fields = $login->validator->validateFields($_POST);
 
-    if (empty($fields['username'])) {
-        $login->validator->errors['username'] = $modx->lexicon('register.field_required');
+    if (empty($fields[$usernameField])) {
+        $login->validator->errors[$usernameField] = $modx->lexicon('register.field_required');
     } else {
         /* make sure username isnt taken */
-        $alreadyExists = $modx->getObject('modUser',array('username' => $fields['username']));
+        $alreadyExists = $modx->getObject('modUser',array('username' => $fields[$usernameField]));
         if ($alreadyExists) {
             if ($alreadyExists->get('active') == 0) {
                 /* if inactive, probably an expired activation account, so
@@ -57,16 +60,16 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
                  */
                 $alreadyExists->remove();
             } else {
-                $login->validator->errors['username'] = $modx->lexicon('register.username_taken');
+                $login->validator->errors[$usernameField] = $modx->lexicon('register.username_taken');
             }
         }
     }
     
-    if (empty($fields['password'])) {
-        $login->validator->errors['password'] = $modx->lexicon('register.field_required');
+    if (empty($fields[$passwordField])) {
+        $login->validator->errors[$passwordField] = $modx->lexicon('register.field_required');
     }
-    if (empty($fields['email'])) {
-        $login->validator->errors['email'] = $modx->lexicon('register.field_required');
+    if (empty($fields[$emailField])) {
+        $login->validator->errors[$emailField] = $modx->lexicon('register.field_required');
     }
 
     if (empty($login->validator->errors)) {

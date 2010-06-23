@@ -78,6 +78,12 @@ class lgnValidator {
         foreach ($keys as $k => $v) {
             $key = explode(':',$k);
             $validators = count($key);
+
+            /* strip tags by default */
+            if (strpos($k,'allowTags') === false && !is_array($v)) {
+                $v = strip_tags($v);
+            }
+            
             if ($validators > 1) {
                 $this->fields[$key[0]] = $v;
                 for ($i=1;$i<$validators;$i++) {
@@ -111,13 +117,14 @@ class lgnValidator {
             $type = substr($type,0,$hasParams);
         }
 
+        $invNames = array('validate','validateFields','_addError','__construct');
         if (method_exists($this,$type) && $type != 'validate') {
             /* built-in validator */
             $validated = $this->$type($key,$value,$param);
 
         } else if ($snippet = $this->modx->getObject('modSnippet',array('name' => $type))) {
             /* custom snippet validator */
-            $validated = $snippet->process(array(
+            $props = array_merge($this->login->config,array(
                 'key' => $key,
                 'value' => $value,
                 'param' => $param,
@@ -125,6 +132,7 @@ class lgnValidator {
                 'validator' => &$this,
                 'errors' => &$this->errors,
             ));
+            $validated = $snippet->process($props);
 
         } else {
             /* no validator found */
@@ -133,19 +141,41 @@ class lgnValidator {
         }
 
         if (is_array($validated) && !empty($validated)) {
-            $this->errors = array_merge($this->errors,$validated);
+            foreach ($validated as $key => $errMsg) {
+                $this->_addError($key,$errMsg);
+            }
             $validated = false;
-        } else if ($validated != true) {
-            $this->errors[$key] .= ' '.$validated;
+        } elseif ($validated !== '1' && $validated !== 1 && $validated !== true) {
+            $this->_addError($key,$validated);
             $validated = false;
         }
         return $validated;
     }
 
     /**
+     * Adds an error to the stack.
+     *
+     * @access private
+     * @param string $key The field to add the error to.
+     * @param string $value The error message.
+     * @return string The added error message with the error wrapper.
+     */
+    private function _addError($key,$value) {
+        $errTpl = $this->modx->getOption('errTpl',$this->login->config,'<span class="error">[[+error]]</span>');
+        $this->errors[$key] .= ' '.str_replace('[[+error]]',$value,$errTpl);
+        return $this->errors[$key];
+    }
+
+    /**
      * Checks to see if field is required.
      */
     public function required($key,$value) {
+        $success = false;
+        if (is_array($value)) {
+            $success = !empty($value['tmp_name']) && isset($value['error']) && $value['error'] == UPLOAD_ERR_OK ? true : false;
+        } else {
+            $success = !empty($value) ? true : false;
+        }
         return !empty($value) ? true : $this->modx->lexicon('register.field_required');
     }
 
@@ -237,5 +267,78 @@ class lgnValidator {
         }
         return true;
     }
+    /**
+     * See if field contains a certain value.
+     */
+    public function contains($key,$value,$expr = '') {
+        if (!preg_match('/'.$expr.'/i',$value)) {
+            return $this->modx->lexicon('formit.contains',array('value' => $expr));
+        }
+        return true;
+    }
 
+    /**
+     * Strip a string from the value.
+     */
+    public function strip($key,$value,$param = '') {
+        $this->fields[$key] = str_replace($param,'',$value);
+    }
+
+    /**
+     * Strip all tags in the field. The parameter can be a string of allowed
+     * tags.
+     */
+    public function stripTags($key,$value,$allowedTags = '') {
+        $this->fields[$key] = strip_tags($value,$allowedTags);
+        return true;
+    }
+
+    /**
+     * Strip all tags in the field. The parameter can be a string of allowed
+     * tags.
+     */
+    public function allowTags($key,$value,$allowedTags = '<strong><em><b><i><li><ul><a>') {
+        $this->fields[$key] = strip_tags($value,$allowedTags);
+        return true;
+    }
+
+    /**
+     * Validates value between a range, specified by min-max.
+     */
+    public function range($key,$value,$ranges = '0-1') {
+        $range = explode('-',$ranges);
+        if (count($range) < 2) return $this->modx->lexicon('register.range_invalid');
+
+        if ($value < $range[0] || $value > $range[1]) {
+            return $this->modx->lexicon('register.range',array(
+                'min' => $range[0],
+                'max' => $range[1],
+            ));
+        }
+        return true;
+    }
+
+    /**
+     * Checks to see if the field is a number.
+     */
+     public function isNumber($key,$value) {
+         if (!is_numeric($value)) {
+             return $this->modx->lexicon('register.not_number');
+         }
+     }
+
+    /**
+     * Checks to see if the field is a valid date. Allows for date formatting as
+     * well.
+     */
+    public function isDate($key,$value,$format = '') {
+        $ts = strtotime($value);
+        if ($ts === false) {
+            return $this->modx->lexicon('register.not_date');
+        }
+        if (!empty($format)) {
+            $this->fields[$key] = strftime($format,$ts);
+        }
+        return true;
+    }
 }
