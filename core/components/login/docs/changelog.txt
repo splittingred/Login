@@ -1,12 +1,23 @@
 Changelog file for Login component.
 
-Login 1.0 ($LastChangedRevision$, $LastChangedDate$)
+Login 1.0.3
+====================================
+- Fixed bug with embedded output in Login snippet
+- Added Russian translation
+
+Login 1.0.2
 ====================================
 - Updated copyright information
 - Ensure username,password and email are always passed to register snippet to prevent blank logins
+
+Login 1.0.1
+====================================
 - Consolidated elements into own dir
 - Added extra checks and fixes to lgnValidator class
 - Added UpdateProfile snippet to enable updating of profile from front-end
+
+Login 1.0.0
+====================================
 - [#ADDON-129] Added name to default Register form
 - [#ADDON-106] Fixed incorrect plugin event invoking
 - [#ADDON-107] Added missing lexicon entry register.password_confirm

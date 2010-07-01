@@ -161,7 +161,7 @@ if ($authenticated) {
 
 switch ($tplType) {
     case 'embedded':
-        if (!$authenticated) $modx->setPlaceholders($phs);
+        $modx->setPlaceholders($phs);
         break;
     case 'modChunk':
         $output .= $modx->getChunk($tpl, $phs);
