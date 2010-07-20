@@ -48,6 +48,13 @@ $properties = array(
         'options' => '',
         'value' => true,
     ),
+    array(
+        'name' => 'syncUsername',
+        'desc' => 'If set to a column name in the Profile, UpdateProfile will attempt to sync the username to this field after a successful save.',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+    ),
 );
 
 return $properties;

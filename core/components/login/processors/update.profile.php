@@ -29,11 +29,37 @@
 $profile = $modx->user->getOne('Profile');
 if (empty($profile)) return $modx->lexicon('login.profile_err_nf');
 
+/* set fields */
 $profile->fromArray($_POST);
+
+/* sync username if setting is set */
+$syncUsername = $modx->getOption('syncUsername',$scriptProperties,false);
+$oldUsername = $modx->user->get('username');
+$usernameChanged = false;
+if (!empty($syncUsername)) {
+    $newUsername = $profile->get($syncUsername);
+    if (!empty($newUsername) && strcmp($newUsername,$oldUsername) == 0) {
+        $alreadyExists = $modx->getCount('modUser',array('username' => $newUsername));
+        if (!empty($alreadyExists)) {
+            return $modx->lexicon('login.username_err_ae');
+        }
+        $modx->user->set('username',$newUsername);
+        $usernameChanged = $modx->user->save();
+    }
+}
+
+/* if save is unsuccessful */
 if ($profile->save() == false) {
+    /* first revert username change */
+    if ($usernameChanged) {
+        $modx->user->set('username',$oldUsername);
+        $modx->user->save();
+    }
+    /* then return error */
     return $modx->lexicon('login.profile_err_save');
 }
 
+/* return success */
 $successMsg = $modx->getOption('successMsg',$scriptProperties,$modx->lexicon('login.profile_updated'));
 $modx->toPlaceholder('error.message',$successMsg);
 

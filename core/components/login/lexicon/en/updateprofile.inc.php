@@ -39,5 +39,6 @@ $_lang['login.profile_err_save'] = 'An unknown error occurred while trying to up
 $_lang['login.profile_updated'] = 'Profile Updated.';
 $_lang['login.state'] = 'State';
 $_lang['login.update_profile'] = 'Update Profile';
+$_lang['login.username_err_ae'] = 'That username is already taken. Please specify another.';
 $_lang['login.website'] = 'Website';
 $_lang['login.zip'] = 'Zip';

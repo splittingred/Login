@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.0.3
 ====================================
+- Added syncUsername property to UpdateProfile snippet
 - Fixed bug with embedded output in Login snippet
 - Added Russian translation
 
