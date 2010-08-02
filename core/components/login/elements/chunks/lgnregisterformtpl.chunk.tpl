@@ -30,6 +30,9 @@
         <input type="text" name="email:email" id="email" value="[[+email]]" />
         
         <br class="clear" />
+
+        [[+register.recaptcha_html]]
+        [[+error.recaptcha]]
         
         <div class="form-buttons">
             <input type="submit" name="login-register-btn" value="Register" />

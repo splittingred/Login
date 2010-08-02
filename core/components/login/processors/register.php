@@ -102,6 +102,23 @@ if ($activation && !empty($email) && !empty($activateResourceId)) {
     $user->save();
 }
 
+
+/* do pre-register hooks */
+$postHooks = $modx->getOption('postHooks',$scriptProperties,'');
+$login->loadHooks('posthooks');
+$fields['register.user'] = &$user;
+$fields['register.profile'] =& $profile;
+$fields['register.usergroups'] = $usergroups;
+$login->posthooks->loadMultiple($postHooks,$fields);
+
+/* process hooks */
+if (!empty($login->posthooks->errors)) {
+    $modx->toPlaceholders($login->posthooks->errors,'error');
+
+    $errorMsg = $login->posthooks->getErrorMessage();
+    $modx->toPlaceholder('message',$errorMsg,'error');
+}
+
 /* if provided a redirect id, will redirect to that resource, with the
  * GET params `username` and `email` for you to use */
 $submittedResourceId = $modx->getOption('submittedResourceId',$scriptProperties,'');

@@ -34,7 +34,22 @@ $corePath = $modx->getOption('login.core_path',$scriptProperties,$modx->getOptio
 $login = $modx->getService('login','Login',$corePath.'model/login/',$scriptProperties);
 if (!is_object($login) || !($login instanceof Login)) return '';
 
+/* setup default properties */
+$preHooks = $modx->getOption('preHooks',$scriptProperties,'');
 $submitVar = $modx->getOption('submitVar',$scriptProperties,'login-register-btn');
+
+/* if using recaptcha, load recaptcha html */
+if (strpos($preHooks,'recaptcha') !== false) {
+    $recaptcha = $modx->getService('recaptcha','reCaptcha',$login->config['modelPath'].'recaptcha/');
+    if ($recaptcha instanceof reCaptcha) {
+        $html = $recaptcha->getHtml();
+        $modx->setPlaceholder('register.recaptcha_html',$html);
+    } else {
+        $modx->log(modX::LOG_LEVEL_ERROR,'[Register] '.$this->modx->lexicon('register.recaptcha_err_load'));
+    }
+}
+
+/* check for POST */
 if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     $modx->lexicon->load('login:register');
 
@@ -73,9 +88,22 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     }
 
     if (empty($login->validator->errors)) {
-        $result = require_once $login->config['processorsPath'].'register.php';
-        if ($result !== true) {
-            $modx->toPlaceholder('message',$result,'error');
+
+        /* do pre-register hooks */
+        $login->loadHooks('prehooks');
+        $login->prehooks->loadMultiple($preHooks,$fields);
+
+        /* process hooks */
+        if (!empty($login->prehooks->errors)) {
+            $modx->toPlaceholders($login->prehooks->errors,'error');
+
+            $errorMsg = $login->prehooks->getErrorMessage();
+            $modx->toPlaceholder('message',$errorMsg,'error');
+        } else {
+            $result = require_once $login->config['processorsPath'].'register.php';
+            if ($result !== true) {
+                $modx->toPlaceholder('message',$result,'error');
+            }
         }
     }
     $modx->toPlaceholders($login->validator->errors,'error');

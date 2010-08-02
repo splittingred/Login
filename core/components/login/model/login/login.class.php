@@ -192,4 +192,21 @@ class Login {
         }
         return $output;
     }
+    
+    /**
+     * Loads the Hooks class.
+     *
+     * @access public
+     * @param $config array An array of configuration parameters for the
+     * hooks class
+     * @return fiHooks An instance of the fiHooks class.
+     */
+    public function loadHooks($type,$config = array()) {
+        if (!$this->modx->loadClass('login.lgnHooks',$this->config['modelPath'],true,true)) {
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not load Hooks class.');
+            return false;
+        }
+        $this->{$type} = new lgnHooks($this,$config);
+        return $this->hooks;
+    }
 }
