@@ -35,7 +35,7 @@ $user = $modx->newObject('modUser');
 $profile = $modx->newObject('modUserProfile');
 
 /* set extended data if any */
-if ($modx->getOption('useExtended',null,true)) {
+if ($modx->getOption('useExtended',$scriptProperties,true)) {
     /* first cut out regular fields */
     $profileFields = $profile->toArray();
     $userFields = $user->toArray();

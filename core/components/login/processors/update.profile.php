@@ -33,7 +33,7 @@ if (empty($profile)) return $modx->lexicon('login.profile_err_nf');
 unset($fields['nospam'],$fields['blank']);
 
 /* set extended data if any */
-if ($modx->getOption('useExtended',null,true)) {
+if ($modx->getOption('useExtended',$scriptProperties,true)) {
     /* first cut out regular fields */
     $profileFields = $profile->toArray();
     $newExtended = array();

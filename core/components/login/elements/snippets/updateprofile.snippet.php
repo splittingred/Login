@@ -1,6 +1,6 @@
 <?php
 /**
- * Register
+ * UpdateProfile
  *
  * Copyright 2010 by Shaun McCormick <shaun@modxcms.com>
  *
@@ -20,11 +20,11 @@
  * @package login
  */
 /**
- * MODx Register Snippet.
+ * MODx UpdateProfile Snippet.
  *
- * Handles User registrations.
+ * Handles updating of User Profiles.
  *
- * @author Shaun McCormick <shaun@modxcms.com>
+ * @author Shaun McCormick <shaun@modx.com>
  * @copyright Copyright &copy; 2010
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU General Public License
  * version 2 or (at your option) any later version.
@@ -58,7 +58,7 @@ if (empty($profile)) {
 
 $placeholders = $profile->toArray();
 /* add extended fields to placeholders */
-if ($modx->getOption('useExtended',null,true)) {
+if ($modx->getOption('useExtended',$scriptProperties,true)) {
     $extended = $profile->get('extended');
     if (!empty($extended) && is_array($extended)) {
         $placeholders = array_merge($extended,$placeholders);

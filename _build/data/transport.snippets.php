@@ -81,5 +81,15 @@ $properties = include $sources['data'].'properties/properties.updateprofile.php'
 $snippets[5]->setProperties($properties);
 unset($properties);
 
+$snippets[6]= $modx->newObject('modSnippet');
+$snippets[6]->fromArray(array(
+    'id' => 6,
+    'name' => 'Profile',
+    'description' => 'Displays Profile data for a User.',
+    'snippet' => getSnippetContent($sources['source_core'].'/elements/snippets/profile.snippet.php'),
+),'',true,true);
+$properties = include $sources['data'].'properties/properties.profile.php';
+$snippets[6]->setProperties($properties);
+unset($properties);
 
 return $snippets;
