@@ -77,7 +77,7 @@ if ($modx->getOption('useExtended',$scriptProperties,true)) {
         $placeholders = array_merge($extended,$placeholders);
     }
 }
-
+unset($placeholders['password'],$placeholders['cachepwd']);
 /* now set placeholders */
 $modx->toPlaceholders($placeholders,$prefix,'');
 return '';
