@@ -103,7 +103,7 @@ if ($activation && !empty($email) && !empty($activateResourceId)) {
 }
 
 
-/* do pre-register hooks */
+/* do post-register hooks */
 $postHooks = $modx->getOption('postHooks',$scriptProperties,'');
 $login->loadHooks('posthooks');
 $fields['register.user'] = &$user;

@@ -59,6 +59,15 @@ if ($profile->save() == false) {
     return $modx->lexicon('login.profile_err_save');
 }
 
+/* do post-update hooks */
+$postHooks = $modx->getOption('postHooks',$scriptProperties,'');
+$login->loadHooks('posthooks');
+$fields['updateprofile.user'] = &$modx->user;
+$fields['updateprofile.profile'] =& $profile;
+$fields['updateprofile.usernameChanged'] = $usernameChanged;
+$login->posthooks->loadMultiple($postHooks,$fields);
+
+
 /* return success */
 $successMsg = $modx->getOption('successMsg',$scriptProperties,$modx->lexicon('login.profile_updated'));
 $modx->toPlaceholder('error.message',$successMsg);

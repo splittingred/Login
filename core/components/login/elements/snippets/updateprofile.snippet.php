@@ -34,7 +34,8 @@ $login = $modx->getService('login','Login',$modx->getOption('login.core_path',nu
 if (!($login instanceof Login)) return '';
 $modx->lexicon->load('login:updateprofile');
 
-/* set default properties */
+/* setup default properties */
+$preHooks = $modx->getOption('preHooks',$scriptProperties,'');
 $submitVar = $modx->getOption('submitVar',$scriptProperties,'login-updprof-btn');
 $redirectToLogin = $modx->getOption('redirectToLogin',$scriptProperties,true);
 $reloadOnSuccess = $modx->getOption('reloadOnSuccess',$scriptProperties,true);
@@ -68,14 +69,28 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     $fields = $login->validator->validateFields($_POST);
 
     if (empty($login->validator->errors)) {
-        $result = require_once $login->config['processorsPath'].'update.profile.php';
-        if ($result !== true) {
-            $modx->toPlaceholder('message',$result,'error');
-        } else if ($reloadOnSuccess) {
-            $url = $modx->makeUrl($modx->resource->get('id'),'','?updpsuccess=1');
-            $modx->sendRedirect($url);
+
+        /* do pre-update hooks */
+        $login->loadHooks('prehooks');
+        $login->prehooks->loadMultiple($preHooks,$fields);
+
+        /* process hooks */
+        if (!empty($login->prehooks->errors)) {
+            $modx->toPlaceholders($login->prehooks->errors,'error');
+
+            $errorMsg = $login->prehooks->getErrorMessage();
+            $modx->toPlaceholder('message',$errorMsg,'error');
         } else {
-            $modx->setPlaceholder('login.update_success',true);
+            /* update the profile */
+            $result = require_once $login->config['processorsPath'].'update.profile.php';
+            if ($result !== true) {
+                $modx->toPlaceholder('message',$result,'error');
+            } else if ($reloadOnSuccess) {
+                $url = $modx->makeUrl($modx->resource->get('id'),'','?updpsuccess=1');
+                $modx->sendRedirect($url);
+            } else {
+                $modx->setPlaceholder('login.update_success',true);
+            }
         }
     }
     $modx->toPlaceholders($login->validator->errors,'error');

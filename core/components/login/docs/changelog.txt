@@ -2,7 +2,8 @@ Changelog file for Login component.
 
 Login 1.0.3
 ====================================
-- Added preHooks and postHooks properties for doing pre and post register scripting to Register
+- Added preHooks and postHooks properties for doing pre and post register scripting to UpdateProfile snippet
+- Added preHooks and postHooks properties for doing pre and post register scripting to Register snippet
 - Added syncUsername property to UpdateProfile snippet
 - Fixed bug with embedded output in Login snippet
 - Added Russian translation
