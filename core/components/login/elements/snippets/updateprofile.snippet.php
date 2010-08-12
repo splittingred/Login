@@ -55,7 +55,15 @@ if (empty($profile)) {
     $modx->log(modX::LOG_LEVEL_ERROR,'Could not find profile for user: '.$modx->user->get('username'));
     return '';
 }
+
 $placeholders = $profile->toArray();
+/* add extended fields to placeholders */
+if ($modx->getOption('useExtended',null,true)) {
+    $extended = $profile->get('extended');
+    if (!empty($extended) && is_array($extended)) {
+        $placeholders = array_merge($extended,$placeholders);
+    }
+}
 $modx->toPlaceholders($placeholders);
 
 /* if success */
@@ -67,6 +75,7 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     /* handle validation */
     $login->loadValidator();
     $fields = $login->validator->validateFields($_POST);
+    if (!empty($submitVar)) unset($fields[$submitVar]);
 
     if (empty($login->validator->errors)) {
 

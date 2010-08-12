@@ -29,10 +29,29 @@
 $profile = $modx->user->getOne('Profile');
 if (empty($profile)) return $modx->lexicon('login.profile_err_nf');
 
-/* set fields */
-$profile->fromArray($_POST);
+/* get rid of spam fields */
+unset($fields['nospam'],$fields['blank']);
 
-/* sync username if setting is set */
+/* set extended data if any */
+if ($modx->getOption('useExtended',null,true)) {
+    /* first cut out regular fields */
+    $profileFields = $profile->toArray();
+    $newExtended = array();
+    foreach ($fields as $field => $value) {
+        if (!isset($profileFields[$field])) {
+            $newExtended[$field] = $value;
+        }
+    }
+    /* now merge with existing extended data */
+    $extended = $profile->get('extended');
+    $extended = array_merge($extended,$newExtended);
+    $profile->set('extended',$extended);
+}
+
+/* set fields */
+$profile->fromArray($fields);
+
+/* sync username with specified field if setting is set */
 $syncUsername = $modx->getOption('syncUsername',$scriptProperties,false);
 $oldUsername = $modx->user->get('username');
 $usernameChanged = false;

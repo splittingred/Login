@@ -1,5 +1,10 @@
 Changelog file for Login component.
 
+Login 1.0.4
+====================================
+- Added &useExtended to UpdateProfile, which allows users to set additional fields passed to be set in extended column
+- Fixed bug in UpdateProfile where validators were broken
+
 Login 1.0.3
 ====================================
 - Fixed bug where logout link generation was ignorant of xhtml_urls setting
