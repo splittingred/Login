@@ -91,6 +91,13 @@ $properties = array(
         'value' => '',
     ),
     array(
+        'name' => 'useExtended',
+        'desc' => 'Whether or not to set any extra fields in the form to the Profiles extended field. This can be useful for storing extra user fields.',
+        'type' => 'combo-boolean',
+        'options' => '',
+        'value' => true,
+    ),
+    array(
         'name' => 'activation',
         'desc' => 'Whether or not to require activation for proper registration. If true, users will not be marked active until they have activated their account. Defaults to true. Will only work if the registration form passes an email field.',
         'type' => 'combo-boolean',

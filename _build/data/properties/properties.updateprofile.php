@@ -55,6 +55,13 @@ $properties = array(
         'options' => '',
         'value' => '',
     ),
+    array(
+        'name' => 'useExtended',
+        'desc' => 'Whether or not to set any extra fields in the form to the Profiles extended field. This can be useful for storing extra user fields.',
+        'type' => 'combo-boolean',
+        'options' => '',
+        'value' => true,
+    ),
 );
 
 return $properties;

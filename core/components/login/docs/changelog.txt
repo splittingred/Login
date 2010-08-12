@@ -1,8 +1,8 @@
 Changelog file for Login component.
 
-Login 1.0.4
+Login 1.1.0
 ====================================
-- Added &useExtended to UpdateProfile, which allows users to set additional fields passed to be set in extended column
+- Added &useExtended to UpdateProfile/Register, which allows users to set additional fields passed to be set in extended column
 - Fixed bug in UpdateProfile where validators were broken
 
 Login 1.0.3

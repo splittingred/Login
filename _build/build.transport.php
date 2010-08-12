@@ -3,7 +3,7 @@
  * Login
  *
  * Copyright 2010 by Jason Coward <jason@modxcms.com> and Shaun McCormick
- * <shaun@modxcms.com>
+ * <shaun@modx.com>
  *
  * Login is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -35,7 +35,7 @@ set_time_limit(0);
 /* define version */
 define('PKG_NAME','Login');
 define('PKG_NAME_LOWER','login');
-define('PKG_VERSION','1.0.4');
+define('PKG_VERSION','1.1.0');
 define('PKG_RELEASE','rc1');
 
 /* define sources */

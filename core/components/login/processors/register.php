@@ -26,12 +26,33 @@
  * @package login
  * @subpackage processors
  */
+/* get rid of spam fields, submitVar field */
+unset($fields['nospam'],$fields['blank']);
+if (!empty($submitVar)) unset($fields[$submitVar]);
+
 /* create user and profile */
 $user = $modx->newObject('modUser');
+$profile = $modx->newObject('modUserProfile');
+
+/* set extended data if any */
+if ($modx->getOption('useExtended',null,true)) {
+    /* first cut out regular fields */
+    $profileFields = $profile->toArray();
+    $userFields = $user->toArray();
+    $extended = array();
+    foreach ($fields as $field => $value) {
+        if (!isset($profileFields[$field]) && !isset($userFields[$field]) && $field != 'password_confirm' && $field != 'passwordconfirm') {
+            $extended[$field] = $value;
+        }
+    }
+    /* now set extended data */
+    $profile->set('extended',$extended);
+}
+
+/* set user and profile */
 $user->fromArray($fields);
 $user->set('active',0);
 $user->set('password',md5($fields['password']));
-$profile = $modx->newObject('modUserProfile');
 $profile->fromArray($fields);
 
 if (!$user->save()) {
