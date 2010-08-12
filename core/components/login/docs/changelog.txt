@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.0.3
 ====================================
+- Fixed bug where logout link generation was ignorant of xhtml_urls setting
 - Fixed bug where ForgotPassword was sending invalid confirmUrl
 - Added preHooks and postHooks properties for doing pre and post register scripting to UpdateProfile snippet
 - Added preHooks and postHooks properties for doing pre and post register scripting to Register snippet
