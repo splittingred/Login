@@ -251,9 +251,9 @@ $modx->setPlaceholder('actionMsg', $actionMsg);
 $phs = $authenticated ? $scriptProperties : array_merge($scriptProperties, $_POST);
 /* make sure to strip out logout GET parameter to prevent ghost logout */
 if (!$redirectToPrior) {
-    $phs['request_uri'] = str_replace(array('?service=logout','&service=logout','&amp;service=logout'),'',$_SERVER['REQUEST_URI']);
+    $phs['request_uri'] = str_replace(array('?service='.$logoutKey,'&service='.$logoutKey,'&amp;service='.$logoutKey),'',$_SERVER['REQUEST_URI']);
 } else {
-    $phs['request_uri'] = str_replace(array('?service=logout','&service=logout','&amp;service=logout'),'',$_SERVER['HTTP_REFERER']);
+    $phs['request_uri'] = str_replace(array('?service='.$logoutKey,'&service='.$logoutKey,'&amp;service='.$logoutKey),'',$_SERVER['HTTP_REFERER']);
 }
 
 /* properly build logout url */
