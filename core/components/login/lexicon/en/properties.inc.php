@@ -29,6 +29,8 @@ $_lang['prop_login.loginresourceid_desc'] = 'The resource to direct users to on 
 $_lang['prop_login.loginmsg_desc'] = 'Optional label message for login action. If blank, will default to lexicon string for Login.';
 $_lang['prop_login.logoutmsg_desc'] = 'Optional label message for logout action. If blank, will default to lexicon string for Logout.';
 $_lang['prop_login.redirecttoprior_desc'] = 'If true, will redirect to the referring page (HTTP_REFERER) on successful login.';
+$_lang['prop_login.rememberme_desc'] = 'Optional. The field name of the Remember Me toggle to preserve login state. Defaults to `rememberme`.';
+$_lang['prop_login.contexts_desc'] = '(Experimental) A comma-separated list of contexts to log in to. Defaults to the current context if not explicitly set.';
 $_lang['prop_login.toplaceholder_desc'] = 'If set, will set the output of the login snippet to a placeholder of this name rather than directly outputting the return contents.';
 
 /* Profile snippet */

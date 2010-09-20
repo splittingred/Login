@@ -158,11 +158,27 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'rememberMeKey',
+        'desc' => 'prop_login.remembermekey_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 'rememberme',
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'contexts',
+        'desc' => 'prop_login.contexts_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'toPlaceholder',
         'desc' => 'prop_login.toplaceholder_desc',
         'type' => 'textfield',
         'options' => '',
-        'value' => false,
+        'value' => '',
         'lexicon' => 'login:properties',
     ),
     /* recaptcha hook */

@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.2.0
 ====================================
+- Added experimental multiple-context login support
 - Fixed bug in login snippet with hard-coded action keys
 - Added support to set subject in ForgotPassword email
 - Added reCaptcha support to login form via a preHook
