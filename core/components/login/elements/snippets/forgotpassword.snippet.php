@@ -42,6 +42,7 @@ $sentTpl = !empty($sentTpl) ? $sentTpl : 'lgnForgotPassSentTpl';
 $sentTplType = !empty($sentTplType) ? $sentTplType : 'modChunk';
 $emailTpl = !empty($emailTpl) ? $emailTpl : 'lgnForgotPassEmail';
 $emailTplType = !empty($emailTplType) ? $emailTplType : 'modChunk';
+$emailSubject = !empty($emailSubject) ? $emailSubject : '';
 $resetResourceId = !empty($resetResourceId) ? $resetResourceId : 1;
 
 /* get the request URI */
@@ -81,7 +82,7 @@ if (!empty($_POST['login_fp_service'])) {
         /* now set new password to cache to prevent middleman attacks */
         $modx->cacheManager->set('login/resetpassword/'.$user->get('username'),$pword);
 
-        $subject = $modx->getOption('login.forgot_password_email_subject',$scriptProperties,$modx->lexicon('login.forgot_password_email_subject'));
+        $subject = !empty($emailSubject) ? $emailSubject : $modx->getOption('login.forgot_password_email_subject',$scriptProperties,$modx->lexicon('login.forgot_password_email_subject'));
         $Login->sendEmail($user->get('email'),$user->get('username'),$subject,$emailProperties);
         $tpl = $sentTpl;
     }

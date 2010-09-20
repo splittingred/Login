@@ -82,6 +82,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'emailSubject',
+        'desc' => 'prop_forgotpassword.emailsubject_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'resetResourceId',
         'desc' => 'prop_forgotpassword.resetresourceid_desc',
         'type' => 'textfield',

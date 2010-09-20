@@ -10,6 +10,7 @@ $_lang['prop_forgotpassword.senttpl_desc'] = 'The message tpl to show when an em
 $_lang['prop_forgotpassword.senttpltype_desc'] = 'The type of tpl being provided for the sentTpl property. Defaults to a Chunk.';
 $_lang['prop_forgotpassword.tpl_desc'] = 'The forgot password form tpl.';
 $_lang['prop_forgotpassword.tpltype_desc'] = 'The type of tpl being provided for the tpl property. Defaults to a Chunk.';
+$_lang['prop_forgotpassword.emailsubject_desc'] = 'The subject of the forgot password email.';
 $_lang['prop_forgotpassword.resetresourceid_desc'] = 'The resource to direct users to in the confirmation email, where the ResetPassword snippet call is.';
 
 /* Login snippet */
