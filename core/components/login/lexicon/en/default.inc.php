@@ -31,8 +31,8 @@ $_lang['login.login_err'] = 'Unknown error logging in!';
 $_lang['login.logout'] = 'Logout';
 $_lang['login.logout_err'] = 'Unknown error logging out!';
 $_lang['login.password'] = 'Password';
+$_lang['login.recaptcha_err_load'] = 'Could not load reCaptcha service class.';
 $_lang['login.username'] = 'Username';
-
 
 
 $_lang['setting_login.forgot_password_confirm_resource'] = 'Forgot Password Confirmation Resource ID';

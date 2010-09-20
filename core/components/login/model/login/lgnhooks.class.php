@@ -291,7 +291,9 @@ class lgnHooks {
      */
     public function recaptcha(array $fields = array()) {
         $passed = false;
-        $recaptcha = $this->modx->getService('recaptcha','reCaptcha',$this->formit->config['modelPath'].'recaptcha/');
+        if ($this->modx->user && $this->modx->user->isAuthenticated($this->modx->context->get('key'))) return true;
+        $this->modx->lexicon->load('login:recaptcha');
+        $recaptcha = $this->modx->getService('recaptcha','reCaptcha',$this->login->config['modelPath'].'recaptcha/');
         if (!($recaptcha instanceof reCaptcha)) return $passed;
         if (empty($recaptcha->config[reCaptcha::OPT_PRIVATE_KEY])) return $passed;
 

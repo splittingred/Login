@@ -165,6 +165,20 @@ $properties = array(
         'value' => false,
         'lexicon' => 'login:properties',
     ),
+    /* recaptcha hook */
+    array(
+        'name' => 'recaptchaTheme',
+        'desc' => 'prop_register.recaptchatheme_desc',
+        'type' => 'list',
+        'options' => array(
+            array('text' => 'opt_register.red','value' => 'red'),
+            array('text' => 'opt_register.white','value' => 'white'),
+            array('text' => 'opt_register.clean','value' => 'clean'),
+            array('text' => 'opt_register.blackglass','value' => 'blackglass'),
+        ),
+        'value' => 'clean',
+        'lexicon' => 'login:properties',
+    ),
 );
 
 return $properties;

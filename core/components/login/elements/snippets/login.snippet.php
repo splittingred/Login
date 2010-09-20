@@ -263,6 +263,21 @@ if ($authenticated) {
     $phs['logoutUrl'] .= $phs['actionKey'].'='.$phs['logoutKey'];
 }
 
+/* if using recaptcha, load recaptcha html */
+if (strpos($preHooks,'recaptcha') !== false && !$authenticated) {
+    $recaptcha = $modx->getService('recaptcha','reCaptcha',$login->config['modelPath'].'recaptcha/');
+    if ($recaptcha instanceof reCaptcha) {
+        $modx->lexicon->load('login:recaptcha');
+        $recaptchaTheme = $modx->getOption('recaptchaTheme',$scriptProperties,'clean');
+        $recaptchaWidth = $modx->getOption('recaptchaWidth',$scriptProperties,500);
+        $recaptchaHeight = $modx->getOption('recaptchaHeight',$scriptProperties,300);
+        $html = $recaptcha->getHtml($recaptchaTheme,$recaptchaWidth,$recaptchaHeight);
+        $modx->setPlaceholder('login.recaptcha_html',$html);
+    } else {
+        $modx->log(modX::LOG_LEVEL_ERROR,'[Login] '.$this->modx->lexicon('login.recaptcha_err_load'));
+    }
+}
+
 /* get output of form */
 $output = $login->getChunk($tpl,$phs,$tplType);
 
