@@ -65,17 +65,18 @@ class lgnHooks {
      *
      * @access public
      * @param array $hooks The hooks to run.
-     * @parma array $fields The fields and values of the form
+     * @param array $fields The fields and values of the form
+     * @param array $options An array of options to pass to the hook.
      * @return array An array of field name => value pairs.
      */
-    public function loadMultiple($hooks,$fields) {
+    public function loadMultiple($hooks,$fields,array $options = array()) {
         if (empty($hooks)) return array();
         if (is_string($hooks)) $hooks = explode(',',$hooks);
 
         $this->hooks = array();
         $this->fields =& $fields;
         foreach ($hooks as $hook) {
-            $success = $this->load($hook,$this->fields);
+            $success = $this->load($hook,$this->fields,$options);
             if (!$success) return $this->hooks;
             /* dont proceed if hook fails */
         }
@@ -88,9 +89,10 @@ class lgnHooks {
      * @access public
      * @param string $hook The name of the hook. May be a Snippet name.
      * @param array $fields The fields and values of the form.
+     * @param array $options An array of options to pass to the hook.
      * @return boolean True if hook was successful.
      */
-    public function load($hook,$fields = array()) {
+    public function load($hook,$fields = array(),array $options = array()) {
         $success = false;
         $this->hooks[] = $hook;
 
@@ -100,7 +102,7 @@ class lgnHooks {
 
         } else if ($snippet = $this->modx->getObject('modSnippet',array('name' => $hook))) {
             /* custom snippet hook */
-            $properties = $this->login->config;
+            $properties = array_merge($this->login->config,$options);
             $properties['login'] =& $this->login;
             $properties['hook'] =& $this;
             $properties['fields'] = $fields;

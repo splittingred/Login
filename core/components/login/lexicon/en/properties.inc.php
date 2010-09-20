@@ -19,6 +19,8 @@ $_lang['prop_login.logoutkey_desc'] = 'The logout action key.';
 $_lang['prop_login.tpltype_desc'] = 'The type of tpls being provided for the login and logout forms.';
 $_lang['prop_login.logintpl_desc'] = 'The login form tpl.';
 $_lang['prop_login.logouttpl_desc'] = 'The logout tpl.';
+$_lang['prop_login.prehooks_desc'] = 'What scripts to fire, if any, before the user is logged in or out. This can be a comma-separated list of hooks, and if the first fails, the proceeding ones will not fire. A hook can also be a Snippet name that will execute that Snippet.';
+$_lang['prop_login.posthooks_desc'] = 'What scripts to fire, if any, after the user has been logged in or out. This can be a comma-separated list of hooks, and if the first fails, the proceeding ones will not fire. A hook can also be a Snippet name that will execute that Snippet.';
 $_lang['prop_login.errtpl_desc'] = 'The error tpl.';
 $_lang['prop_login.errtpltype_desc'] = 'The type of error tpl.';
 $_lang['prop_login.logoutresourceid_desc'] = 'Resource ID to redirect to on successful logout. 0 will redirect to self.';
@@ -26,6 +28,7 @@ $_lang['prop_login.loginresourceid_desc'] = 'The resource to direct users to on 
 $_lang['prop_login.loginmsg_desc'] = 'Optional label message for login action. If blank, will default to lexicon string for Login.';
 $_lang['prop_login.logoutmsg_desc'] = 'Optional label message for logout action. If blank, will default to lexicon string for Logout.';
 $_lang['prop_login.redirecttoprior_desc'] = 'If true, will redirect to the referring page (HTTP_REFERER) on successful login.';
+$_lang['prop_login.toplaceholder_desc'] = 'If set, will set the output of the login snippet to a placeholder of this name rather than directly outputting the return contents.';
 
 /* Profile snippet */
 $_lang['prop_profile.prefix_desc'] = 'A string to prefix all placeholders for fields that will be set by this Snippet.';

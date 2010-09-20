@@ -55,34 +55,174 @@
  * @property string logoutMsg The string to use for the logout action. Defaults
  * to the lexicon string "login.logout"
  */
+$corePath = $modx->getOption('login.core_path',$scriptProperties,$modx->getOption('core_path',null,MODX_CORE_PATH).'components/login/');
+$login = $modx->getService('login','Login',$corePath.'model/login/',$scriptProperties);
+if (!is_object($login) || !($login instanceof Login)) return '';
+
 $output = '';
 $modx->lexicon->load('login:default');
 
+/* setup default properties */
+$preHooks = $modx->getOption('preHooks',$scriptProperties,'');
+$loginTpl = $modx->getOption('loginTpl',$scriptProperties,'lgnLoginTpl');
+$logoutTpl = $modx->getOption('logoutTpl',$scriptProperties,'lgnLogoutTpl');
+$loginMsg = $modx->getOption('loginMsg',$scriptProperties,'');
+$logoutMsg = $modx->getOption('logoutMsg',$scriptProperties,'');
+$tplType = $modx->getOption('tplType',$scriptProperties,'modChunk');
+$actionKey = $modx->getOption('actionKey',$scriptProperties,'service');
+$loginKey = $modx->getOption('loginKey',$scriptProperties,'login');
+$logoutKey = $modx->getOption('logoutKey',$scriptProperties,'logout');
+$errorPrefix = $modx->getOption('errorPrefix',$scriptProperties,'error');
+$errTpl = $modx->getOption('errTpl',$scriptProperties,'lgnErrTpl');
+$errTplType = $modx->getOption('errTplType',$scriptProperties,'modChunk');
 $authenticated = $modx->user->isAuthenticated($modx->context->get('key'));
 
 if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
     if (isset($_REQUEST['login_context']) && !empty($_REQUEST['login_context'])) {
         $loginContext = $_REQUEST['login_context'];
     }
+    
+    /* login */
     if (!empty($_POST) && isset($_POST[$actionKey]) && !$authenticated) {
         if ($_POST[$actionKey] == $loginKey) {
             /* set default POST vars if not in form */
             if (!isset($_POST['login_context'])) $_POST['login_context'] = $loginContext;
 
-            /* send to login processor and handle response */
+            /* do pre-login hooks */
+            $fields = $_REQUEST;
+            $login->loadHooks('loginPrehooks');
+            $login->loginPrehooks->loadMultiple($preHooks,$fields,array(
+                'mode' => 'login',
+            ));
+
+            /* process prehooks */
+            if (!empty($login->loginPrehooks->errors)) {
+                $modx->toPlaceholders($login->loginPrehooks->errors,$errorPrefix);
+
+                $errorMsg = $login->loginPrehooks->getErrorMessage();
+                $errorOutput = $modx->parseChunk($errTpl, array('msg' => $errorMsg));
+                $modx->setPlaceholder('errors',$errorOutput);
+                
+            } else {
+                /* send to login processor and handle response */
+                $response = $modx->executeProcessor(array(
+                    'action' => 'login',
+                    'location' => 'security'
+                ));
+                if (!empty($response) && is_array($response)) {
+                    if (!empty($response['success']) && isset($response['object'])) {
+                        /* do post hooks */
+                        $postHooks = $modx->getOption('postHooks',$scriptProperties,'');
+                        $login->loadHooks('posthooks');
+                        $fields = $_POST;
+                        $fields['response'] =& $response;
+                        $fields['loginResourceId'] =& $loginResourceId;
+                        $login->posthooks->loadMultiple($postHooks,$fields,array(
+                            'mode' => 'login',
+                        ));
+
+                        /* process posthooks for login */
+                        if (!empty($login->posthooks->errors)) {
+                            $modx->toPlaceholders($login->posthooks->errors,$errorPrefix);
+
+                            $errorMsg = $login->posthooks->getErrorMessage();
+                            $modx->toPlaceholder('message',$errorMsg,$errorPrefix);
+                        } else {
+                            $loginResourceId = $modx->getOption('loginResourceId',$scriptProperties,0);
+                            /* login posthooks succeeded, now redirect */
+                            if (!empty($loginResourceId) && ($url = $modx->makeUrl($loginResourceId, $loginContext, '', 'full'))) {
+                                $modx->sendRedirect($url);
+                            } elseif (isset($response['object']['url'])) {
+                                $modx->sendRedirect($response['object']['url']);
+                            } else {
+                                $modx->sendRedirect($modx->getOption('site_url'));
+                            }
+                        }
+
+                    /* logout failed, output error */
+                    } else {
+                        $errorOutput = '';
+                        if (isset($response['errors']) && !empty($response['errors'])) {
+                            foreach ($response['errors'] as $error) {
+                                $errorOutput .= $modx->parseChunk($errTpl, $error);
+                            }
+                        } elseif (isset($response['message']) && !empty($response['message'])) {
+                            $errorOutput = $modx->parseChunk($errTpl, array('msg' => $response['message']));
+                        } else {
+                            $errorOutput = $modx->parseChunk($errTpl, array('msg' => $modx->lexicon('login.login_err')));
+                        }
+                        $modx->setPlaceholder('errors', $errorOutput);
+                    }
+                }
+            }
+        } else {
+            $modx->log(modX::LOG_LEVEL_ERROR,$modx->lexicon('login.invalid_post',array(
+                'action' => $_POST[$actionKey],
+            )));
+        }
+
+    /* logout */
+    } elseif ($_REQUEST[$actionKey] == $logoutKey && $authenticated) {
+        /* set default REQUEST vars if not provided */
+        if (empty($_REQUEST['login_context'])) $_REQUEST['login_context'] = $loginContext;
+
+        /* do pre-register hooks */
+        $fields = $_REQUEST;
+        $login->loadHooks('logoutPrehooks');
+        $login->logoutPrehooks->loadMultiple($preHooks,$fields,array(
+            'mode' => 'logout',
+        ));
+
+        /* process prehooks error messages */
+        if (!empty($login->logoutPrehooks->errors)) {
+            $modx->toPlaceholders($login->logoutPrehooks->errors,$errorPrefix);
+
+            $errorMsg = $login->logoutPrehooks->getErrorMessage();
+            $errorOutput = $modx->parseChunk($errTpl, array('msg' => $errorMsg));
+            $modx->setPlaceholder('errors',$errorOutput);
+
+        /* prehooks successful, move on */
+        } else { 
+            /* send to logout processor and handle response */
             $response = $modx->executeProcessor(array(
-                'action' => 'login',
+                'action' => 'logout',
                 'location' => 'security'
             ));
             if (!empty($response) && is_array($response)) {
+                /* if successful logout */
                 if (!empty($response['success']) && isset($response['object'])) {
-                    if (!empty($loginResourceId) && ($url = $modx->makeUrl($loginResourceId, $loginContext, '', 'full'))) {
-                        $modx->sendRedirect($url);
-                    } elseif (isset($response['object']['url'])) {
-                        $modx->sendRedirect($response['object']['url']);
-                    } else {
-                        $modx->sendRedirect($modx->getOption('site_url'));
+                    
+                    /* do post hooks for logout */
+                    $postHooks = $modx->getOption('postHooks',$scriptProperties,'');
+                    $login->loadHooks('posthooks');
+                    $fields = $_POST;
+                    $fields['response'] =& $response;
+                    $fields['logoutResourceId'] =& $logoutResourceId;
+                    $login->posthooks->loadMultiple($postHooks,$fields,array(
+                        'mode' => 'logout',
+                    ));
+
+                    /* log posthooks errors */
+                    if (!empty($login->posthooks->errors)) {
+                        $modx->log(modX::LOG_LEVEL_ERROR,'[Login] Post-Hook errors: '.print_r($login->posthooks->errors,true));
+
+                        $errorMsg = $login->posthooks->getErrorMessage();
+                        if (!empty($errorMsg)) {
+                            $modx->log(modX::LOG_LEVEL_ERROR,'[Login] Post-Hook error: '.$errorMsg);
+                        }
                     }
+
+                    /* redirect */
+                    $logoutResourceId = $modx->getOption('logoutResourceId',$scriptProperties,0);
+                    if (isset($response['object']['url'])) {
+                        $modx->sendRedirect($response['object']['url']);
+                    } elseif (!empty($logoutResourceId)) {
+                        $modx->sendRedirect($modx->makeUrl($logoutResourceId));
+                    } else {
+                        $modx->sendRedirect($_SERVER['REQUEST_URI']);
+                    }
+
+                /* logout failed, output error */
                 } else {
                     $errorOutput = '';
                     if (isset($response['errors']) && !empty($response['errors'])) {
@@ -92,46 +232,10 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                     } elseif (isset($response['message']) && !empty($response['message'])) {
                         $errorOutput = $modx->parseChunk($errTpl, array('msg' => $response['message']));
                     } else {
-                        $errorOutput = $modx->parseChunk($errTpl, array('msg' => $modx->lexicon('login.login_err')));
+                        $errorOutput = $modx->parseChunk($errTpl, array('msg' => $modx->lexicon('login.logout_err')));
                     }
                     $modx->setPlaceholder('errors', $errorOutput);
                 }
-            }
-        } else {
-            $modx->log(modX::LOG_LEVEL_ERROR,$modx->lexicon('login.invalid_post',array(
-                'action' => $_POST[$actionKey],
-            )));
-        }
-    } elseif ($_REQUEST[$actionKey] == $logoutKey && $authenticated) {
-        /* set default REQUEST vars if not provided */
-        if (empty($_REQUEST['login_context'])) $_REQUEST['login_context'] = $loginContext;
-
-        /* send to logout processor and handle response */
-        $response = $modx->executeProcessor(array(
-            'action' => 'logout',
-            'location' => 'security'
-        ));
-        if (!empty($response) && is_array($response)) {
-            if (!empty($response['success']) && isset($response['object'])) {
-                if (isset($response['object']['url'])) {
-                    $modx->sendRedirect($response['object']['url']);
-                } elseif (!empty($logoutResourceId)) {
-                    $modx->sendRedirect($modx->makeUrl($logoutResourceId));
-                } else {
-                    $modx->sendRedirect($_SERVER['REQUEST_URI']);
-                }
-            } else {
-                $errorOutput = '';
-                if (isset($response['errors']) && !empty($response['errors'])) {
-                    foreach ($response['errors'] as $error) {
-                        $errorOutput .= $modx->parseChunk($errTpl, $error);
-                    }
-                } elseif (isset($response['message']) && !empty($response['message'])) {
-                    $errorOutput = $modx->parseChunk($errTpl, array('msg' => $response['message']));
-                } else {
-                    $errorOutput = $modx->parseChunk($errTpl, array('msg' => $modx->lexicon('login.logout_err')));
-                }
-                $modx->setPlaceholder('errors', $errorOutput);
             }
         }
     }
@@ -159,23 +263,13 @@ if ($authenticated) {
     $phs['logoutUrl'] .= $phs['actionKey'].'='.$phs['logoutKey'];
 }
 
-switch ($tplType) {
-    case 'embedded':
-        $modx->setPlaceholders($phs);
-        break;
-    case 'modChunk':
-        $output .= $modx->getChunk($tpl, $phs);
-        break;
-    case 'file':
-        $output .= file_get_contents($tpl);
-        $modx->setPlaceholders($phs);
-        break;
-    case 'inline':
-    default:
-        /* default is inline, meaning the tpl content was provided directly in the property */
-        $output .= $tpl;
-        $modx->setPlaceholders($phs);
-        break;
-}
+/* get output of form */
+$output = $login->getChunk($tpl,$phs,$tplType);
 
+/* if setting placeholder, set, otherwise, return (commas!) */
+$toPlaceholder = $modx->getOption('toPlaceholder',$scriptProperties,'');
+if (!empty($toPlaceholder)) {
+    $modx->setPlaceholder($toPlaceholder,$output);
+    return '';
+}
 return $output;
