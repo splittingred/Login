@@ -29,24 +29,27 @@
 $properties = array(
     array(
         'name' => 'prefix',
-        'desc' => 'A string to prefix all placeholders for fields that will be set by this Snippet.',
+        'desc' => 'prop_profile.prefix_desc',
         'type' => 'textfield',
         'options' => '',
         'value' => '',
+        'lexicon' => 'login:properties',
     ),
     array(
         'name' => 'user',
-        'desc' => 'Optional. Either a user ID or username. If set, will use this user rather than the currently logged in one.',
+        'desc' => 'prop_profile.user_desc',
         'type' => 'textfield',
         'options' => '',
         'value' => '',
+        'lexicon' => 'login:properties',
     ),
     array(
         'name' => 'useExtended',
-        'desc' => 'Whether or not to set any extra fields in the form to the Profiles extended field. This can be useful for storing extra user fields.',
+        'desc' => 'prop_profile.useextended_desc',
         'type' => 'combo-boolean',
         'options' => '',
         'value' => true,
+        'lexicon' => 'login:properties',
     ),
 );
 

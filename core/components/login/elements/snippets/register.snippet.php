@@ -42,7 +42,11 @@ $submitVar = $modx->getOption('submitVar',$scriptProperties,'login-register-btn'
 if (strpos($preHooks,'recaptcha') !== false) {
     $recaptcha = $modx->getService('recaptcha','reCaptcha',$login->config['modelPath'].'recaptcha/');
     if ($recaptcha instanceof reCaptcha) {
-        $html = $recaptcha->getHtml();
+        $modx->lexicon->load('login:recaptcha');
+        $recaptchaTheme = $modx->getOption('recaptchaTheme',$scriptProperties,'clean');
+        $recaptchaWidth = $modx->getOption('recaptchaWidth',$scriptProperties,500);
+        $recaptchaHeight = $modx->getOption('recaptchaHeight',$scriptProperties,300);
+        $html = $recaptcha->getHtml($recaptchaTheme,$recaptchaWidth,$recaptchaHeight);
         $modx->setPlaceholder('register.recaptcha_html',$html);
     } else {
         $modx->log(modX::LOG_LEVEL_ERROR,'[Register] '.$this->modx->lexicon('register.recaptcha_err_load'));

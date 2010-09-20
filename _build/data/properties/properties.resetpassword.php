@@ -29,29 +29,32 @@
 $properties = array(
     array(
         'name' => 'tpl',
-        'desc' => 'The reset password message tpl.',
+        'desc' => 'prop_resetpassword.tpl_desc',
         'type' => 'textfield',
         'options' => '',
         'value' => 'lgnResetPassTpl',
+        'lexicon' => 'login:properties',
     ),
     array(
         'name' => 'tplType',
-        'desc' => 'The type of tpl being provided. Defaults to a Chunk.',
+        'desc' => 'prop_resetpassword.tpltype_desc',
         'type' => 'list',
         'options' => array(
-            array('name' => 'Chunk','value' => 'modChunk'),
-            array('name' => 'File','value' => 'file'),
-            array('name' => 'Inline','value' => 'inline'),
-            array('name' => 'Embedded','value' => 'embedded'),
+            array('name' => 'opt_register.chunk','value' => 'modChunk'),
+            array('name' => 'opt_register.file','value' => 'file'),
+            array('name' => 'opt_register.inline','value' => 'inline'),
+            array('name' => 'opt_register.embedded','value' => 'embedded'),
         ),
         'value' => 'modChunk',
+        'lexicon' => 'login:properties',
     ),
     array(
         'name' => 'loginResourceId',
-        'desc' => 'The resource to direct users to on successful confirmation.',
+        'desc' => 'prop_resetpassword.loginresourceid_desc',
         'type' => 'textfield',
         'options' => '',
-        'value' => '1',
+        'value' => 1,
+        'lexicon' => 'login:properties',
     ),
 );
 
