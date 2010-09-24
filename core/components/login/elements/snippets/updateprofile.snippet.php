@@ -50,6 +50,40 @@ if (empty($profile)) {
     return '';
 }
 
+
+/* do prehooks */
+$login->loadHooks('preHooks');
+$login->preHooks->loadMultiple($preHooks,$fields);
+
+/* do pre-register hooks */
+$login->loadHooks('preHooks');
+$login->preHooks->loadMultiple($preHooks,$fields,array(
+    'submitVar' => $submitVar,
+));
+$fields = array();
+/* if a prehook sets a field, do so here */
+if (!empty($login->preHooks->fields)) {
+    $modx->toPlaceholders($login->preHooks->fields);
+    if (empty($_POST)) {
+        $fields = $login->preHooks->fields;
+    } else {
+        $fields = $login->preHooks->fields;
+        $fields = array_merge($fields,$_POST);
+    }
+}
+
+/* process hooks */
+if (!empty($login->preHooks->errors)) {
+    $errors = array();
+    foreach ($login->preHooks->errors as $key => $error) {
+        $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
+    }
+    $modx->toPlaceholders($errors,'error');
+
+    $errorMsg = $login->preHooks->getErrorMessage();
+    $modx->toPlaceholder('message',$errorMsg,'error');
+}
+
 $placeholders = $profile->toArray();
 /* add extended fields to placeholders */
 if ($modx->getOption('useExtended',$scriptProperties,true)) {
@@ -58,6 +92,7 @@ if ($modx->getOption('useExtended',$scriptProperties,true)) {
         $placeholders = array_merge($extended,$placeholders);
     }
 }
+$placeholders = array_merge($placeholders,$fields);
 $modx->toPlaceholders($placeholders);
 
 /* if success */
@@ -72,28 +107,15 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     if (!empty($submitVar)) unset($fields[$submitVar]);
 
     if (empty($login->validator->errors)) {
-
-        /* do pre-update hooks */
-        $login->loadHooks('prehooks');
-        $login->prehooks->loadMultiple($preHooks,$fields);
-
-        /* process hooks */
-        if (!empty($login->prehooks->errors)) {
-            $modx->toPlaceholders($login->prehooks->errors,'error');
-
-            $errorMsg = $login->prehooks->getErrorMessage();
-            $modx->toPlaceholder('message',$errorMsg,'error');
+        /* update the profile */
+        $result = require_once $login->config['processorsPath'].'update.profile.php';
+        if ($result !== true) {
+            $modx->toPlaceholder('message',$result,'error');
+        } else if ($reloadOnSuccess) {
+            $url = $modx->makeUrl($modx->resource->get('id'),'','?updpsuccess=1');
+            $modx->sendRedirect($url);
         } else {
-            /* update the profile */
-            $result = require_once $login->config['processorsPath'].'update.profile.php';
-            if ($result !== true) {
-                $modx->toPlaceholder('message',$result,'error');
-            } else if ($reloadOnSuccess) {
-                $url = $modx->makeUrl($modx->resource->get('id'),'','?updpsuccess=1');
-                $modx->sendRedirect($url);
-            } else {
-                $modx->setPlaceholder('login.update_success',true);
-            }
+            $modx->setPlaceholder('login.update_success',true);
         }
     }
     $modx->toPlaceholders($login->validator->errors,'error');

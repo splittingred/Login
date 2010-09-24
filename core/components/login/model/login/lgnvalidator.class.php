@@ -160,8 +160,7 @@ class lgnValidator {
      * @return string The added error message with the error wrapper.
      */
     private function _addError($key,$value) {
-        $errTpl = $this->modx->getOption('errTpl',$this->login->config,'<span class="error">[[+error]]</span>');
-        $this->errors[$key] .= ' '.str_replace('[[+error]]',$value,$errTpl);
+        $this->errors[$key] .= $value;
         return $this->errors[$key];
     }
 

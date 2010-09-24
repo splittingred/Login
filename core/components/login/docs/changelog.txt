@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.2.0
 ====================================
+- Fixed issues with placement of prehooks and such
 - Added excludeExtended property to Register, UpdateProfile snippets to allow for excluding fields from extended fields
 - Added new hook API methods for easier setting/retrieving of fields
 - Added experimental multiple-context login support

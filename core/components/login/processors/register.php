@@ -136,7 +136,11 @@ $login->posthooks->loadMultiple($postHooks,$fields);
 
 /* process hooks */
 if (!empty($login->posthooks->errors)) {
-    $modx->toPlaceholders($login->posthooks->errors,'error');
+    $errors = array();
+    foreach ($login->posthooks->errors as $key => $error) {
+        $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
+    }
+    $modx->toPlaceholders($errors,'error');
 
     $errorMsg = $login->posthooks->getErrorMessage();
     $modx->toPlaceholder('message',$errorMsg,'error');
