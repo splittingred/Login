@@ -38,7 +38,7 @@ if ($modx->getOption('useExtended',$scriptProperties,true)) {
     $excludeExtended = $modx->getOption('excludeExtended',$scriptProperties,'');
     $excludeExtended = explode(',',$excludeExtended);
     $profileFields = $profile->toArray();
-    $userFields = $user->toArray();
+    $userFields = $modx->user->toArray();
     $newExtended = array();
     foreach ($fields as $field => $value) {
         if (!isset($profileFields[$field]) && !isset($userFields[$field]) && $field != 'password_confirm' && $field != 'passwordconfirm' && !in_array($field,$excludeExtended)) {
