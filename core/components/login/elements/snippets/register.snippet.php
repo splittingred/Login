@@ -48,38 +48,6 @@ if (strpos($preHooks,'recaptcha') !== false) {
     }
 }
 
-
-
-/* do pre-register hooks */
-$login->loadHooks('preHooks');
-$login->preHooks->loadMultiple($preHooks,$fields,array(
-    'submitVar' => $submitVar,
-));
-$fields = array();
-/* if a prehook sets a field, do so here */
-if (!empty($login->preHooks->fields)) {
-    $modx->toPlaceholders($login->preHooks->fields);
-    if (empty($_POST)) {
-        $fields = $login->preHooks->fields;
-    } else {
-        $fields = $login->preHooks->fields;
-        $fields = array_merge($fields,$_POST);
-    }
-}
-
-/* process hooks */
-if (!empty($login->preHooks->errors)) {
-    $errors = array();
-    foreach ($login->preHooks->errors as $key => $error) {
-        $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
-    }
-    $modx->toPlaceholders($errors,'error');
-
-    $errorMsg = $login->preHooks->getErrorMessage();
-    $modx->toPlaceholder('message',$errorMsg,'error');
-    return '';
-}
-
 /* check for POST */
 if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     $modx->lexicon->load('login:register');
@@ -92,7 +60,7 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
 
     /* handle validation */
     $login->loadValidator();
-    $fields = array_merge($fields,$login->validator->validateFields($_POST));
+    $fields = $login->validator->validateFields($_POST);
 
     if (empty($fields[$usernameField])) {
         $login->validator->errors[$usernameField] = $modx->lexicon('register.field_required');
@@ -119,9 +87,31 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     }
 
     if (empty($login->validator->errors)) {
-        $result = require_once $login->config['processorsPath'].'register.php';
-        if ($result !== true) {
-            $modx->toPlaceholder('message',$result,'error');
+        /* do pre-register hooks */
+        $login->loadHooks('preHooks');
+        $login->preHooks->loadMultiple($preHooks,$fields,array(
+            'submitVar' => $submitVar,
+        ));
+        if (!empty($login->preHooks->fields)) {
+            $fields = $login->preHooks->fields;
+        }
+
+        /* process hooks */
+        if (!empty($login->preHooks->errors)) {
+            $errors = array();
+            foreach ($login->preHooks->errors as $key => $error) {
+                $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
+            }
+            $modx->toPlaceholders($errors,'error');
+
+            $errorMsg = $login->preHooks->getErrorMessage();
+            $modx->toPlaceholder('message',$errorMsg,'error');
+        } else {
+            /* everything good, go ahead and register */
+            $result = require_once $login->config['processorsPath'].'register.php';
+            if ($result !== true) {
+                $modx->toPlaceholder('message',$result,'error');
+            }
         }
     } else {
         $errors = array();

@@ -96,6 +96,23 @@ class lgnValidator {
     }
 
     /**
+     * Strips validators from an array of fields
+     */
+    public function stripValidators(array $keys = array()) {
+        $fields = array();
+        foreach ($keys as $k => $v) {
+            $key = explode(':',$k);
+            $validators = count($key);
+            if ($validators > 1) {
+                $fields[$key[0]] = $v;
+            } else {
+                $fields[$k] = $v;
+            }
+        }
+        return $fields;
+    }
+
+    /**
      * Validates a field based on a custom rule, if specified
      *
      * @access public

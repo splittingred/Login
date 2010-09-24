@@ -33,6 +33,7 @@ $preHooks = $modx->getOption('preHooks',$scriptProperties,'');
 $submitVar = $modx->getOption('submitVar',$scriptProperties,'login-updprof-btn');
 $redirectToLogin = $modx->getOption('redirectToLogin',$scriptProperties,true);
 $reloadOnSuccess = $modx->getOption('reloadOnSuccess',$scriptProperties,true);
+$errTpl = $modx->getOption('errTpl',$scriptProperties,'<span class="error">[[+error]]</span>');
 
 /* verify authenticated status */
 if (!$modx->user->hasSessionContext($modx->context->get('key'))) {
@@ -50,40 +51,6 @@ if (empty($profile)) {
     return '';
 }
 
-
-/* do prehooks */
-$login->loadHooks('preHooks');
-$login->preHooks->loadMultiple($preHooks,$fields);
-
-/* do pre-register hooks */
-$login->loadHooks('preHooks');
-$login->preHooks->loadMultiple($preHooks,$fields,array(
-    'submitVar' => $submitVar,
-));
-$fields = array();
-/* if a prehook sets a field, do so here */
-if (!empty($login->preHooks->fields)) {
-    $modx->toPlaceholders($login->preHooks->fields);
-    if (empty($_POST)) {
-        $fields = $login->preHooks->fields;
-    } else {
-        $fields = $login->preHooks->fields;
-        $fields = array_merge($fields,$_POST);
-    }
-}
-
-/* process hooks */
-if (!empty($login->preHooks->errors)) {
-    $errors = array();
-    foreach ($login->preHooks->errors as $key => $error) {
-        $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
-    }
-    $modx->toPlaceholders($errors,'error');
-
-    $errorMsg = $login->preHooks->getErrorMessage();
-    $modx->toPlaceholder('message',$errorMsg,'error');
-}
-
 $placeholders = $profile->toArray();
 /* add extended fields to placeholders */
 if ($modx->getOption('useExtended',$scriptProperties,true)) {
@@ -92,7 +59,6 @@ if ($modx->getOption('useExtended',$scriptProperties,true)) {
         $placeholders = array_merge($extended,$placeholders);
     }
 }
-$placeholders = array_merge($placeholders,$fields);
 $modx->toPlaceholders($placeholders);
 
 /* if success */
@@ -107,15 +73,39 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     if (!empty($submitVar)) unset($fields[$submitVar]);
 
     if (empty($login->validator->errors)) {
-        /* update the profile */
-        $result = require_once $login->config['processorsPath'].'update.profile.php';
-        if ($result !== true) {
-            $modx->toPlaceholder('message',$result,'error');
-        } else if ($reloadOnSuccess) {
-            $url = $modx->makeUrl($modx->resource->get('id'),'','?updpsuccess=1');
-            $modx->sendRedirect($url);
+        /* do prehooks */
+        $login->loadHooks('preHooks');
+        $login->preHooks->loadMultiple($preHooks,$fields,array(
+            'submitVar' => $submitVar,
+            'redirectToLogin' => $redirectToLogin,
+            'reloadOnSuccess' => $reloadOnSuccess,
+        ));
+        if (!empty($login->preHooks->fields)) {
+            $fields = $login->preHooks->fields;
+        }
+        
+        /* process hooks */
+        if (!empty($login->preHooks->errors)) {
+            $errors = array();
+            foreach ($login->preHooks->errors as $key => $error) {
+                $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
+            }
+            $modx->toPlaceholders($errors,'error');
+
+            $errorMsg = $login->preHooks->getErrorMessage();
+            $modx->toPlaceholder('message',$errorMsg,'error');
+
         } else {
-            $modx->setPlaceholder('login.update_success',true);
+            /* update the profile */
+            $result = require_once $login->config['processorsPath'].'update.profile.php';
+            if ($result !== true) {
+                $modx->toPlaceholder('message',$result,'error');
+            } else if ($reloadOnSuccess) {
+                $url = $modx->makeUrl($modx->resource->get('id'),'','?updpsuccess=1');
+                $modx->sendRedirect($url);
+            } else {
+                $modx->setPlaceholder('login.update_success',true);
+            }
         }
     }
     $modx->toPlaceholders($login->validator->errors,'error');
