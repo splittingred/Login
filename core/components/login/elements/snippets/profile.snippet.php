@@ -20,14 +20,8 @@
  * @package login
  */
 /**
- * MODx Profile Snippet.
+ * MODx Profile Snippet. Sets Profile data for a user to placeholders
  *
- * Sets Profile data for a user to placeholders
- *
- * @author Shaun McCormick <shaun@modx.com>
- * @copyright Copyright &copy; 2010
- * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU General Public License
- * version 2 or (at your option) any later version.
  * @package login
  */
 $login = $modx->getService('login','Login',$modx->getOption('login.core_path',null,$modx->getOption('core_path').'components/login/').'model/login/',$scriptProperties);

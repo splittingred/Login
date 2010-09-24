@@ -108,6 +108,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'excludeExtended',
+        'desc' => 'prop_register.excludeextended_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'activation',
         'desc' => 'prop_register.activation_desc',
         'type' => 'combo-boolean',

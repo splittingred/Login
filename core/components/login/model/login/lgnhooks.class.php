@@ -2,7 +2,7 @@
 /**
  * lgnHooks
  *
- * Copyright 2010 by Shaun McCormick <shaun@modxcms.com>
+ * Copyright 2010 by Shaun McCormick <shaun@modx.com>
  *
  * Register is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -94,18 +94,20 @@ class lgnHooks {
      */
     public function load($hook,$fields = array(),array $options = array()) {
         $success = false;
+        if (!empty($fields)) $this->fields =& $fields;
         $this->hooks[] = $hook;
 
-        if (method_exists($this,$hook) && $hook != 'load') {
+        $reserved = array('load','_process','__construct','getErrorMessage','addError','getValue','getValues','setValue','setValues');
+        if (method_exists($this,$hook) && !in_array($hook,$reserved)) {
             /* built-in hooks */
-            $success = $this->$hook($fields);
+            $success = $this->$hook($this->fields);
 
         } else if ($snippet = $this->modx->getObject('modSnippet',array('name' => $hook))) {
             /* custom snippet hook */
             $properties = array_merge($this->login->config,$options);
             $properties['login'] =& $this->login;
             $properties['hook'] =& $this;
-            $properties['fields'] = $fields;
+            $properties['fields'] =& $this->fields;
             $properties['errors'] =& $this->errors;
             $success = $snippet->process($properties);
 
@@ -135,6 +137,63 @@ class lgnHooks {
     public function getErrorMessage($delim = "\n") {
         return implode($delim,$this->errors);
     }
+    /**
+     * Adds an error to the stack.
+     *
+     * @access private
+     * @param string $key The field to add the error to.
+     * @param string $value The error message.
+     * @return string The added error message with the error wrapper.
+     */
+    public function addError($key,$value) {
+        $this->errors[$key] .= $value;
+        return $this->errors[$key];
+    }
+
+    /**
+     * Sets the value of a field.
+     *
+     * @param string $key The field name to set.
+     * @param mixed $value The value to set to the field.
+     * @return mixed The set value.
+     */
+    public function setValue($key,$value) {
+        $this->fields[$key] = $value;
+        return $this->fields[$key];
+    }
+
+    /**
+     * Sets an associative array of field name and values.
+     *
+     * @param array $values A key/name pair of fields and values to set.
+     */
+    public function setValues($values) {
+        foreach ($values as $key => $value) {
+            $this->setValue($key,$value);
+        }
+    }
+
+    /**
+     * Gets the value of a field.
+     *
+     * @param string $key The field name to get.
+     * @return mixed The value of the key, or null if non-existent.
+     */
+    public function getValue($key) {
+        if (array_key_exists($key,$this->fields)) {
+            return $this->fields[$key];
+        }
+        return null;
+    }
+
+    /**
+     * Gets an associative array of field name and values.
+     *
+     * @return array $values A key/name pair of fields and values.
+     */
+    public function getValues() {
+        return $this->fields;
+    }
 
     /**
      * Redirect to a specified URL.
@@ -151,6 +210,7 @@ class lgnHooks {
         $url = $this->modx->makeUrl($this->login->config['redirectTo'],'','','abs');
         return $this->modx->sendRedirect($url);
     }
+
 
     /**
      * Send an email of the form.
@@ -172,18 +232,24 @@ class lgnHooks {
      */
     public function email(array $fields = array()) {
         $tpl = $this->modx->getOption('emailTpl',$this->login->config,'');
-
-        $emailFrom = empty($fields['email']) ? $this->modx->getOption('emailsender') : $fields['email'];
-        if (empty($emailFrom)) {
-            $emailFrom = $this->modx->getOption('emailFrom',$this->login->config,$emailFrom);
-        }
-        $emailFromName = $this->modx->getOption('emailFromName',$this->login->config,$emailFrom);
         $emailHtml = $this->modx->getOption('emailHtml',$this->login->config,true);
+
+        /* get from name */
+        $emailFrom = $this->modx->getOption('emailFrom',$this->login->config,'');
+        if (empty($emailFrom)) {
+            $emailFrom = !empty($fields['email']) ? $fields['email'] : $this->modx->getOption('emailsender');
+        }
+        $emailFrom = $this->_process($emailFrom,$fields);
+        $emailFromName = $this->modx->getOption('emailFromName',$this->login->config,$emailFrom);
+        $emailFromName = $this->_process($emailFromName,$fields);
+
+        /* get subject */
         if (!empty($fields['subject']) && $this->modx->getOption('emailUseFieldForSubject',$this->login->config,true)) {
             $subject = $fields['subject'];
         } else {
             $subject = $this->modx->getOption('emailSubject',$this->login->config,'');
         }
+        $subject = $this->_process($subject,$fields);
 
         /* check email to */
         $emailTo = $this->modx->getOption('emailTo',$this->login->config,'');
@@ -211,7 +277,7 @@ class lgnHooks {
 
         /* load mail service */
         $this->modx->getService('mail', 'mail.modPHPMailer');
-        $this->modx->mail->set(modMail::MAIL_BODY, $message);
+        $this->modx->mail->set(modMail::MAIL_BODY,$emailHtml ? nl2br($message) : $message);
         $this->modx->mail->set(modMail::MAIL_FROM, $emailFrom);
         $this->modx->mail->set(modMail::MAIL_FROM_NAME, $emailFromName);
         $this->modx->mail->set(modMail::MAIL_SENDER, $emailFrom);
@@ -230,9 +296,49 @@ class lgnHooks {
         $numAddresses = count($emailTo);
         for ($i=0;$i<$numAddresses;$i++) {
             $etn = !empty($emailToName[$i]) ? $emailToName[$i] : '';
+            if (!empty($etn)) $etn = $this->_process($etn,$fields);
+            $emailTo[$i] = $this->_process($emailTo[$i],$fields);
             $this->modx->mail->address('to',$emailTo[$i],$etn);
         }
-        $this->modx->mail->address('reply-to',$emailFrom);
+
+        /* reply to */
+        $emailReplyTo = $this->modx->getOption('emailReplyTo',$this->login->config,$emailFrom);
+        $emailReplyTo = $this->_process($emailReplyTo,$fields);
+        $emailReplyToName = $this->modx->getOption('emailReplyToName',$this->login->config,$emailFromName);
+        $emailReplyToName = $this->_process($emailReplyToName,$fields);
+        $this->modx->mail->address('reply-to',$emailReplyTo,$emailReplyToName);
+
+        /* cc */
+        $emailCC = $this->modx->getOption('emailCC',$this->login->config,'');
+        if (!empty($emailCC)) {
+            $emailCCName = $this->modx->getOption('emailCCName',$this->login->config,'');
+            $emailCC = explode(',',$emailCC);
+            $emailCCName = explode(',',$emailCCName);
+            $numAddresses = count($emailCC);
+            for ($i=0;$i<$numAddresses;$i++) {
+                $etn = !empty($emailCCName[$i]) ? $emailCCName[$i] : '';
+                if (!empty($etn)) $etn = $this->_process($etn,$fields);
+                $emailCC[$i] = $this->_process($emailCC[$i],$fields);
+                $this->modx->mail->address('cc',$emailCC[$i],$etn);
+            }
+        }
+
+        /* bcc */
+        $emailBCC = $this->modx->getOption('emailBCC',$this->login->config,'');
+        if (!empty($emailBCC)) {
+            $emailBCCName = $this->modx->getOption('emailBCCName',$this->login->config,'');
+            $emailBCC = explode(',',$emailBCC);
+            $emailBCCName = explode(',',$emailBCCName);
+            $numAddresses = count($emailBCC);
+            for ($i=0;$i<$numAddresses;$i++) {
+                $etn = !empty($emailBCCName[$i]) ? $emailBCCName[$i] : '';
+                if (!empty($etn)) $etn = $this->_process($etn,$fields);
+                $emailBCC[$i] = $this->_process($emailBCC[$i],$fields);
+                $this->modx->mail->address('bcc',$emailBCC[$i],$etn);
+            }
+        }
+
+        /* set HTML */
         $this->modx->mail->setHTML($emailHtml);
 
         /* send email */
@@ -250,6 +356,12 @@ class lgnHooks {
         return $sent;
     }
 
+    public function _process($str,array $placeholders = array()) {
+        foreach ($placeholders as $k => $v) {
+            $str = str_replace('[[+'.$k.']]',$v,$str);
+        }
+        return $str;
+    }
     /**
      * Ensure the a field passes a spam filter.
      *

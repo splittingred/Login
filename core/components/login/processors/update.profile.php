@@ -35,10 +35,13 @@ unset($fields['nospam'],$fields['blank']);
 /* set extended data if any */
 if ($modx->getOption('useExtended',$scriptProperties,true)) {
     /* first cut out regular fields */
+    $excludeExtended = $modx->getOption('excludeExtended',$scriptProperties,'');
+    $excludeExtended = explode(',',$excludeExtended);
     $profileFields = $profile->toArray();
+    $userFields = $user->toArray();
     $newExtended = array();
     foreach ($fields as $field => $value) {
-        if (!isset($profileFields[$field])) {
+        if (!isset($profileFields[$field]) && !isset($userFields[$field]) && $field != 'password_confirm' && $field != 'passwordconfirm' && !in_array($field,$excludeExtended)) {
             $newExtended[$field] = $value;
         }
     }

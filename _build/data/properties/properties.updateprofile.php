@@ -68,6 +68,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'excludeExtended',
+        'desc' => 'prop_updateprofile.excludeextended_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'preHooks',
         'desc' => 'prop_updateprofile.prehooks_desc',
         'type' => 'textfield',

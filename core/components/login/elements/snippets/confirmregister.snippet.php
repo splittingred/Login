@@ -2,7 +2,7 @@
 /**
  * Register
  *
- * Copyright 2010 by Shaun McCormick <shaun@modxcms.com>
+ * Copyright 2010 by Shaun McCormick <shaun@modx.com>
  *
  * Register is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -20,12 +20,10 @@
  * @package login
  */
 /**
- * MODx Confirm Register Activation Snippet
+ * MODx Confirm Register Activation Snippet. Snippet to place on an activation
+ * page that the user using the Register snippet would be sent to via the
+ * activation email.
  *
- * @author Shaun McCormick <shaun@modxcms.com>
- * @copyright Copyright &copy; 2010
- * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU General Public License
- * version 2 or (at your option) any later version.
  * @package login
  */
 $model_path = $modx->getOption('core_path').'components/login/model/login/';

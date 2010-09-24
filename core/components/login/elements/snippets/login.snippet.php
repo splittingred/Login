@@ -2,8 +2,8 @@
 /**
  * Login
  *
- * Copyright 2010 by Jason Coward <jason@modxcms.com> and Shaun McCormick
- * <shaun@modxcms.com>
+ * Copyright 2010 by Jason Coward <jason@modx.com> and Shaun McCormick
+ * <shaun@modx.com>
  *
  * Login is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -26,12 +26,6 @@
  * This snippet handles login POSTs, sending the user back to where they came from or to a specific
  * location if specified in the POST.
  *
- * @version 2.0.0
- * @author Jason Coward <jason@modxcms.com>
- * @author Shaun McCormick <shaun@modxcms.com>
- * @copyright Copyright &copy; 2010
- * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU General Public License
- * version 2 or (at your option) any later version.
  * @package login
  *
  * @property textfield actionKey The REQUEST variable containing the action to take.

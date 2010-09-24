@@ -2,8 +2,8 @@
 /**
  * ForgotPassword
  *
- * Copyright 2010 by Jason Coward <jason@modxcms.com> and Shaun McCormick
- * <shaun@modxcms.com>
+ * Copyright 2010 by Jason Coward <jason@modx.com> and Shaun McCormick
+ * <shaun@modx.com>
  *
  * ForgotPassword is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -21,13 +21,9 @@
  * @package login
  */
 /**
- * MODx ForgotPassword Snippet
+ * MODx ForgotPassword Snippet. Displays a form for users who have forgotten
+ * their password and gives them the ability to retrieve it.
  *
- * @author Jason Coward <jason@modxcms.com>
- * @author Shaun McCormick <shaun@modxcms.com>
- * @copyright Copyright &copy; 2010
- * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU General Public License
- * version 2 or (at your option) any later version.
  * @package login
  */
 $model_path = $modx->getOption('core_path').'components/login/model/login/';

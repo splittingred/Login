@@ -36,12 +36,14 @@ $profile = $modx->newObject('modUserProfile');
 
 /* set extended data if any */
 if ($modx->getOption('useExtended',$scriptProperties,true)) {
-    /* first cut out regular fields */
+    /* first cut out regular and unwanted fields */
+    $excludeExtended = $modx->getOption('excludeExtended',$scriptProperties,'');
+    $excludeExtended = explode(',',$excludeExtended);
     $profileFields = $profile->toArray();
     $userFields = $user->toArray();
     $extended = array();
     foreach ($fields as $field => $value) {
-        if (!isset($profileFields[$field]) && !isset($userFields[$field]) && $field != 'password_confirm' && $field != 'passwordconfirm') {
+        if (!isset($profileFields[$field]) && !isset($userFields[$field]) && $field != 'password_confirm' && $field != 'passwordconfirm' && !in_array($field,$excludeExtended)) {
             $extended[$field] = $value;
         }
     }
