@@ -1,5 +1,9 @@
 Changelog file for Login component.
 
+Login 1.2.1
+====================================
+- Added Dutch translation
+
 Login 1.2.0
 ====================================
 - Fixed issues with placement of prehooks and such
