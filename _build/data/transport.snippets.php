@@ -92,4 +92,15 @@ $properties = include $sources['data'].'properties/properties.profile.php';
 $snippets[6]->setProperties($properties);
 unset($properties);
 
+$snippets[7]= $modx->newObject('modSnippet');
+$snippets[7]->fromArray(array(
+    'id' => 7,
+    'name' => 'ChangePassword',
+    'description' => 'Processes a form for changing the password for a User.',
+    'snippet' => getSnippetContent($sources['source_core'].'/elements/snippets/changepassword.snippet.php'),
+),'',true,true);
+$properties = include $sources['data'].'properties/properties.changepassword.php';
+$snippets[7]->setProperties($properties);
+unset($properties);
+
 return $snippets;
