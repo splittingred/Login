@@ -70,15 +70,12 @@ $errorPrefix = $modx->getOption('errorPrefix',$scriptProperties,'error');
 $errTpl = $modx->getOption('errTpl',$scriptProperties,'lgnErrTpl');
 $errTplType = $modx->getOption('errTplType',$scriptProperties,'modChunk');
 $rememberMeKey = $modx->getOption('rememberMeKey',$scriptProperties,'rememberme');
-$contexts = !empty($scriptProperties['contexts']) ? $scriptProperties['contexts'] : $modx->context->get('key');
-$authenticated = $modx->user->isAuthenticated($modx->context->get('key'));
-$contexts = 'web,my';
+$loginContext = isset($_REQUEST['login_context']) && !empty($_REQUEST['login_context']) ? $_REQUEST['login_context'] : $modx->context->get('key');
+$contexts = !empty($scriptProperties['contexts']) ? $scriptProperties['contexts'] : '';
+$contexts = !empty($_REQUEST['add_contexts']) ? $_REQUEST['add_contexts'] : $contexts;
+$authenticated = $modx->user->isAuthenticated($loginContext);
 
 if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
-    if (isset($_REQUEST['login_context']) && !empty($_REQUEST['login_context'])) {
-        $loginContext = $_REQUEST['login_context'];
-    }
-    
     /* login */
     if (!empty($_POST) && isset($_POST[$actionKey]) && !$authenticated) {
         if ($_POST[$actionKey] == $loginKey) {
@@ -101,12 +98,13 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                 $modx->setPlaceholder('errors',$errorOutput);
                 
             } else {
-                /* send to login processor and handle response for each context */
+                /* send to login processor and handle response */
                 $responseUrl = '';
+                $loggedIn = false;
                 $response = $login->executeProcessor(array(
                     'action' => 'login',
                     'location' => 'security',
-                    'login_context' => $modx->context->get('key'),
+                    'login_context' => $loginContext,
                     'add_contexts' => $contexts,
                     'rememberme' => !empty($_REQUEST[$rememberMeKey]) ? true : false,
                 ));
@@ -129,6 +127,7 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                     $fields = $_POST;
                     $fields['response'] =& $response;
                     $fields['contexts'] =& $contexts;
+                    $fields['loginContext'] =& $loginContext;
                     $fields['loginResourceId'] =& $loginResourceId;
                     $login->posthooks->loadMultiple($postHooks,$fields,array(
                         'mode' => 'login',
@@ -196,12 +195,24 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
         /* prehooks successful, move on */
         } else { 
             /* send to logout processor and handle response for each context */
+            $loggedOut = false;
+            $responseUrl = '';
             $response = $login->executeProcessor(array(
                 'action' => 'logout',
                 'location' => 'security',
-                'login_context' => $modx->context->get('key'),
-                'add_contexts' => $contexts,
+                'login_context' => $loginContext,
+                'add_contexts' => $contexts
             ));
+            if (empty($response) || !is_array($response) || empty($response['success'])) {
+                $loggedOut = false;
+                break;
+            } else {
+                $loggedOut = true;
+                if (!empty($response['object']) && !empty($response['object']['url'])) {
+                    $responseUrl = $response['object']['url'];
+                }
+            }
+
             /* if successful logout */
             if (!empty($response) && !empty($response['success'])) {
                 /* do post hooks for logout */
