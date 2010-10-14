@@ -71,8 +71,8 @@ $errTpl = $modx->getOption('errTpl',$scriptProperties,'lgnErrTpl');
 $errTplType = $modx->getOption('errTplType',$scriptProperties,'modChunk');
 $rememberMeKey = $modx->getOption('rememberMeKey',$scriptProperties,'rememberme');
 $contexts = !empty($scriptProperties['contexts']) ? $scriptProperties['contexts'] : $modx->context->get('key');
-$contexts = explode(',',$contexts);
 $authenticated = $modx->user->isAuthenticated($modx->context->get('key'));
+$contexts = 'web,my';
 
 if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
     if (isset($_REQUEST['login_context']) && !empty($_REQUEST['login_context'])) {
@@ -103,25 +103,21 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
             } else {
                 /* send to login processor and handle response for each context */
                 $responseUrl = '';
-                $results = array();
-                $loggedIn = false;
-                foreach ($contexts as $context) {
-                    $response = $login->executeProcessor(array(
-                        'action' => 'login',
-                        'location' => 'security',
-                        'login_context' => $context,
-                        'rememberme' => !empty($_REQUEST[$rememberMeKey]) ? true : false,
-                    ));
-                    $results[$context] = $response;
-                    if (empty($response) || !is_array($response) || empty($response['success'])) {
-                        $loggedIn = false;
-                        break;
-                    } else {
-                        $loggedIn = true;
-                        /* grab last responseUrl */
-                        if (!empty($response['object']) && !empty($response['object']['url'])) {
-                            $responseUrl = $response['object']['url'];
-                        }
+                $response = $login->executeProcessor(array(
+                    'action' => 'login',
+                    'location' => 'security',
+                    'login_context' => $modx->context->get('key'),
+                    'add_contexts' => $contexts,
+                    'rememberme' => !empty($_REQUEST[$rememberMeKey]) ? true : false,
+                ));
+                if (empty($response) || !is_array($response) || empty($response['success'])) {
+                    $loggedIn = false;
+                    break;
+                } else {
+                    $loggedIn = true;
+                    /* grab last responseUrl */
+                    if (!empty($response['object']) && !empty($response['object']['url'])) {
+                        $responseUrl = $response['object']['url'];
                     }
                 }
 
@@ -200,30 +196,14 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
         /* prehooks successful, move on */
         } else { 
             /* send to logout processor and handle response for each context */
-            $loggedOut = false;
-            $responseUrl = '';
-            $results = array();
-            foreach ($contexts as $context) {
-                $response = $login->executeProcessor(array(
-                    'action' => 'logout',
-                    'location' => 'security',
-                    'login_context' => $context,
-                ));
-                $results[$context] = $response;
-                if (empty($response) || !is_array($response) || empty($response['success'])) {
-                    $loggedOut = false;
-                    break;
-                } else {
-                    $loggedOut = true;
-                    /* grab last responseUrl */
-                    if (!empty($response['object']) && !empty($response['object']['url'])) {
-                        $responseUrl = $response['object']['url'];
-                    }
-                }
-            }
-
+            $response = $login->executeProcessor(array(
+                'action' => 'logout',
+                'location' => 'security',
+                'login_context' => $modx->context->get('key'),
+                'add_contexts' => $contexts,
+            ));
             /* if successful logout */
-            if (!empty($loggedOut)) {
+            if (!empty($response) && !empty($response['success'])) {
                 /* do post hooks for logout */
                 $postHooks = $modx->getOption('postHooks',$scriptProperties,'');
                 $login->loadHooks('posthooks');
@@ -246,8 +226,8 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
 
                 /* redirect */
                 $logoutResourceId = $modx->getOption('logoutResourceId',$scriptProperties,0);
-                if (!empty($responseUrl)) {
-                    $modx->sendRedirect($responseUrl);
+                if (!empty($response['object']) && !empty($response['object']['url'])) {
+                    $modx->sendRedirect($response['object']['url']);
                 } elseif (!empty($logoutResourceId)) {
                     $modx->sendRedirect($modx->makeUrl($logoutResourceId));
                 } else {
@@ -292,6 +272,7 @@ if ($authenticated) {
     $phs['logoutUrl'] = $phs['request_uri'];
     $phs['logoutUrl'] .= strpos($phs['logoutUrl'],'?') ? ($modx->getOption('xhtml_urls',null,false) ? '&amp;' : '&') : '?';
     $phs['logoutUrl'] .= $phs['actionKey'].'='.$phs['logoutKey'];
+    $phs['logoutUrl'] = str_replace(array('?=','&='),'',$phs['logoutUrl']);
 }
 
 /* if using recaptcha, load recaptcha html */
