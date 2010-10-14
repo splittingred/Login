@@ -91,6 +91,7 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
         $login->loadHooks('preHooks');
         $login->preHooks->loadMultiple($preHooks,$fields,array(
             'submitVar' => $submitVar,
+            'usernameField' => $usernameField,
         ));
         if (!empty($login->preHooks->fields)) {
             $fields = $login->preHooks->fields;

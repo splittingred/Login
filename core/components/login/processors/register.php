@@ -53,6 +53,7 @@ if ($modx->getOption('useExtended',$scriptProperties,true)) {
 
 /* set user and profile */
 $user->fromArray($fields);
+$user->set('username',$fields[$usernameField]);
 $user->set('active',0);
 $user->set('password',md5($fields['password']));
 $profile->fromArray($fields);
