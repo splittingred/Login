@@ -99,8 +99,6 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                 
             } else {
                 /* send to login processor and handle response */
-                $responseUrl = '';
-                $loggedIn = false;
                 $response = $login->executeProcessor(array(
                     'action' => 'login',
                     'location' => 'security',
@@ -108,19 +106,9 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                     'add_contexts' => $contexts,
                     'rememberme' => !empty($_REQUEST[$rememberMeKey]) ? true : false,
                 ));
-                if (empty($response) || !is_array($response) || empty($response['success'])) {
-                    $loggedIn = false;
-                    break;
-                } else {
-                    $loggedIn = true;
-                    /* grab last responseUrl */
-                    if (!empty($response['object']) && !empty($response['object']['url'])) {
-                        $responseUrl = $response['object']['url'];
-                    }
-                }
 
                 /* if we've got a good response, proceed */
-                if (!empty($loggedIn)) {
+                if (!empty($response) && !empty($response['success'])) {
                     /* do post hooks */
                     $postHooks = $modx->getOption('postHooks',$scriptProperties,'');
                     $login->loadHooks('posthooks');
@@ -144,8 +132,8 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                         /* login posthooks succeeded, now redirect */
                         if (!empty($loginResourceId) && ($url = $modx->makeUrl($loginResourceId, $loginContext, '', 'full'))) {
                             $modx->sendRedirect($url);
-                        } elseif (!empty($responseUrl)) {
-                            $modx->sendRedirect($responseUrl);
+                        } elseif (!empty($response['object']) && !empty($response['object']['url'])) {
+                            $modx->sendRedirect($response['object']['url']);
                         } else {
                             $modx->sendRedirect($modx->getOption('site_url'));
                         }
@@ -195,23 +183,12 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
         /* prehooks successful, move on */
         } else { 
             /* send to logout processor and handle response for each context */
-            $loggedOut = false;
-            $responseUrl = '';
             $response = $login->executeProcessor(array(
                 'action' => 'logout',
                 'location' => 'security',
                 'login_context' => $loginContext,
                 'add_contexts' => $contexts
             ));
-            if (empty($response) || !is_array($response) || empty($response['success'])) {
-                $loggedOut = false;
-                break;
-            } else {
-                $loggedOut = true;
-                if (!empty($response['object']) && !empty($response['object']['url'])) {
-                    $responseUrl = $response['object']['url'];
-                }
-            }
 
             /* if successful logout */
             if (!empty($response) && !empty($response['success'])) {
@@ -220,6 +197,8 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                 $login->loadHooks('posthooks');
                 $fields = $_POST;
                 $fields['response'] =& $response;
+                $fields['contexts'] =& $contexts;
+                $fields['loginContext'] =& $loginContext;
                 $fields['logoutResourceId'] =& $logoutResourceId;
                 $login->posthooks->loadMultiple($postHooks,$fields,array(
                     'mode' => 'logout',

@@ -1,5 +1,9 @@
 Changelog file for Login component.
 
+Login 1.3.1-pl (October 15, 2010)
+====================================
+- Fixed issue with Login snippet on invalid logins
+
 Login 1.3.0-pl (October 14, 2010)
 ====================================
 - Modified experimental multi-context support to use new login processor add_contexts parameter
