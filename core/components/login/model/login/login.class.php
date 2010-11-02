@@ -158,7 +158,7 @@ class Login {
         switch ($type) {
             case 'embedded':
                 if (!$this->modx->user->isAuthenticated($this->modx->context->get('key'))) {
-                    $modx->setPlaceholders($properties);
+                    $this->modx->setPlaceholders($properties);
                 }
                 break;
             case 'modChunk':
