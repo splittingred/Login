@@ -151,7 +151,10 @@ if (!empty($login->posthooks->errors)) {
  * GET params `username` and `email` for you to use */
 $submittedResourceId = $modx->getOption('submittedResourceId',$scriptProperties,'');
 if (!empty($submittedResourceId)) {
-    $url = $modx->makeUrl($submittedResourceId).'?username='.$user->get('username').'&email='.$profile->get('email');
+    $url = $modx->makeUrl($submittedResourceId,'',array(
+        'username' => $user->get('username'),
+        'email' => $profile->get('email'),
+    ));
     $modx->sendRedirect($url);
 } else {
     $successMsg = $modx->getOption('successMsg',$scriptProperties,'');
