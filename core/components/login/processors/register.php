@@ -117,6 +117,9 @@ if ($activation && !empty($email) && !empty($activateResourceId)) {
     $modx->registry->login->send('/useractivation/',array($user->get('username') => $pword),array(
         'ttl' => ($modx->getOption('activationttl',$scriptProperties,180)*60),
     ));
+    /* set cachepwd here to prevent re-registration of inactive users */
+    $user->set('cachepwd',md5($pword));
+    $user->save();
 
     $subject = $modx->getOption('activationEmailSubject',$scriptProperties,$modx->lexicon('login.activation_email_subject'));
     $login->sendEmail($user->get('email'),$user->get('username'),$subject,$emailProperties);

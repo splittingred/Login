@@ -68,9 +68,11 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
         /* make sure username isnt taken */
         $alreadyExists = $modx->getObject('modUser',array('username' => $fields[$usernameField]));
         if ($alreadyExists) {
-            if ($alreadyExists->get('active') == 0) {
-                /* if inactive, probably an expired activation account, so
-                 * let's remove it and let user re-register
+            $cachePwd = $alreadyExists->get('cachepwd');
+            if ($alreadyExists->get('active') == 0 && !empty($cachePwd)) {
+                /* if inactive and has a cachepwd, probably an expired
+                 * activation account, so let's remove it
+                 * and let user re-register
                  */
                 $alreadyExists->remove();
             } else {

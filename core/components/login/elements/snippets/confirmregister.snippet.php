@@ -64,6 +64,7 @@ if (!empty($result)) {
 
 /* activate user */
 $user->set('active',1);
+$user->set('cachepwd','');
 $user->save();
 
 /* invoke OnUserActivate event */
