@@ -103,4 +103,15 @@ $properties = include $sources['data'].'properties/properties.changepassword.php
 $snippets[7]->setProperties($properties);
 unset($properties);
 
+$snippets[8]= $modx->newObject('modSnippet');
+$snippets[8]->fromArray(array(
+    'id' => 8,
+    'name' => 'isLoggedIn',
+    'description' => 'Checks to see if the user is logged in. If not, redirects to Unauthorized Page.',
+    'snippet' => getSnippetContent($sources['source_core'].'/elements/snippets/isloggedin.snippet.php'),
+),'',true,true);
+$properties = include $sources['data'].'properties/properties.isloggedin.php';
+$snippets[8]->setProperties($properties);
+unset($properties);
+
 return $snippets;

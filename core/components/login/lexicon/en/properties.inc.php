@@ -93,3 +93,6 @@ $_lang['prop_changepassword.posthooks_desc'] = 'What scripts to fire, if any, af
 $_lang['prop_changepassword.reloadonsuccess_desc'] = 'If true, the page will redirect to itself with a GET parameter to prevent double-postbacks. If false, it will simply set a success placeholder.';
 $_lang['prop_changepassword.successmessage_desc'] = 'If reloadOnSuccess is set to false, output this message in the [prefix].successMessage placeholder.';
 $_lang['prop_changepassword.placeholderprefix_desc'] = 'The prefix to use for all placeholders set by this snippet.';
+
+/* isLoggedIn snippet */
+$_lang['prop_isloggedin.contexts_desc'] = 'A comma-separated list of contexts to check authenticated status for. If not set, will default to current context.';
