@@ -74,7 +74,9 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
                  * activation account, so let's remove it
                  * and let user re-register
                  */
-                $alreadyExists->remove();
+                if (!$alreadyExists->remove()) {
+                    $modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not remove old, deactive user with cachepwd.');
+                }
             } else {
                 $login->validator->errors[$usernameField] = $modx->lexicon('register.username_taken');
             }
@@ -113,7 +115,7 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
             /* everything good, go ahead and register */
             $result = require_once $login->config['processorsPath'].'register.php';
             if ($result !== true) {
-                $modx->toPlaceholder('message',$result,'error');
+                $modx->setPlaceholder('error.message',$result);
             }
         }
     } else {

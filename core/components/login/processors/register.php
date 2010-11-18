@@ -53,16 +53,12 @@ if ($modx->getOption('useExtended',$scriptProperties,true)) {
 
 /* set user and profile */
 $user->fromArray($fields);
+$user->set('class_key','modUser');
 $user->set('username',$fields[$usernameField]);
 $user->set('active',0);
 $user->set('password',md5($fields['password']));
 $profile->fromArray($fields);
-
-if (!$user->save()) {
-    return $modx->lexicon('register.user_err_save');
-}
-$profile->set('internalKey',$user->get('id'));
-$profile->save();
+$user->addOne($profile,'Profile');
 
 /* if usergroups set */
 $usergroups = $modx->getOption('usergroups',$scriptProperties,'');
@@ -82,8 +78,14 @@ if (!empty($usergroups)) {
         $member = $modx->newObject('modUserGroupMember');
         $member->set('member',$user->get('id'));
         $member->set('user_group',$usergroup->get('id'));
-        $member->save();
+        $user->addMany($member,'UserGroupMembers');
     }
+}
+
+/* save user */
+if (!$user->save()) {
+    $modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not save newly registered user: '.$user->get('id').' with username: '.$user->get('username'));
+    return $modx->lexicon('register.user_err_save');
 }
 
 /* send activation email (if chosen) */
@@ -91,7 +93,6 @@ $email = $user->get('email');
 $activation = $modx->getOption('activation',$scriptProperties,true);
 $activateResourceId = $modx->getOption('activationResourceId',$scriptProperties,'');
 if ($activation && !empty($email) && !empty($activateResourceId)) {
-
     /* generate a password and encode it and the username into the url */
     $pword = $login->generatePassword();
     $confirmParams = 'lp='.urlencode(base64_encode($pword));
@@ -119,10 +120,13 @@ if ($activation && !empty($email) && !empty($activateResourceId)) {
     ));
     /* set cachepwd here to prevent re-registration of inactive users */
     $user->set('cachepwd',md5($pword));
-    $user->save();
+    if (!$user->save()) {
+        $modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not update cachepwd for activation for User: '.$user->get('username'));
+    }
 
-    $subject = $modx->getOption('activationEmailSubject',$scriptProperties,$modx->lexicon('login.activation_email_subject'));
-    $login->sendEmail($user->get('email'),$user->get('username'),$subject,$emailProperties);
+    $activationEmail = $modx->getOption('activationEmail',$scriptProperties,$user->get('email'));
+    $subject = $modx->getOption('activationEmailSubject',$scriptProperties,$modx->lexicon('register.activation_email_subject'));
+    $login->sendEmail($activationEmail,$user->get('username'),$subject,$emailProperties);
 
 } else {
     $user->set('active',1);

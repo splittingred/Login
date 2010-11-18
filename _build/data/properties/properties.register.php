@@ -140,6 +140,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'activationEmail',
+        'desc' => 'prop_register.activationemail_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'activationEmailSubject',
         'desc' => 'prop_register.activationemailsubject_desc',
         'type' => 'textfield',

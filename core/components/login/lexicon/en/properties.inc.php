@@ -53,6 +53,7 @@ $_lang['prop_register.excludeextended_desc'] = 'A comma-separated list of fields
 $_lang['prop_register.activation_desc'] = 'Whether or not to require activation for proper registration. If true, users will not be marked active until they have activated their account. Defaults to true. Will only work if the registration form passes an email field.';
 $_lang['prop_register.activationttl_desc'] = 'Number of minutes until the activation email expires. Defaults to 3 hours.';
 $_lang['prop_register.activationresourceid_desc'] = 'The Resource ID where the ConfirmRegister snippet for activation is located.';
+$_lang['prop_register.activationemail_desc'] = 'If set, will sent activation emails to this address instead of the newly registered user&apos;s address.';
 $_lang['prop_register.activationemailsubject_desc'] = 'The subject of the activation email.';
 $_lang['prop_register.activationemailtpltype_desc'] = 'The type of tpls being provided for the activation email.';
 $_lang['prop_register.activationemailtpl_desc'] = 'The activation email tpl.';

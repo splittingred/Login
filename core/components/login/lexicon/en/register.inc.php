@@ -26,6 +26,7 @@
  * @package login
  * @subpackage lexicon
  */
+$_lang['register.activation_email_subject'] = 'Thanks for Registering. Please Activate!';
 $_lang['register.email'] = 'Email';
 $_lang['register.email_invalid'] = 'Please enter a valid email address.';
 $_lang['register.email_invalid_domain'] = 'Your email address does not have a valid domain name.';
