@@ -130,7 +130,13 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                     } else {
                         $loginResourceId = $modx->getOption('loginResourceId',$scriptProperties,0);
                         /* login posthooks succeeded, now redirect */
-                        if (!empty($loginResourceId) && ($url = $modx->makeUrl($loginResourceId, $loginContext, '', 'full'))) {
+                        if (!empty($loginResourceId)) {
+                            
+                            $loginResourceParams = $modx->getOption('loginResourceParams',$scriptProperties,'');
+                            if (!empty($loginResourceParams)) {
+                                $loginResourceParams = $modx->fromJSON($loginResourceParams);
+                            }
+                            $url = $modx->makeUrl($loginResourceId,'',$loginResourceParams,'full');
                             $modx->sendRedirect($url);
                         } elseif (!empty($response['object']) && !empty($response['object']['url'])) {
                             $modx->sendRedirect($response['object']['url']);
@@ -219,7 +225,12 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                 if (!empty($response['object']) && !empty($response['object']['url'])) {
                     $modx->sendRedirect($response['object']['url']);
                 } elseif (!empty($logoutResourceId)) {
-                    $modx->sendRedirect($modx->makeUrl($logoutResourceId));
+                    $logoutResourceParams = $modx->getOption('logoutResourceParams',$scriptProperties,'');
+                    if (!empty($logoutResourceParams)) {
+                        $logoutResourceParams = $modx->fromJSON($logoutResourceParams);
+                    }
+                    $url = $modx->makeUrl($logoutResourceId,'',$logoutResourceParams,'full');
+                    $modx->sendRedirect($url);
                 } else {
                     $modx->sendRedirect($_SERVER['REQUEST_URI']);
                 }

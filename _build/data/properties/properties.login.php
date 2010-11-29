@@ -118,6 +118,22 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'loginResourceId',
+        'desc' => 'prop_login.loginresourceid_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '0',
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'loginResourceParams',
+        'desc' => 'prop_login.loginresourceparams_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'logoutResourceId',
         'desc' => 'prop_login.logoutresourceid_desc',
         'type' => 'textfield',
@@ -126,11 +142,11 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
-        'name' => 'loginResourceId',
-        'desc' => 'prop_login.loginresourceid_desc',
+        'name' => 'logoutResourceParams',
+        'desc' => 'prop_login.logoutresourceparams_desc',
         'type' => 'textfield',
         'options' => '',
-        'value' => '0',
+        'value' => '',
         'lexicon' => 'login:properties',
     ),
     array(

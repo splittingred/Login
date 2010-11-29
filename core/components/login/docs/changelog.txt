@@ -1,7 +1,8 @@
 Changelog file for Login component.
 
-Login 1.4.0-rc1
+Login 1.4.0
 ====================================
+- Added loginResourceParams, logoutResourceParams, which allows attaching REQUEST parameters to login/logout redirection URLs
 - Added changelog to build
 - [#26],[#14] Added activationEmail property for better handling of middle men in activation steps
 
