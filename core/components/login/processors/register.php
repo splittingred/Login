@@ -124,7 +124,8 @@ if ($activation && !empty($email) && !empty($activateResourceId)) {
         $modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not update cachepwd for activation for User: '.$user->get('username'));
     }
 
-    $activationEmail = $modx->getOption('activationEmail',$scriptProperties,$user->get('email'));
+    /* send either to user's email or a specified activation email */
+    $activationEmail = !empty($scriptProperties['activationEmail']) ? $scriptProperties['activationEmail'] : $user->get('email');
     $subject = $modx->getOption('activationEmailSubject',$scriptProperties,$modx->lexicon('register.activation_email_subject'));
     $login->sendEmail($activationEmail,$user->get('username'),$subject,$emailProperties);
 
