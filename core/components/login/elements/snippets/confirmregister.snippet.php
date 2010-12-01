@@ -65,11 +65,34 @@ if (!empty($result)) {
 /* activate user */
 $user->set('active',1);
 $user->set('cachepwd','');
-$user->save();
+if (!$user->save()) {
+    $modx->log(modX::LOG_LEVEL_ERROR,'[Register] Could not save activated user: '.$user->get('username'));
+    return '';
+}
 
 /* invoke OnUserActivate event */
 $modx->invokeEvent('OnUserActivate',array(
     'user' => &$user,
 ));
+
+/* if wanting to redirect after confirmed registration (for shopping carts) */
+$redirectTo = $modx->getOption('redirectTo',$scriptProperties,'');
+if (!empty($redirectTo)) {
+    /* allow custom redirection params */
+    $redirectParams = $modx->getOption('redirectParams',$scriptProperties,'');
+    if (!empty($redirectParams)) $redirectParams = $modx->fromJSON($redirectParams);
+    if (empty($redirectParams) || !is_array($redirectParams)) $redirectParams = array();
+
+    /* handle persist params from Register snippet */
+    $persistParams = $_GET;
+    unset($persistParams['lp'],$persistParams['lu']);
+    $persistParams['username'] = $user->get('username');
+    $persistParams['userid'] = $user->get('id');    
+    $redirectParams = array_merge($redirectParams,$persistParams);
+
+    /* redirect user */
+    $url = $modx->makeUrl($redirectTo,'',$redirectParams);
+    $modx->sendRedirect($url);
+}
 
 return '';

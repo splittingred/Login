@@ -84,6 +84,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'persistParams',
+        'desc' => 'prop_register.persistparams_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'preHooks',
         'desc' => 'prop_register.prehooks_desc',
         'type' => 'textfield',

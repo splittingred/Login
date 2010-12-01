@@ -27,6 +27,22 @@
  * @subpackage build
  */
 $properties = array(
+    array(
+        'name' => 'redirectTo',
+        'desc' => 'prop_confirmregister.redirectto_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'redirectParams',
+        'desc' => 'prop_confirmregister.redirectparams_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
 );
 
 return $properties;

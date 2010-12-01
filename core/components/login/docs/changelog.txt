@@ -2,6 +2,8 @@ Changelog file for Login component.
 
 Login 1.4.0
 ====================================
+- Added redirectTo, redirectParams to ConfirmRegister that will redirect after successful confirmation
+- Added persistParams to Register snippet, useful for shopping cart implementations to persist parameters across the registration process
 - [#27] Fixed issue with activationEmail always overriding normal email
 - [#29] Added loginResourceParams, logoutResourceParams, which allows attaching REQUEST parameters to login/logout redirection URLs
 - Added changelog to build

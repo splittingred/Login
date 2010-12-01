@@ -88,6 +88,11 @@ if (!$user->save()) {
     return $modx->lexicon('register.user_err_save');
 }
 
+/* setup persisting parameters */
+$persistParams = $modx->getOption('persistParams',$scriptProperties,'');
+if (!empty($persistParams)) $persistParams = $modx->fromJSON($persistParams);
+if (empty($persistParams) || !is_array($persistParams)) $persistParams = array();
+
 /* send activation email (if chosen) */
 $email = $user->get('email');
 $activation = $modx->getOption('activation',$scriptProperties,true);
@@ -95,8 +100,9 @@ $activateResourceId = $modx->getOption('activationResourceId',$scriptProperties,
 if ($activation && !empty($email) && !empty($activateResourceId)) {
     /* generate a password and encode it and the username into the url */
     $pword = $login->generatePassword();
-    $confirmParams = 'lp='.urlencode(base64_encode($pword));
-    $confirmParams .= '&lu='.urlencode(base64_encode($user->get('username')));
+    $confirmParams['lp'] = urlencode(base64_encode($pword));
+    $confirmParams['lu'] = urlencode(base64_encode($user->get('username')));
+    $confirmParams = array_merge($persistParams,$confirmParams);
     $confirmUrl = $modx->makeUrl($activateResourceId,'',$confirmParams,'full');
 
     /* set the email properties */
@@ -159,10 +165,11 @@ if (!empty($login->posthooks->errors)) {
  * GET params `username` and `email` for you to use */
 $submittedResourceId = $modx->getOption('submittedResourceId',$scriptProperties,'');
 if (!empty($submittedResourceId)) {
-    $url = $modx->makeUrl($submittedResourceId,'',array(
+    $persistParams = array_merge($persistParams,array(
         'username' => $user->get('username'),
         'email' => $profile->get('email'),
     ));
+    $url = $modx->makeUrl($submittedResourceId,'',$persistParams);
     $modx->sendRedirect($url);
 } else {
     $successMsg = $modx->getOption('successMsg',$scriptProperties,'');

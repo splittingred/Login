@@ -48,6 +48,7 @@ $_lang['prop_register.usernamefield_desc'] = 'The name of the field to use for t
 $_lang['prop_register.passwordfield_desc'] = 'The name of the field to use for the new User&apos;s password.';
 $_lang['prop_register.emailfield_desc'] = 'The name of the field to use for the new User&apos;s email address.';
 $_lang['prop_register.successmsg_desc'] = 'Optional. If not redirecting using the submittedResourceId parameter, will display this message instead.';
+$_lang['prop_register.persistparams_desc'] = 'Optional. A JSON object of parameters to persist across the register process. Useful when using redirect on ConfirmRegister to redirect to another page (eg, for shopping carts).';
 $_lang['prop_register.prehooks_desc'] = 'What scripts to fire, if any, before the form passes validation. This can be a comma-separated list of hooks, and if the first fails, the proceeding ones will not fire. A hook can also be a Snippet name that will execute that Snippet.';
 $_lang['prop_register.posthooks_desc'] = 'What scripts to fire, if any, after the user has been registered. This can be a comma-separated list of hooks, and if the first fails, the proceeding ones will not fire. A hook can also be a Snippet name that will execute that Snippet.';
 $_lang['prop_register.useextended_desc'] = 'Whether or not to set any extra fields in the form to the Profiles extended field. This can be useful for storing extra user fields.';
@@ -70,6 +71,10 @@ $_lang['opt_register.blackglass'] = 'Black Glass';
 $_lang['opt_register.clean'] = 'Clean';
 $_lang['opt_register.red'] = 'Red';
 $_lang['opt_register.white'] = 'White';
+
+/* ConfirmRegister snippet */
+$_lang['prop_confirmregister.redirectto_desc'] = 'Optional. After a successful confirmation, redirect to this Resource.';
+$_lang['prop_confirmregister.redirectparams_desc'] = 'Optional. A JSON object of parameters to pass when redirecting using redirectTo.';
 
 /* ResetPassword snippet */
 $_lang['prop_resetpassword.tpl_desc'] = 'The reset password message tpl.';
