@@ -103,9 +103,19 @@ if ($activation && !empty($email) && !empty($activateResourceId)) {
     $confirmParams['lp'] = urlencode(base64_encode($pword));
     $confirmParams['lu'] = urlencode(base64_encode($user->get('username')));
     $confirmParams = array_merge($persistParams,$confirmParams);
+
+    /* if using redirectBack param, set here to allow dynamic redirection
+     * handling from other forms.
+     */
+    $redirectBack = $modx->getOption('redirectBack',$_REQUEST,$modx->getOption('redirectBack',$scriptProperties,''));
+    if (!empty($redirectBack)) {
+        $confirmParams['redirectBack'] = $redirectBack;
+    }
+
+    /* generate confirmation url */
     $confirmUrl = $modx->makeUrl($activateResourceId,'',$confirmParams,'full');
 
-    /* set the email properties */
+    /* set confirmation email properties */
     $emailTpl = $modx->getOption('activationEmailTpl',$scriptProperties,'lgnActivateEmail');
     $emailTplType = $modx->getOption('activationEmailTplType',$scriptProperties,'modChunk');
     $emailProperties = $user->toArray();

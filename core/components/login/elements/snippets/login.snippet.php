@@ -128,10 +128,12 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                         $errorMsg = $login->posthooks->getErrorMessage();
                         $modx->toPlaceholder('message',$errorMsg,$errorPrefix);
                     } else {
-                        $loginResourceId = $modx->getOption('loginResourceId',$scriptProperties,0);
+                        /* allow dynamic redirection handling */
+                        $redirectBack = $modx->getOption('redirectBack',$_REQUEST,$modx->getOption('redirectBack',$scriptProperties,''));
+                        /* otherwise specify a specific resource to redirect to */
+                        $loginResourceId = $modx->getOption('loginResourceId',$scriptProperties,$redirectBack);
                         /* login posthooks succeeded, now redirect */
                         if (!empty($loginResourceId)) {
-                            
                             $loginResourceParams = $modx->getOption('loginResourceParams',$scriptProperties,'');
                             if (!empty($loginResourceParams)) {
                                 $loginResourceParams = $modx->fromJSON($loginResourceParams);

@@ -75,8 +75,12 @@ $modx->invokeEvent('OnUserActivate',array(
     'user' => &$user,
 ));
 
-/* if wanting to redirect after confirmed registration (for shopping carts) */
-$redirectTo = $modx->getOption('redirectTo',$scriptProperties,'');
+/* if wanting to redirect after confirmed registration (for shopping carts)
+ * Also allow &redirectBack parameter sent in confirmation email to redirect
+ * to a form requiring registration
+ */
+$redirectBack = $modx->getOption('redirectBack',$_REQUEST,$modx->getOption('redirectBack',$scriptProperties,''));
+$redirectTo = !empty($scriptProperties['redirectTo']) ? $scriptProperties['redirectTo'] : $redirectBack;
 if (!empty($redirectTo)) {
     /* allow custom redirection params */
     $redirectParams = $modx->getOption('redirectParams',$scriptProperties,'');
