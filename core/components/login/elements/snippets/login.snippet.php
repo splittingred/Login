@@ -131,7 +131,7 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                         /* allow dynamic redirection handling */
                         $redirectBack = $modx->getOption('redirectBack',$_REQUEST,$modx->getOption('redirectBack',$scriptProperties,''));
                         /* otherwise specify a specific resource to redirect to */
-                        $loginResourceId = $modx->getOption('loginResourceId',$scriptProperties,$redirectBack);
+                        $loginResourceId = !empty($scriptProperties['loginResourceId']) ? $scriptProperties['loginResourceId'] : $redirectBack;
                         /* login posthooks succeeded, now redirect */
                         if (!empty($loginResourceId)) {
                             $loginResourceParams = $modx->getOption('loginResourceParams',$scriptProperties,'');

@@ -51,9 +51,11 @@ if ($modx->getOption('useExtended',$scriptProperties,true)) {
     $profile->set('extended',$extended);
 }
 
+/* allow overriding of class key */
+if (empty($fields['class_key'])) $fields['class_key'] = 'modUser';
+
 /* set user and profile */
 $user->fromArray($fields);
-$user->set('class_key','modUser');
 $user->set('username',$fields[$usernameField]);
 $user->set('active',0);
 $user->set('password',md5($fields['password']));
