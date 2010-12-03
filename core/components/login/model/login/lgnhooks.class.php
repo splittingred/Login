@@ -421,4 +421,36 @@ class lgnHooks {
         return $passed;
     }
 
+    /**
+     * Math field hook for anti-spam math input field.
+     *
+     * @access public
+     * @param array $fields An array of cleaned POST fields
+     * @return boolean True if email was successfully sent.
+     */
+    public function math(array $fields = array()) {
+        $op1Field = $this->modx->getOption('mathOp1Field',$this->login->config,'op1');
+        if (empty($fields[$op1Field])) { $this->errors[$mathField] = $this->modx->lexicon('register.math_field_nf',array('field' => $op1Field)); return false; }
+        $op2Field = $this->modx->getOption('mathOp2Field',$this->login->config,'op2');
+        if (empty($fields[$op2Field])) { $this->errors[$mathField] = $this->modx->lexicon('register.math_field_nf',array('field' => $op2Field)); return false; }
+        $operatorField = $this->modx->getOption('mathOperatorField',$this->login->config,'operator');
+        if (empty($fields[$operatorField])) { $this->errors[$mathField] = $this->modx->lexicon('register.math_field_nf',array('field' => $operatorField)); return false; }
+        $mathField = $this->modx->getOption('mathField',$this->login->config,'math');
+        if (empty($fields[$mathField])) { $this->errors[$mathField] = $this->modx->lexicon('register.math_field_nf',array('field' => $mathField)); return false; }
+
+        $answer = false;
+        $op1 = (int)$fields[$op1Field];
+        $op2 = (int)$fields[$op2Field];
+        switch ($fields[$operatorField]) {
+            case '+': $answer = $op1 + $op2; break;
+            case '-': $answer = $op1 - $op2; break;
+            case '*': $answer = $op1 * $op2; break;
+        }
+        $guess = (int)$fields[$mathField];
+        $passed = (boolean)($guess == $answer);
+        if (!$passed) {
+            $this->errors[$mathField] = $this->modx->lexicon('register.math_incorrect');
+        }
+        return $passed;
+    }
 }

@@ -24,14 +24,14 @@
  * 
  * @package login
  */
-$corePath = $modx->getOption('login.core_path',$scriptProperties,$modx->getOption('core_path',null,MODX_CORE_PATH).'components/login/');
-$login = $modx->getService('login','Login',$corePath.'model/login/',$scriptProperties);
-if (!is_object($login) || !($login instanceof Login)) return '';
+require_once $modx->getOption('login.core_path',null,$modx->getOption('core_path').'components/login/').'model/login/login.class.php';
+$login = new Login($modx,$scriptProperties);
 
 /* setup default properties */
 $preHooks = $modx->getOption('preHooks',$scriptProperties,'');
 $submitVar = $modx->getOption('submitVar',$scriptProperties,'login-register-btn');
 $errTpl = $modx->getOption('errTpl',$scriptProperties,'<span class="error">[[+error]]</span>');
+$placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'');
 
 /* if using recaptcha, load recaptcha html */
 if (strpos($preHooks,'recaptcha') !== false) {
@@ -42,10 +42,26 @@ if (strpos($preHooks,'recaptcha') !== false) {
         $recaptchaWidth = $modx->getOption('recaptchaWidth',$scriptProperties,500);
         $recaptchaHeight = $modx->getOption('recaptchaHeight',$scriptProperties,300);
         $html = $recaptcha->getHtml($recaptchaTheme,$recaptchaWidth,$recaptchaHeight);
-        $modx->setPlaceholder('register.recaptcha_html',$html);
+        $modx->setPlaceholder($placeholderPrefix.'recaptcha_html',$html);
     } else {
         $modx->log(modX::LOG_LEVEL_ERROR,'[Register] '.$this->modx->lexicon('register.recaptcha_err_load'));
     }
+}
+
+/* if using math hook, load default placeholders */
+if (strpos($preHooks,'math') !== false && empty($_POST)) {
+    $mathMaxRange = $modx->getOption('mathMaxRange',$scriptProperties,100);
+    $mathMinRange = $modx->getOption('mathMinRange',$scriptProperties,10);
+    $op1 = rand($mathMinRange,$mathMaxRange);
+    $op2 = rand($mathMinRange,$mathMaxRange);
+    if ($op2 > $op1) { $t = $op2; $op2 = $op1; $op1 = $t; } /* swap so we always get positive #s */
+    $operators = array('+','-');
+    $operator = rand(0,1);
+    $modx->setPlaceholders(array(
+        $modx->getOption('mathOp1Field',$scriptProperties,'op1') => $op1,
+        $modx->getOption('mathOp2Field',$scriptProperties,'op2') => $op2,
+        $modx->getOption('mathOperatorField',$scriptProperties,'operator') => $operators[$operator],
+    ),$placeholderPrefix);
 }
 
 /* check for POST */
@@ -107,15 +123,15 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
             foreach ($login->preHooks->errors as $key => $error) {
                 $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
             }
-            $modx->toPlaceholders($errors,'error');
+            $modx->toPlaceholders($errors,$placeholderPrefix.'error');
 
             $errorMsg = $login->preHooks->getErrorMessage();
-            $modx->toPlaceholder('message',$errorMsg,'error');
+            $modx->setPlaceholder($placeholderPrefix.'error.message',$errorMsg);
         } else {
             /* everything good, go ahead and register */
             $result = require_once $login->config['processorsPath'].'register.php';
             if ($result !== true) {
-                $modx->setPlaceholder('error.message',$result);
+                $modx->setPlaceholder($placeholderPrefix.'error.message',$result);
             }
         }
     } else {
@@ -123,9 +139,9 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
         foreach ($login->validator->errors as $key => $error) {
             $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
         }
-        $modx->toPlaceholders($errors,'error');
+        $modx->toPlaceholders($errors,$placeholderPrefix.'error');
     }
-    $modx->toPlaceholders($fields);
+    $modx->setPlaceholders($fields,$placeholderPrefix);
 }
 
 return '';

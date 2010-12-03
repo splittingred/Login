@@ -198,6 +198,55 @@ $properties = array(
         'value' => 'clean',
         'lexicon' => 'login:properties',
     ),
+    /* math hook */
+    array(
+        'name' => 'mathMinRange',
+        'desc' => 'prop_register.mathminrange_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 10,
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'mathMaxRange',
+        'desc' => 'prop_register.mathmaxrange_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 100,
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'mathField',
+        'desc' => 'prop_register.mathfield_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 'math',
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'mathOp1Field',
+        'desc' => 'prop_register.mathop1field_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 'op1',
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'mathOp2Field',
+        'desc' => 'prop_register.mathop2field_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 'op2',
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'mathOperatorField',
+        'desc' => 'prop_register.mathoperatorfield_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 'operator',
+        'lexicon' => 'login:properties',
+    ),
 );
 
 return $properties;
