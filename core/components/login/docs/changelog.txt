@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.5.0
 ====================================
+- [#15] Added ability to assign roles when using &usergroups in Register, ie: &usergroups=`my-group-name:Member`
 - Added math hook to Register, allowing anti-spam math field measure
 - Added fix to allow overriding of class_key for new users in Register
 

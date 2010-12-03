@@ -67,19 +67,29 @@ $usergroups = $modx->getOption('usergroups',$scriptProperties,'');
 if (!empty($usergroups)) {
     $usergroups = explode(',',$usergroups);
 
-    foreach ($usergroups as $usergroupPk) {
+    foreach ($usergroups as $usergroupMeta) {
+        $usergroupMeta = explode(':',$usergroupMeta);
+        if (empty($usergroupMeta[0])) continue;
+
+        /* get usergroup */
         $pk = array();
-        if (is_numeric($usergroupPk)) {
-            $pk['id'] = $usergroupPk;
-        } else {
-            $pk['name'] = $usergroupPk;
-        }
+        $pk[intval($usergroupMeta[0]) > 0 ? 'id' : 'name'] = $usergroupMeta[0];
         $usergroup = $modx->getObject('modUserGroup',$pk);
         if (!$usergroup) continue;
 
+        /* get role */
+        $rolePk = !empty($usergroupMeta[1]) ? $usergroupMeta[1] : 'Member';
+        $role = $modx->getObject('modUserGroupRole',array('name' => $rolePk));
+
+        /* create membership */
         $member = $modx->newObject('modUserGroupMember');
         $member->set('member',$user->get('id'));
         $member->set('user_group',$usergroup->get('id'));
+        if (!empty($role)) {
+            $member->set('role',$role->get('id'));
+        } else {
+            $member->set('role',1);
+        }
         $user->addMany($member,'UserGroupMembers');
     }
 }
