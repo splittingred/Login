@@ -78,7 +78,7 @@ $modx->invokeEvent('OnUserActivate',array(
 if ($modx->getOption('authenticate',$scriptProperties,true)) {
     $modx->user =& $user;
     $modx->getUser();
-    $contexts = $modx->getOption('authenticateContexts',$scriptProperties,$modx->context->get('key'));
+    $contexts = !empty($scriptProperties['authenticateContexts']) ? $scriptProperties['authenticateContexts'] : $modx->context->get('key');
     $contexts = explode(',',$contexts);
     foreach ($contexts as $ctx) {
         $modx->user->addSessionContext($ctx);

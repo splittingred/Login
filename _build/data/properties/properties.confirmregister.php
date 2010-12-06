@@ -43,6 +43,22 @@ $properties = array(
         'value' => '',
         'lexicon' => 'login:properties',
     ),
+    array(
+        'name' => 'authenticate',
+        'desc' => 'prop_confirmregister.authenticate_desc',
+        'type' => 'combo-boolean',
+        'options' => '',
+        'value' => true,
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'authenticateContexts',
+        'desc' => 'prop_confirmregister.authenticatecontexts_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
 );
 
 return $properties;
