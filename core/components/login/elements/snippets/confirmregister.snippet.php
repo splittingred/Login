@@ -75,6 +75,16 @@ $modx->invokeEvent('OnUserActivate',array(
     'user' => &$user,
 ));
 
+if ($modx->getOption('authenticate',$scriptProperties,true)) {
+    $modx->user =& $user;
+    $modx->getUser();
+    $contexts = $modx->getOption('authenticateContexts',$scriptProperties,$modx->context->get('key'));
+    $contexts = explode(',',$contexts);
+    foreach ($contexts as $ctx) {
+        $modx->user->addSessionContext($ctx);
+    }
+}
+
 /* if wanting to redirect after confirmed registration (for shopping carts)
  * Also allow &redirectBack parameter sent in confirmation email to redirect
  * to a form requiring registration
@@ -93,6 +103,7 @@ if (!empty($redirectTo)) {
     $persistParams['username'] = $user->get('username');
     $persistParams['userid'] = $user->get('id');    
     $redirectParams = array_merge($redirectParams,$persistParams);
+    unset($redirectParams[$modx->getOption('request_param_alias',null,'q')],$redirectParams['redirectBack']);
 
     /* redirect user */
     $url = $modx->makeUrl($redirectTo,'',$redirectParams);
