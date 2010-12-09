@@ -77,6 +77,9 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     /* handle validation */
     $login->loadValidator();
     $fields = $login->validator->validateFields($_POST);
+    foreach ($fields as $k => $v) {
+        $fields[$k] = str_replace(array('[',']'),array('&#91;','&#93'),$v);
+    }
 
     if (empty($fields[$usernameField])) {
         $login->validator->errors[$usernameField] = $modx->lexicon('register.field_required');

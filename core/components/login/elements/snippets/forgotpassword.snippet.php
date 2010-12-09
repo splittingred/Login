@@ -83,9 +83,10 @@ if (!empty($_POST['login_fp_service'])) {
         $tpl = $sentTpl;
     }
 }
-
 if (!empty($_POST)) {
-    foreach ($_POST as $k => $v) { $phs['loginfp.post.'.$k] = $v; }
+    foreach ($_POST as $k => $v) {
+        $phs['loginfp.post.'.$k] = str_replace(array('[',']'),array('&#91;','&#93'),$v);
+    }
 }
 
 $output = $Login->getChunk($tpl,$phs,$tplType);

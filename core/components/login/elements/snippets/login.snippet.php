@@ -263,6 +263,9 @@ $actionMsg = $authenticated
 
 $modx->setPlaceholder('actionMsg', $actionMsg);
 $phs = $authenticated ? $scriptProperties : array_merge($scriptProperties, $_POST);
+foreach ($phs as $k => $v) {
+    $phs[$k] = str_replace(array('[',']'),array('&#91;','&#93'),$v);
+}
 /* make sure to strip out logout GET parameter to prevent ghost logout */
 if (!$redirectToPrior) {
     $phs['request_uri'] = str_replace(array('?service='.$logoutKey,'&service='.$logoutKey,'&amp;service='.$logoutKey),'',$_SERVER['REQUEST_URI']);
