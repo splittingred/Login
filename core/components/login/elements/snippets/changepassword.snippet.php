@@ -44,7 +44,7 @@ if (!empty($_POST) && isset($_POST[$submitVar])) {
     $login->loadValidator();
     $fields = $login->validator->validateFields($_POST);
     foreach ($fields as $k => $v) {
-        $fields[$k] = str_replace(array('[',']'),array('&#91;','&#93'),$v);
+        $fields[$k] = str_replace(array('[',']'),array('&#91;','&#93;'),$v);
     }
     if (!empty($submitVar)) unset($fields[$submitVar]);
     $errors = $login->validator->errors;

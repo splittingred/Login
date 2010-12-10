@@ -40,6 +40,8 @@ $emailTpl = !empty($emailTpl) ? $emailTpl : 'lgnForgotPassEmail';
 $emailTplType = !empty($emailTplType) ? $emailTplType : 'modChunk';
 $emailSubject = !empty($emailSubject) ? $emailSubject : '';
 $resetResourceId = !empty($resetResourceId) ? $resetResourceId : 1;
+$redirectTo = $modx->getOption('redirectTo',$scriptProperties,false);
+$redirectParams = $modx->getOption('redirectParams',$scriptProperties,'');
 
 /* get the request URI */
 $phs = array(
@@ -81,6 +83,13 @@ if (!empty($_POST['login_fp_service'])) {
         $subject = !empty($emailSubject) ? $emailSubject : $modx->getOption('login.forgot_password_email_subject',$scriptProperties,$modx->lexicon('login.forgot_password_email_subject'));
         $Login->sendEmail($user->get('email'),$user->get('username'),$subject,$emailProperties);
         $tpl = $sentTpl;
+
+        /* if redirecting, do so here */
+        if (!empty($redirectTo)) {
+            if (!empty($redirectParams)) $redirectParams = $modx->fromJSON($redirectParams);
+            $url = $modx->makeUrl($redirectTo,'',$redirectParams);
+            $modx->sendRedirect($url);
+        }
     }
 }
 if (!empty($_POST)) {

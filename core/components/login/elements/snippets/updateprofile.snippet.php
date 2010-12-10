@@ -27,6 +27,7 @@
 $login = $modx->getService('login','Login',$modx->getOption('login.core_path',null,$modx->getOption('core_path').'components/login/').'model/login/',$scriptProperties);
 if (!($login instanceof Login)) return '';
 $modx->lexicon->load('login:updateprofile');
+$modx->lexicon->load('login:register');
 
 /* setup default properties */
 $preHooks = $modx->getOption('preHooks',$scriptProperties,'');
@@ -71,7 +72,7 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     $login->loadValidator();
     $fields = $login->validator->validateFields($_POST);
     foreach ($fields as $k => $v) {
-        $fields[$k] = str_replace(array('[',']'),array('&#91;','&#93'),$v);
+        $fields[$k] = str_replace(array('[',']'),array('&#91;','&#93;'),$v);
     }
     if (!empty($submitVar)) unset($fields[$submitVar]);
 
@@ -110,6 +111,10 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
                 $modx->setPlaceholder('login.update_success',true);
             }
         }
+    }
+    $errors = array();
+    foreach ($login->validator->errors as $key => $error) {
+      $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
     }
     $modx->toPlaceholders($login->validator->errors,'error');
     $modx->toPlaceholders($fields);

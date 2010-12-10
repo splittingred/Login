@@ -1,5 +1,12 @@
 Changelog file for Login component.
 
+Login 1.5.1
+====================================
+- [#28] Fixed validator issue in UpdateProfile
+- Added redirectTo and redirectParams on ForgotPassword snippet
+- Updated events in ResetPassword snippet to pass user object
+- Fixed UpdateProfile to properly update user obj so derivative User classes can manage profile updates
+
 Login 1.5.0
 ====================================
 - Fixed security vulnerability

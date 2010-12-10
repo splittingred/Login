@@ -71,7 +71,8 @@ if (!empty($syncUsername)) {
 }
 
 /* if save is unsuccessful */
-if ($profile->save() == false) {
+$modx->user->addOne($profile,'Profile');
+if ($modx->user->save() == false) {
     /* first revert username change */
     if ($usernameChanged) {
         $modx->user->set('username',$oldUsername);

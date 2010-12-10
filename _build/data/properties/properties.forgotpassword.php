@@ -97,6 +97,22 @@ $properties = array(
         'value' => 1,
         'lexicon' => 'login:properties',
     ),
+    array(
+        'name' => 'redirectTo',
+        'desc' => 'prop_forgotpassword.redirectto_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'redirectParams',
+        'desc' => 'prop_forgotpassword.redirectparams_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
 );
 
 return $properties;

@@ -122,7 +122,7 @@ $properties = array(
         'desc' => 'prop_login.loginresourceid_desc',
         'type' => 'textfield',
         'options' => '',
-        'value' => '0',
+        'value' => 0,
         'lexicon' => 'login:properties',
     ),
     array(
@@ -138,7 +138,7 @@ $properties = array(
         'desc' => 'prop_login.logoutresourceid_desc',
         'type' => 'textfield',
         'options' => '',
-        'value' => '0',
+        'value' => 0,
         'lexicon' => 'login:properties',
     ),
     array(

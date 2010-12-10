@@ -62,11 +62,15 @@ $modx->invokeEvent('OnWebChangePassword', array (
     'userid' => $user->get('id'),
     'username' => $user->get('username'),
     'userpassword' => $password,
+    'user' => &$user,
+    'newpassword' => $password,
 ));
 $modx->invokeEvent('OnUserChangePassword', array (
     'userid' => $user->get('id'),
     'username' => $user->get('username'),
     'userpassword' => $password,
+    'user' => &$user,
+    'newpassword' => $password,
 ));
 
 $phs = array(
