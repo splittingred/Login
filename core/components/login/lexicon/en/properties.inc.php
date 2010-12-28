@@ -60,6 +60,7 @@ $_lang['prop_register.activationemail_desc'] = 'If set, will sent activation ema
 $_lang['prop_register.activationemailsubject_desc'] = 'The subject of the activation email.';
 $_lang['prop_register.activationemailtpltype_desc'] = 'The type of tpls being provided for the activation email.';
 $_lang['prop_register.activationemailtpl_desc'] = 'The activation email tpl.';
+$_lang['prop_register.placeholderprefix_desc'] = 'The prefix to use for all placeholders set by this snippet.';
 $_lang['prop_register.recaptchaheight_desc'] = 'If `recaptcha` is set as a preHook, this will select the height for the reCaptcha widget.';
 $_lang['prop_register.recaptchatheme_desc'] = 'If `recaptcha` is set as a preHook, this will select a theme for the reCaptcha widget.';
 $_lang['prop_register.recaptchawidth_desc'] = 'If `recaptcha` is set as a preHook, this will set the width for the reCaptcha widget.';
@@ -94,10 +95,12 @@ $_lang['prop_updateprofile.submitvar_desc'] = 'The var to check for to load the 
 $_lang['prop_updateprofile.redirecttologin_desc'] = 'If a user is not logged in and accesses this Resource, redirect them to the Unauthorized Page.';
 $_lang['prop_updateprofile.reloadonsuccess_desc'] = 'If true, the page will redirect to itself with a GET parameter to prevent double-postbacks. If false, it will simply set a success placeholder.';
 $_lang['prop_updateprofile.syncusername_desc'] = 'If set to a column name in the Profile, UpdateProfile will attempt to sync the username to this field after a successful save.';
+$_lang['prop_updateprofile.emailfield_desc'] = 'The field name for the email field in the form.';
 $_lang['prop_updateprofile.useextended_desc'] = 'Whether or not to set any extra fields in the form to the Profiles extended field. This can be useful for storing extra user fields.';
 $_lang['prop_updateprofile.excludeextended_desc'] = 'A comma-separated list of fields to exclude from setting as extended fields.';
 $_lang['prop_updateprofile.prehooks_desc'] = 'What scripts to fire, if any, before the form passes validation. This can be a comma-separated list of hooks, and if the first fails, the proceeding ones will not fire. A hook can also be a Snippet name that will execute that Snippet.';
 $_lang['prop_updateprofile.posthooks_desc'] = 'What scripts to fire, if any, after the user has been registered. This can be a comma-separated list of hooks, and if the first fails, the proceeding ones will not fire. A hook can also be a Snippet name that will execute that Snippet.';
+$_lang['prop_updateprofile.placeholderprefix_desc'] = 'The prefix to use for all placeholders set by this snippet.';
 
 /* ChangePassword snippet */
 $_lang['prop_changepassword.submitvar_desc'] = 'The var to check for to load the ChangePassword functionality. If empty or set to false, ChangePassword will process the form on all POST requests.';

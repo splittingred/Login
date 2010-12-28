@@ -60,7 +60,7 @@ $oldUsername = $modx->user->get('username');
 $usernameChanged = false;
 if (!empty($syncUsername)) {
     $newUsername = $profile->get($syncUsername);
-    if (!empty($newUsername) && strcmp($newUsername,$oldUsername) == 0) {
+    if (!empty($newUsername) && strcmp($newUsername,$oldUsername) != 0) {
         $alreadyExists = $modx->getCount('modUser',array('username' => $newUsername));
         if (!empty($alreadyExists)) {
             return $modx->lexicon('login.username_err_ae');

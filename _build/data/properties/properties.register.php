@@ -184,6 +184,14 @@ $properties = array(
         'value' => 'lgnActivateEmailTpl',
         'lexicon' => 'login:properties',
     ),
+    array(
+        'name' => 'placeholderPrefix',
+        'desc' => 'prop_register.placeholderprefix_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
     /* recaptcha hook */
     array(
         'name' => 'recaptchaTheme',

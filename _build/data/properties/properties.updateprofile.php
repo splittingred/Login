@@ -60,6 +60,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'emailField',
+        'desc' => 'prop_updateprofile.emailfield_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 'email',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'useExtended',
         'desc' => 'prop_updateprofile.useextended_desc',
         'type' => 'combo-boolean',
@@ -86,6 +94,14 @@ $properties = array(
     array(
         'name' => 'postHooks',
         'desc' => 'prop_updateprofile.posthooks_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'placeholderPrefix',
+        'desc' => 'prop_updateprofile.placeholderprefix_desc',
         'type' => 'textfield',
         'options' => '',
         'value' => '',
