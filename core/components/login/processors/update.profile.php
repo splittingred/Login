@@ -47,7 +47,7 @@ if ($modx->getOption('useExtended',$scriptProperties,true)) {
     }
     /* now merge with existing extended data */
     $extended = $profile->get('extended');
-    $extended = array_merge($extended,$newExtended);
+    $extended = is_array($extended) ? array_merge($extended,$newExtended) : $newExtended;
     $profile->set('extended',$extended);
 }
 
