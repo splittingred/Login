@@ -76,6 +76,7 @@ class lgnHooks {
         $this->hooks = array();
         $this->fields =& $fields;
         foreach ($hooks as $hook) {
+            $hook = trim($hook);
             $success = $this->load($hook,$this->fields,$options);
             if (!$success) return $this->hooks;
             /* dont proceed if hook fails */

@@ -60,6 +60,7 @@ $user->set('username',$fields[$usernameField]);
 $user->set('active',0);
 $user->set('password',md5($fields['password']));
 $profile->fromArray($fields);
+$profile->set('internalKey',0);
 $user->addOne($profile,'Profile');
 
 /* if usergroups set */
@@ -83,7 +84,7 @@ if (!empty($usergroups)) {
 
         /* create membership */
         $member = $modx->newObject('modUserGroupMember');
-        $member->set('member',$user->get('id'));
+        $member->set('member',0);
         $member->set('user_group',$usergroup->get('id'));
         if (!empty($role)) {
             $member->set('role',$role->get('id'));

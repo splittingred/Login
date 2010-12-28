@@ -2,6 +2,8 @@ Changelog file for Login component.
 
 Login 1.5.1
 ====================================
+- [#43] Add workaround for xPDO bug with NULL fields in modUserProfile
+- Trim each hook specification in hooks calls
 - [#28] Fixed validator issue in UpdateProfile
 - Added redirectTo and redirectParams on ForgotPassword snippet
 - Updated events in ResetPassword snippet to pass user object
