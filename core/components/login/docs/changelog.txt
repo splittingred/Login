@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.5.1
 ====================================
+- [#40] Fix issue with syncUsername in UpdateProfile
 - [#42] Respect allow_multiple_emails setting that prevents users with same email addresses
 - [#43] Add workaround for xPDO bug with NULL fields in modUserProfile
 - Trim each hook specification in hooks calls
