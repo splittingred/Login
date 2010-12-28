@@ -57,6 +57,9 @@ class lgnValidator {
         $this->login =& $login;
         $this->modx =& $login->modx;
         $this->config = array_merge(array(
+            'use_multibyte' => (boolean)$this->modx->getOption('use_multibyte',null,false),
+            'encoding' => $this->modx->getOption('modx_charset',null,'UTF-8'),
+            'customValidators' => !empty($this->login->config['customValidators']) ? explode(',',$this->login->config['customValidators']) : array(),
         ),$config);
     }
 
@@ -74,15 +77,43 @@ class lgnValidator {
      */
     public function validateFields(array $keys = array()) {
         $this->fields = array();
+
+        /* process the list of fields that will be validated */
+        $validationFields = explode(',',$validationFields);
+        $fieldValidators = array();
+        foreach ($validationFields as $idx => $v) {
+            $v = trim(ltrim($v),' '); /* allow multi-line definitions */
+            $key = explode(':',$v); /* explode into list separated by : */
+            if (!empty($key[0])) {
+                $field = $key[0];
+                array_splice($key,0,1); /* remove the field name from validator list */
+                $fieldValidators[$field] = $key;
+            }
+        }
+
+        /* do it the old way, through name:validator on the POST */
         foreach ($keys as $k => $v) {
             $key = explode(':',$k);
-            $validators = count($key);
+
+            $stripTags = strpos($k,'allowTags') === false;
+            if (isset($fieldValidators[$k])) {
+                foreach ($fieldValidators[$k] as $fv) {
+                    if (strpos($fv,'allowTags') !== false) {
+                        $stripTags = false;
+                    }
+                }
+            }
 
             /* strip tags by default */
-            if (strpos($k,'allowTags') === false && !is_array($v)) {
+            if ($stripTags && !is_array($v)) {
                 $v = strip_tags($v);
             }
-            
+
+            /* handle checkboxes/radios with empty hiddens before that are field[] names */
+            if (is_array($v) && !isset($_FILES[$key[0]]) && empty($v[0])) array_splice($v,0,1);
+
+            /* loop through validators and execute the old way, for backwards compatibility */
+            $validators = count($key);
             if ($validators > 1) {
                 $this->fields[$key[0]] = $v;
                 for ($i=1;$i<$validators;$i++) {
@@ -90,6 +121,13 @@ class lgnValidator {
                 }
             } else {
                 $this->fields[$k] = $v;
+            }
+
+            /* do new way of validation, which is more secure */
+            if (!empty($fieldValidators[$k])) {
+                foreach ($fieldValidators[$k] as $validator) {
+                    $this->validate($k,$v,$validator);
+                }
             }
         }
         return $this->fields;
@@ -126,33 +164,42 @@ class lgnValidator {
     public function validate($key,$value,$type = '') {
         $validated = false;
 
-        $hasParams = strpos($type,'=');
+        $hasParams = $this->config['use_multibyte'] ? mb_strpos($type,'=',0,$this->config['encoding']) : strpos($type,'=');
         $param = null;
         if ($hasParams !== false) {
-            $param = str_replace('`','',substr($type,$hasParams+1,strlen($type)));
-            $type = substr($type,0,$hasParams);
+            $len = $this->config['use_multibyte'] ? mb_strlen($type,$this->config['encoding']) : strlen($type);
+            $s = $this->config['use_multibyte'] ? mb_substr($type,$hasParams+1,$len,$this->config['encoding']) : substr($type,$hasParams+1,$len);
+            $param = str_replace(array('`','^'),'',$s);
+            $type = $this->config['use_multibyte'] ? mb_substr($type,0,$hasParams,$this->config['encoding']) : substr($type,0,$hasParams);
         }
 
         $invNames = array('validate','validateFields','_addError','__construct');
-        if (method_exists($this,$type) && $type != 'validate') {
+        if (method_exists($this,$type) && !in_array($type,$invNames)) {
             /* built-in validator */
             $validated = $this->$type($key,$value,$param);
 
-        } else if ($snippet = $this->modx->getObject('modSnippet',array('name' => $type))) {
-            /* custom snippet validator */
-            $props = array_merge($this->login->config,array(
-                'key' => $key,
-                'value' => $value,
-                'param' => $param,
-                'type' => $type,
-                'validator' => &$this,
-                'errors' => &$this->errors,
-            ));
-            $validated = $snippet->process($props);
-
+        } else if (in_array($type,$this->config['customValidators'])) {
+            /* attempt to grab custom validator */
+            $snippet = $this->modx->getObject('modSnippet',array('name' => $type));
+            if ($snippet) {
+                /* custom snippet validator */
+                $props = array_merge($this->login->config,array(
+                    'key' => $key,
+                    'value' => $value,
+                    'param' => $param,
+                    'type' => $type,
+                    'validator' => &$this,
+                    'errors' => &$this->errors,
+                ));
+                $validated = $snippet->process($props);
+            } else {
+                /* no validator found */
+                $this->modx->log(modX::LOG_LEVEL_ERROR,'[Register] Could not find validator "'.$type.'" for field "'.$key.'".');
+                $validated = true;
+            }
         } else {
             /* no validator found */
-            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Register] Could not find validator "'.$type.'" for field "'.$key.'".');
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Register] Validator "'.$type.'" for field "'.$key.'" was not specified in the customValidators property.');
             $validated = true;
         }
 
@@ -176,8 +223,9 @@ class lgnValidator {
      * @param string $value The error message.
      * @return string The added error message with the error wrapper.
      */
-    private function _addError($key,$value) {
-        $this->errors[$key] .= $value;
+    public function addError($key,$value) {
+        $errTpl = $this->modx->getOption('errTpl',$this->login->config,'<span class="error">[[+error]]</span>');
+        $this->errors[$key] .= ' '.str_replace('[[+error]]',$value,$errTpl);
         return $this->errors[$key];
     }
 
@@ -186,19 +234,19 @@ class lgnValidator {
      */
     public function required($key,$value) {
         $success = false;
-        if (is_array($value)) {
+        if (is_array($value) && isset($_FILES[$key])) { /* handling file uploads */
             $success = !empty($value['tmp_name']) && isset($value['error']) && $value['error'] == UPLOAD_ERR_OK ? true : false;
         } else {
             $success = !empty($value) ? true : false;
         }
-        return !empty($value) ? true : $this->modx->lexicon('register.field_required');
+        return $success ? true : $this->modx->lexicon('register.field_required',array('field' => $key, 'value' => $value));
     }
 
     /**
      * Checks to see if field is blank.
      */
     public function blank($key,$value) {
-        return empty($value) ? true : $this->modx->lexicon('register.field_not_empty');
+        return empty($value) ? true : $this->modx->lexicon('register.field_not_empty',array('field' => $key, 'value' => $value));
     }
 
     /**
@@ -207,7 +255,7 @@ class lgnValidator {
     public function password_confirm($key,$value,$param = 'password_confirm') {
         if (empty($value)) return $this->modx->lexicon('register.password_not_confirmed');
         if ($this->fields[$param] != $value) {
-            return $this->modx->lexicon('register.password_dont_match');
+            return $this->modx->lexicon('register.password_dont_match',array('field' => $key, 'password' => $value, 'password_confirm' => $this->fields[$param]));
         }
         return true;
     }
@@ -217,26 +265,34 @@ class lgnValidator {
      */
     public function email($key,$value) {
         /* validate length and @ */
-        if (!@ereg("^[^@]{1,64}\@[^\@]{1,255}$", $value)) {
-            return $this->modx->lexicon('register.email_invalid');
+        $pattern = "^[^@]{1,64}\@[^\@]{1,255}$";
+        $condition = $this->config['use_multibyte'] ? @mb_ereg($pattern,$value) : @ereg($pattern, $value);
+        if (!$condition || empty($value)) {
+            return $this->modx->lexicon('register.email_invalid',array('field' => $key, 'value' => $value));
         }
 
         $email_array = explode("@", $value);
         $local_array = explode(".", $email_array[0]);
         for ($i = 0; $i < sizeof($local_array); $i++) {
-            if (!@ereg("^(([A-Za-z0-9!#$%&'*+/=?^_`{|}~-][A-Za-z0-9!#$%&'*+/=?^_`{|}~\.-]{0,63})|(\"[^(\\|\")]{0,62}\"))$",$local_array[$i])) {
-                return $this->modx->lexicon('register.email_invalid');
+            $pattern = "^(([A-Za-z0-9!#$%&'*+/=?^_`{|}~-][A-Za-z0-9!#$%&'*+/=?^_`{|}~\.-]{0,63})|(\"[^(\\|\")]{0,62}\"))$";
+            $condition = $this->config['use_multibyte'] ? @mb_ereg($pattern,$local_array[$i]) : @ereg($pattern,$local_array[$i]);
+            if (!$condition) {
+                return $this->modx->lexicon('register.email_invalid',array('field' => $key, 'value' => $value));
             }
         }
         /* validate domain */
-        if (!@ereg("^\[?[0-9\.]+\]?$", $email_array[1])) {
+        $pattern = "^\[?[0-9\.]+\]?$";
+        $condition = $this->config['use_multibyte'] ? @mb_ereg($pattern, $email_array[1]) : @ereg($pattern, $email_array[1]);
+        if (!$condition) {
             $domain_array = explode(".", $email_array[1]);
             if (sizeof($domain_array) < 2) {
-                return $this->modx->lexicon('register.email_invalid_domain');
+                return $this->modx->lexicon('register.email_invalid_domain',array('field' => $key, 'value' => $value));
             }
             for ($i = 0; $i < sizeof($domain_array); $i++) {
-                if (!@ereg("^(([A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9])|([A-Za-z0-9]+))$",$domain_array[$i])) {
-                    return $this->modx->lexicon('register.email_invalid_domain');
+                $pattern = "^(([A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9])|([A-Za-z0-9]+))$";
+                $condition = $this->config['use_multibyte'] ? @mb_ereg($pattern,$domain_array[$i]) : @ereg($pattern,$domain_array[$i]);
+                if (!$condition) {
+                    return $this->modx->lexicon('register.email_invalid_domain',array('field' => $key, 'value' => $value));
                 }
             }
         }
@@ -244,50 +300,53 @@ class lgnValidator {
     }
 
     /**
-     * Checks to see if field value is shorter than $param
+     * Checks to see if field value is shorter than $param.
      */
     public function minLength($key,$value,$param = 0) {
-        if (strlen($value) < $param) {
-            return $this->modx->lexicon('register.min_length',array('length' => $param));
+        $v = $this->config['use_multibyte'] ? mb_strlen($value,$this->config['encoding']) : strlen($value);
+        if ($v < $param) {
+            return $this->modx->lexicon('register.min_length',array('length' => $param, 'field' => $key, 'value' => $value));
         }
         return true;
     }
 
     /**
-     * Checks to see if field value is longer than $param
+     * Checks to see if field value is longer than $param.
      */
     public function maxLength($key,$value,$param = 999) {
-        if (strlen($value) > $param) {
-            return $this->modx->lexicon('register.max_length',array('length' => $param));
+        $v = $this->config['use_multibyte'] ? mb_strlen($value,$this->config['encoding']) : strlen($value);
+        if ($v > $param) {
+            return $this->modx->lexicon('register.max_length',array('length' => $param, 'field' => $key, 'value' => $value));
         }
         return true;
     }
 
     /**
-     * Checks to see if field value is less than $param
+     * Checks to see if field value is less than $param.
      */
     public function minValue($key,$value,$param = 0) {
         if ((float)$value < (float)$param) {
-            return $this->modx->lexicon('register.min_value',array('value' => $param));
+            return $this->modx->lexicon('register.min_value',array('field' => $key,'value' => $param));
         }
         return true;
     }
 
     /**
-     * Checks to see if field value is greater than $param
+     * Checks to see if field value is greater than $param.
      */
     public function maxValue($key,$value,$param = 0) {
         if ((float)$value > (float)$param) {
-            return $this->modx->lexicon('register.max_value',array('value' => $param));
+            return $this->modx->lexicon('register.max_value',array('field' => $key,'value' => $param));
         }
         return true;
     }
+
     /**
      * See if field contains a certain value.
      */
     public function contains($key,$value,$expr = '') {
         if (!preg_match('/'.$expr.'/i',$value)) {
-            return $this->modx->lexicon('formit.contains',array('value' => $expr));
+            return $this->modx->lexicon('register.contains',array('field' => $key,'value' => $expr));
         }
         return true;
     }
@@ -298,7 +357,6 @@ class lgnValidator {
     public function strip($key,$value,$param = '') {
         $this->fields[$key] = str_replace($param,'',$value);
     }
-
     /**
      * Strip all tags in the field. The parameter can be a string of allowed
      * tags.
@@ -313,6 +371,7 @@ class lgnValidator {
      * tags.
      */
     public function allowTags($key,$value,$allowedTags = '<strong><em><b><i><li><ul><a>') {
+        if (empty($allowedTags)) $allowedTags = '<strong><em><b><i><li><ul><a>';
         $this->fields[$key] = strip_tags($value,$allowedTags);
         return true;
     }
@@ -328,6 +387,9 @@ class lgnValidator {
             return $this->modx->lexicon('register.range',array(
                 'min' => $range[0],
                 'max' => $range[1],
+                'field' => $key,
+                'value' => $value,
+                'ranges' => $ranges,
             ));
         }
         return true;
@@ -338,22 +400,39 @@ class lgnValidator {
      */
      public function isNumber($key,$value) {
          if (!is_numeric($value)) {
-             return $this->modx->lexicon('register.not_number');
+             return $this->modx->lexicon('register.not_number',array('field' => $key,'value' => $value));
          }
+         return true;
      }
 
     /**
      * Checks to see if the field is a valid date. Allows for date formatting as
      * well.
      */
-    public function isDate($key,$value,$format = '') {
+    public function isDate($key,$value,$format = '%m/%d/%Y') {
         $ts = strtotime($value);
-        if ($ts === false) {
-            return $this->modx->lexicon('register.not_date');
+        if ($ts === false || empty($value)) {
+            return $this->modx->lexicon('register.not_date',array('format' => $format,'field' => $key, 'value' => $value));
         }
         if (!empty($format)) {
             $this->fields[$key] = strftime($format,$ts);
         }
         return true;
+    }
+
+    /**
+     * Checks to see if a string is all lowercase
+     */
+    public function islowercase($key,$value) {
+        $v = $this->config['use_multibyte'] ? mb_strtolower($value,$this->config['encoding']) : strtolower($value);
+        return strcmp($v,$value) == 0 ? true : $this->modx->lexicon('register.not_lowercase',array('field' => $key,'value' => $value));
+    }
+
+    /**
+     * Checks to see if a string is all uppercase
+     */
+    public function isuppercase($key,$value) {
+        $v = $this->config['use_multibyte'] ? mb_strtoupper($value,$this->config['encoding']) : strtoupper($value);
+        return strcmp($v,$value) == 0 ? true : $this->modx->lexicon('register.not_lowercase',array('field' => $key,'value' => $value));
     }
 }

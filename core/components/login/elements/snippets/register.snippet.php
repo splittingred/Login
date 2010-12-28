@@ -81,6 +81,7 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
         $fields[$k] = str_replace(array('[',']'),array('&#91;','&#93;'),$v);
     }
 
+    /* ensure username field exists and isn't empty */
     if (empty($fields[$usernameField])) {
         $login->validator->errors[$usernameField] = $modx->lexicon('register.field_required');
     } else {
@@ -101,12 +102,20 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
             }
         }
     }
-    
+
+    /* ensure password field isn't empty */
     if (empty($fields[$passwordField])) {
         $login->validator->errors[$passwordField] = $modx->lexicon('register.field_required');
     }
+    /* ensure email field isn't empty */
     if (empty($fields[$emailField])) {
         $login->validator->errors[$emailField] = $modx->lexicon('register.field_required');
+    /* ensure if allow_multiple_emails setting is false, prevent duplicate emails */
+    } else if (!$modx->getOption('allow_multiple_emails',null,false)) {
+        $emailTaken = $modx->getObject('modUserProfile',array('email' => $fields[$emailField]));
+        if ($emailTaken) {
+            $login->validator->errors[$emailField] = $modx->lexicon('register.email_taken',array('email' => $fields[$emailField]));
+        }
     }
 
     if (empty($login->validator->errors)) {

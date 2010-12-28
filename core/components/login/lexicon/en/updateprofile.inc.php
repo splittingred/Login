@@ -30,6 +30,7 @@ $_lang['login.address'] = 'Address';
 $_lang['login.city'] = 'City';
 $_lang['login.country'] = 'Country';
 $_lang['login.email'] = 'Email';
+$_lang['login.email_taken'] = 'The email "[[+email]]" is already in use. Make sure you are not already registered, and if not, please specify another email address.';
 $_lang['login.fax'] = 'Fax';
 $_lang['login.fullname'] = 'Full Name';
 $_lang['login.mobilephone'] = 'Cellphone';

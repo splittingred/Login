@@ -32,6 +32,7 @@ $_lang['register.email_invalid'] = 'Please enter a valid email address.';
 $_lang['register.email_invalid_domain'] = 'Your email address does not have a valid domain name.';
 $_lang['register.email_no_recipient'] = 'No recipient specified for the email.';
 $_lang['register.email_not_sent'] = 'An error occurred while trying to send the email.';
+$_lang['register.email_taken'] = 'The email "[[+email]]" is already in use. Make sure you are not already registered, and if not, please specify another email address.';
 $_lang['register.field_not_empty'] = 'This field must be empty.';
 $_lang['register.field_required'] = 'This field is required.';
 $_lang['register.fullname'] = 'Full Name';

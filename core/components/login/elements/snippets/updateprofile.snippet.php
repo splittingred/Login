@@ -35,6 +35,8 @@ $submitVar = $modx->getOption('submitVar',$scriptProperties,'login-updprof-btn')
 $redirectToLogin = $modx->getOption('redirectToLogin',$scriptProperties,true);
 $reloadOnSuccess = $modx->getOption('reloadOnSuccess',$scriptProperties,true);
 $errTpl = $modx->getOption('errTpl',$scriptProperties,'<span class="error">[[+error]]</span>');
+$emailField = $modx->getOption('email',$scriptProperties,'email');
+$placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'');
 
 /* verify authenticated status */
 if (!$modx->user->hasSessionContext($modx->context->get('key'))) {
@@ -75,6 +77,17 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
         $fields[$k] = str_replace(array('[',']'),array('&#91;','&#93;'),$v);
     }
     if (!empty($submitVar)) unset($fields[$submitVar]);
+    
+    /* if allow_multiple_emails setting is false, prevent duplicate emails */
+    if (!empty($fields[$emailField]) && !$modx->getOption('allow_multiple_emails',null,false)) {
+        $emailTaken = $modx->getObject('modUserProfile',array(
+            'email' => $fields[$emailField],
+            'id:!=' => $modx->user->get('id'),
+        ));
+        if ($emailTaken) {
+            $login->validator->errors[$emailField] = $modx->lexicon('login.email_taken',array('email' => $fields[$emailField]));
+        }
+    }
 
     if (empty($login->validator->errors)) {
         /* do prehooks */
@@ -116,8 +129,8 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     foreach ($login->validator->errors as $key => $error) {
       $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
     }
-    $modx->toPlaceholders($login->validator->errors,'error');
-    $modx->toPlaceholders($fields);
+    $modx->toPlaceholders($login->validator->errors,$placeholderPrefix.'error');
+    $modx->toPlaceholders($fields,$placeholderPrefix);
 }
 
 return '';
