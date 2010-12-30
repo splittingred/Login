@@ -31,6 +31,7 @@ $login = new Login($modx,$scriptProperties);
 $preHooks = $modx->getOption('preHooks',$scriptProperties,'');
 $submitVar = $modx->getOption('submitVar',$scriptProperties,'login-register-btn');
 $errTpl = $modx->getOption('errTpl',$scriptProperties,'<span class="error">[[+error]]</span>');
+$validate = $modx->getOption('validate',$scriptProperties,'');
 $placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'');
 
 /* if using recaptcha, load recaptcha html */
@@ -76,7 +77,7 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
 
     /* handle validation */
     $login->loadValidator();
-    $fields = $login->validator->validateFields($_POST);
+    $fields = $login->validator->validateFields($_POST,$validate);
     foreach ($fields as $k => $v) {
         $fields[$k] = str_replace(array('[',']'),array('&#91;','&#93;'),$v);
     }

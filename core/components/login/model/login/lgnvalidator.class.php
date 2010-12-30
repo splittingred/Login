@@ -75,7 +75,7 @@ class lgnValidator {
      * @param array $keys The fields to validate.
      * @return array An array of field name => value pairs.
      */
-    public function validateFields(array $keys = array()) {
+    public function validateFields(array $keys = array(),$validationFields = '') {
         $this->fields = array();
 
         /* process the list of fields that will be validated */
@@ -173,7 +173,7 @@ class lgnValidator {
             $type = $this->config['use_multibyte'] ? mb_substr($type,0,$hasParams,$this->config['encoding']) : substr($type,0,$hasParams);
         }
 
-        $invNames = array('validate','validateFields','_addError','__construct');
+        $invNames = array('validate','validateFields','addError','__construct');
         if (method_exists($this,$type) && !in_array($type,$invNames)) {
             /* built-in validator */
             $validated = $this->$type($key,$value,$param);
@@ -205,11 +205,11 @@ class lgnValidator {
 
         if (is_array($validated) && !empty($validated)) {
             foreach ($validated as $key => $errMsg) {
-                $this->_addError($key,$errMsg);
+                $this->addError($key,$errMsg);
             }
             $validated = false;
         } elseif ($validated !== '1' && $validated !== 1 && $validated !== true) {
-            $this->_addError($key,$validated);
+            $this->addError($key,$validated);
             $validated = false;
         }
         return $validated;

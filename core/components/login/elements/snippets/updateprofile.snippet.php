@@ -36,6 +36,7 @@ $redirectToLogin = $modx->getOption('redirectToLogin',$scriptProperties,true);
 $reloadOnSuccess = $modx->getOption('reloadOnSuccess',$scriptProperties,true);
 $errTpl = $modx->getOption('errTpl',$scriptProperties,'<span class="error">[[+error]]</span>');
 $emailField = $modx->getOption('email',$scriptProperties,'email');
+$validate = $modx->getOption('validate',$scriptProperties,'');
 $placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'');
 
 /* verify authenticated status */
@@ -72,7 +73,7 @@ if (!empty($_REQUEST['updpsuccess'])) {
 if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
     /* handle validation */
     $login->loadValidator();
-    $fields = $login->validator->validateFields($_POST);
+    $fields = $login->validator->validateFields($_POST,$validate);
     foreach ($fields as $k => $v) {
         $fields[$k] = str_replace(array('[',']'),array('&#91;','&#93;'),$v);
     }
