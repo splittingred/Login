@@ -12,6 +12,7 @@ $modx->lexicon->load('login:changepassword');
 /* setup default properties */
 $submitVar = $modx->getOption('submitVar',$scriptProperties,'logcp-submit');
 $preHooks = $modx->getOption('preHooks',$scriptProperties,'');
+$validate = $modx->getOption('validate',$scriptProperties,'');
 $successMessage = $modx->getOption('successMessage',$scriptProperties,'');
 $reloadOnSuccess = $modx->getOption('reloadOnSuccess',$scriptProperties,true);
 $placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'logcp.');
@@ -19,6 +20,7 @@ $placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'log
 $fieldOldPassword = $modx->getOption('fieldOldPassword',$scriptProperties,'password_old');
 $fieldNewPassword = $modx->getOption('fieldNewPassword',$scriptProperties,'password_new');
 $fieldConfirmNewPassword = $modx->getOption('fieldConfirmNewPassword',$scriptProperties,'password_new_confirm');
+$validateOldPassword = $modx->getOption('validateOldPassword',$scriptProperties,true);
 
 /* verify authenticated status */
 if (!$modx->user->hasSessionContext($modx->context->get('key'))) {
@@ -42,7 +44,7 @@ $error = false;
 if (!empty($_POST) && isset($_POST[$submitVar])) {
     /* handle validation */
     $login->loadValidator();
-    $fields = $login->validator->validateFields($_POST);
+    $fields = $login->validator->validateFields($_POST,$validate);
     foreach ($fields as $k => $v) {
         $fields[$k] = str_replace(array('[',']'),array('&#91;','&#93;'),$v);
     }
@@ -50,45 +52,48 @@ if (!empty($_POST) && isset($_POST[$submitVar])) {
     $errors = $login->validator->errors;
 
     if (empty($errors)) {
-        /* if changing the password */
-        if (empty($fields[$fieldOldPassword]) || md5($fields[$fieldOldPassword]) != $modx->user->get('password')) {
-            $errors[$fieldOldPassword] = $modx->lexicon('login.password_invalid_old');
-        }
-        $minLength = $modx->getOption('password_min_length',null,8);
-        if (empty($fields[$fieldNewPassword]) || strlen($fields[$fieldNewPassword]) < $minLength) {
-            $errors[$fieldNewPassword] = $modx->lexicon('login.password_too_short',array('length' => $minLength));
+        /* do prehooks */
+        $login->loadHooks('preHooks');
+        $login->preHooks->loadMultiple($preHooks,$fields,array(
+            'user' => &$modx->user,
+            'submitVar' => $submitVar,
+            'reloadOnSuccess' => $reloadOnSuccess,
+            'fieldOldPassword' => $fieldOldPassword,
+            'fieldNewPassword' => $fieldNewPassword,
+            'fieldConfirmNewPassword' => $fieldConfirmNewPassword,
+        ));
+        if (!empty($login->preHooks->fields)) {
+            $fields = $login->preHooks->fields;
         }
 
-        /* if using confirm, ensure they match */
-        if (!empty($fieldConfirmNewPassword)) {
-            if (empty($fields[$fieldConfirmNewPassword]) || $fields[$fieldNewPassword] != $fields[$fieldConfirmNewPassword]) {
-                $errors[$fieldConfirmNewPassword] = $modx->lexicon('login.password_no_match');
+        /* process preHooks */
+        if (!empty($login->preHooks->errors)) {
+            $errors = $login->preHooks->errors;
+            $modx->setPlaceholders($errors,$placeholderPrefix.'error.');
+
+            $errorMsg = $login->preHooks->getErrorMessage();
+            $modx->setPlaceholder($placeholderPrefix.'error_message',$errorMsg);
+
+        } else {
+            /* if changing the password */
+            if ($validateOldPassword) {
+                if (empty($fields[$fieldOldPassword]) || md5($fields[$fieldOldPassword]) != $modx->user->get('password')) {
+                    $errors[$fieldOldPassword] = $modx->lexicon('login.password_invalid_old');
+                }
             }
-        }
-
-        if (empty($errors)) {
-            /* do prehooks */
-            $login->loadHooks('preHooks');
-            $login->preHooks->loadMultiple($preHooks,$fields,array(
-                'submitVar' => $submitVar,
-                'reloadOnSuccess' => $reloadOnSuccess,
-                'fieldOldPassword' => $fieldOldPassword,
-                'fieldNewPassword' => $fieldNewPassword,
-                'fieldConfirmNewPassword' => $fieldConfirmNewPassword,
-            ));
-            if (!empty($login->preHooks->fields)) {
-                $fields = $login->preHooks->fields;
+            $minLength = $modx->getOption('password_min_length',null,8);
+            if (empty($fields[$fieldNewPassword]) || strlen($fields[$fieldNewPassword]) < $minLength) {
+                $errors[$fieldNewPassword] = $modx->lexicon('login.password_too_short',array('length' => $minLength));
             }
 
-            /* process preHooks */
-            if (!empty($login->preHooks->errors)) {
-                $errors = $login->preHooks->errors;
-                $modx->setPlaceholders($errors,$placeholderPrefix.'error.');
+            /* if using confirm, ensure they match */
+            if (!empty($fieldConfirmNewPassword)) {
+                if (empty($fields[$fieldConfirmNewPassword]) || $fields[$fieldNewPassword] != $fields[$fieldConfirmNewPassword]) {
+                    $errors[$fieldConfirmNewPassword] = $modx->lexicon('login.password_no_match');
+                }
+            }
 
-                $errorMsg = $login->preHooks->getErrorMessage();
-                $modx->setPlaceholder($placeholderPrefix.'error_message',$errorMsg);
-
-            } else {
+            if (empty($errors)) {
                 /* attempt to change the password */
                 $success = $modx->user->changePassword($fields[$fieldNewPassword],$fields[$fieldOldPassword]);
                 if (!$success) {

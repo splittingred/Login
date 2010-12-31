@@ -63,7 +63,7 @@ if ($modx->getOption('useExtended',$scriptProperties,true)) {
         $placeholders = array_merge($extended,$placeholders);
     }
 }
-$modx->toPlaceholders($placeholders);
+$modx->toPlaceholders($placeholders,$placeholderPrefix);
 
 /* if success */
 if (!empty($_REQUEST['updpsuccess'])) {

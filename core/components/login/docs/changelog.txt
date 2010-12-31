@@ -1,5 +1,10 @@
 Changelog file for Login component.
 
+Login 1.5.2
+====================================
+- Ensure preHooks run before password validation in ChangePassword snippet
+- Fix issue with placeholderPrefix in UpdateProfile snippet
+
 Login 1.5.1
 ====================================
 - [#44] Fix bug with login validator, &validate parameter
