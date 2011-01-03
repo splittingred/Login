@@ -153,6 +153,7 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
             $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
         }
         $modx->toPlaceholders($errors,$placeholderPrefix.'error');
+        $modx->setPlaceholder($placeholderPrefix.'validation_error',true);
     }
     $modx->setPlaceholders($fields,$placeholderPrefix);
 }
