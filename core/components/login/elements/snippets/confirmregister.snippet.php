@@ -90,11 +90,15 @@ if ($modx->getOption('authenticate',$scriptProperties,true)) {
  * to a form requiring registration
  */
 $redirectBack = $modx->getOption('redirectBack',$_REQUEST,$modx->getOption('redirectBack',$scriptProperties,''));
+$redirectBackParams = $redirectBackParams = $modx->getOption('redirectBackParams',$_REQUEST,$modx->getOption('redirectBackParams',$scriptProperties,''));
+if (!empty($redirectBackParams)) {
+    $redirectBackParams = $Login->decodeParams($redirectBackParams);
+}
 $redirectTo = !empty($scriptProperties['redirectTo']) ? $scriptProperties['redirectTo'] : $redirectBack;
 if (!empty($redirectTo)) {
     /* allow custom redirection params */
-    $redirectParams = $modx->getOption('redirectParams',$scriptProperties,'');
-    if (!empty($redirectParams)) $redirectParams = $modx->fromJSON($redirectParams);
+    $redirectParams = !empty($scriptProperties['redirectParams']) ? $scriptProperties['redirectParams'] : $redirectBackParams;
+    if (!empty($redirectParams) && !is_array($redirectParams)) $redirectParams = $modx->fromJSON($redirectParams);
     if (empty($redirectParams) || !is_array($redirectParams)) $redirectParams = array();
 
     /* handle persist params from Register snippet */

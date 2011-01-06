@@ -124,6 +124,10 @@ if ($activation && !empty($email) && !empty($activateResourceId)) {
     if (!empty($redirectBack)) {
         $confirmParams['redirectBack'] = $redirectBack;
     }
+    $redirectBackParams = $modx->getOption('redirectBackParams',$_REQUEST,$modx->getOption('redirectBackParams',$scriptProperties,''));
+    if (!empty($redirectBackParams)) {
+        $confirmParams['redirectBackParams'] = $redirectBackParams;
+    }
 
     /* generate confirmation url */
     $confirmUrl = $modx->makeUrl($activateResourceId,'',$confirmParams,'full');

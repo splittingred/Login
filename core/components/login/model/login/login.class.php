@@ -231,4 +231,30 @@ class Login {
         }
         return $result;
     }
+
+
+    /**
+     * Encodes an array/string of params for URL transmission
+     * 
+     * @param array/string $params
+     * @return string
+     */
+    public function encodeParams($params) {
+        if (is_array($params)) {
+            $params = serialize($params);
+        } else {
+            $params = serialize(array($params));
+        }
+        return strtr(base64_encode($params), '+/=', '-_,');
+    }
+
+    /**
+     * Unencode a serialized, encoded param string
+     * 
+     * @param string $params
+     * @return array
+     */
+    public function decodeParams($params) {
+        return unserialize(base64_decode(strtr($params, '-_,', '+/=')));
+    }
 }

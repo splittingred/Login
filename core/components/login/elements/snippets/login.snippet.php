@@ -96,7 +96,7 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                 $errorMsg = $login->loginPrehooks->getErrorMessage();
                 $errorOutput = $modx->parseChunk($errTpl, array('msg' => $errorMsg));
                 $modx->setPlaceholder('errors',$errorOutput);
-                
+
             } else {
                 /* send to login processor and handle response */
                 $response = $login->executeProcessor(array(
@@ -130,12 +130,17 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                     } else {
                         /* allow dynamic redirection handling */
                         $redirectBack = $modx->getOption('redirectBack',$_REQUEST,$modx->getOption('redirectBack',$scriptProperties,''));
+                        $redirectBackParams = $modx->getOption('redirectBackParams',$_REQUEST,$modx->getOption('redirectBackParams',$scriptProperties,''));
+                        if (!empty($redirectBackParams)) {
+                            $redirectBackParams = $login->decodeParams($redirectBackParams);
+                        }
                         /* otherwise specify a specific resource to redirect to */
                         $loginResourceId = !empty($scriptProperties['loginResourceId']) ? $scriptProperties['loginResourceId'] : $redirectBack;
                         /* login posthooks succeeded, now redirect */
+
                         if (!empty($loginResourceId)) {
-                            $loginResourceParams = $modx->getOption('loginResourceParams',$scriptProperties,'');
-                            if (!empty($loginResourceParams)) {
+                            $loginResourceParams = !empty($scriptProperties['loginResourceParams']) ? $scriptProperties['loginResourceParams'] : $redirectBackParams;
+                            if (!empty($loginResourceParams) && !is_array($loginResourceParams)) {
                                 $loginResourceParams = $modx->fromJSON($loginResourceParams);
                             }
                             $url = $modx->makeUrl($loginResourceId,'',$loginResourceParams,'full');
@@ -189,7 +194,7 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
             $modx->setPlaceholder('errors',$errorOutput);
 
         /* prehooks successful, move on */
-        } else { 
+        } else {
             /* send to logout processor and handle response for each context */
             $response = $login->executeProcessor(array(
                 'action' => 'logout',
