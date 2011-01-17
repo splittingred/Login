@@ -30,6 +30,12 @@ $ctxs = !empty($ctxs) ? $ctxs : $modx->context->get('key');
 if (!is_array($ctxs)) $ctxs = explode(',',$ctxs);
 
 if (!$modx->user->hasSessionContext($ctxs)) {
-    $modx->sendUnauthorizedPage();
+    if (!empty($redirectTo)) {
+        $redirectParams = !empty($redirectParams) ? $modx->fromJSON($redirectParams) : '';
+        $url = $modx->makeUrl($redirectTo,'',$redirectParams,'full');
+        $modx->sendRedirect($url);
+    } else {
+        $modx->sendUnauthorizedPage();
+    }
 }
 return '';

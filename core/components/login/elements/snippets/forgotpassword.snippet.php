@@ -87,7 +87,7 @@ if (!empty($_POST['login_fp_service'])) {
         /* if redirecting, do so here */
         if (!empty($redirectTo)) {
             if (!empty($redirectParams)) $redirectParams = $modx->fromJSON($redirectParams);
-            $url = $modx->makeUrl($redirectTo,'',$redirectParams);
+            $url = $modx->makeUrl($redirectTo,'',$redirectParams,'full');
             $modx->sendRedirect($url);
         }
     }

@@ -196,7 +196,7 @@ if (!empty($submittedResourceId)) {
         'username' => $user->get('username'),
         'email' => $profile->get('email'),
     ));
-    $url = $modx->makeUrl($submittedResourceId,'',$persistParams);
+    $url = $modx->makeUrl($submittedResourceId,'',$persistParams,'full');
     $modx->sendRedirect($url);
 } else {
     $successMsg = $modx->getOption('successMsg',$scriptProperties,'');

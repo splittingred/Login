@@ -119,7 +119,7 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
             if ($result !== true) {
                 $modx->toPlaceholder('message',$result,'error');
             } else if ($reloadOnSuccess) {
-                $url = $modx->makeUrl($modx->resource->get('id'),'','?updpsuccess=1');
+                $url = $modx->makeUrl($modx->resource->get('id'),'','?updpsuccess=1','full');
                 $modx->sendRedirect($url);
             } else {
                 $modx->setPlaceholder('login.update_success',true);

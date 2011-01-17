@@ -122,7 +122,7 @@ if (!empty($_POST) && isset($_POST[$submitVar])) {
                     if ($reloadOnSuccess) {
                         /* if reloading the page after success */
                         $reloadOnSuccessVar = $modx->getOption('reloadOnSuccessVar',$scriptProperties,'logcp-success');
-                        $url = $modx->makeUrl($modx->resource->get('id'),'',array($reloadOnSuccessVar => 1));
+                        $url = $modx->makeUrl($modx->resource->get('id'),'',array($reloadOnSuccessVar => 1),'full');
                         $modx->sendRedirect($url);
 
                     } else {

@@ -115,3 +115,5 @@ $_lang['prop_changepassword.placeholderprefix_desc'] = 'The prefix to use for al
 
 /* isLoggedIn snippet */
 $_lang['prop_isloggedin.contexts_desc'] = 'A comma-separated list of contexts to check authenticated status for. If not set, will default to current context.';
+$_lang['prop_isloggedin.redirectto_desc'] = 'The ID of a Resource to redirect to should the user not be logged in. Will default to the unauthorized_page.';
+$_lang['prop_isloggedin.redirectparams_desc'] = 'If using redirectTo, a JSON object of REQUEST params to send with the redirect.';

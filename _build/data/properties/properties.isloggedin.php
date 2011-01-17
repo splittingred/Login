@@ -35,6 +35,22 @@ $properties = array(
         'value' => '',
         'lexicon' => 'login:properties',
     ),
+    array(
+        'name' => 'redirectto',
+        'desc' => 'prop_isloggedin.redirectto_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'redirectparams',
+        'desc' => 'prop_isloggedin.redirectparams_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
 );
 
 return $properties;
