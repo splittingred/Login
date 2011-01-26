@@ -101,6 +101,7 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
         if (!empty($login->preHooks->fields)) {
             $fields = $login->preHooks->fields;
         }
+        if (!empty($submitVar)) unset($fields[$submitVar]);
         
         /* process hooks */
         if (!empty($login->preHooks->errors)) {

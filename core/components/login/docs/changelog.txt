@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.5.2
 ====================================
+- [#3330] Add sanity checks to prevent possible submitVar data adding in UpdateProfile
 - Add support for moderation of users when done in a prehook
 - Add support for redirectBackParams that can send encoded data through a login/registration process
 - Add a generic validation error in Register to allow for general messages

@@ -31,6 +31,7 @@ if (empty($profile)) return $modx->lexicon('login.profile_err_nf');
 
 /* get rid of spam fields */
 unset($fields['nospam'],$fields['blank']);
+if (!empty($submitVar)) unset($fields[$submitVar]);
 
 /* set extended data if any */
 if ($modx->getOption('useExtended',$scriptProperties,true)) {
