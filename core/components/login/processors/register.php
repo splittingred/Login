@@ -110,7 +110,7 @@ if (empty($persistParams) || !is_array($persistParams)) $persistParams = array()
 $email = $user->get('email');
 $activation = $modx->getOption('activation',$scriptProperties,true);
 $activateResourceId = $modx->getOption('activationResourceId',$scriptProperties,'');
-if ($activation && !empty($email) && !empty($activateResourceId)) {
+if ($activation && !empty($email) && !empty($activateResourceId) && empty($fields['register.moderate'])) {
     /* generate a password and encode it and the username into the url */
     $pword = $login->generatePassword();
     $confirmParams['lp'] = urlencode(base64_encode($pword));
@@ -162,7 +162,7 @@ if ($activation && !empty($email) && !empty($activateResourceId)) {
     $subject = $modx->getOption('activationEmailSubject',$scriptProperties,$modx->lexicon('register.activation_email_subject'));
     $login->sendEmail($activationEmail,$user->get('username'),$subject,$emailProperties);
 
-} else {
+} else if (empty($fields['register.moderate'])) {
     $user->set('active',1);
     $user->save();
 }
@@ -186,6 +186,22 @@ if (!empty($login->posthooks->errors)) {
 
     $errorMsg = $login->posthooks->getErrorMessage();
     $modx->toPlaceholder('message',$errorMsg,'error');
+}
+
+/* if a prehook set the user as moderated, if set, send to an optional other
+ * moderation resource id
+ */
+if (!empty($fields['register.moderate'])) {
+    $moderatedResourceId = $modx->getOption('moderatedResourceId',$scriptProperties,'');
+    if (!empty($moderatedResourceId)) {
+        $persistParams = array_merge($persistParams,array(
+            'username' => $user->get('username'),
+            'email' => $profile->get('email'),
+        ));
+        $url = $modx->makeUrl($moderatedResourceId,'',$persistParams,'full');
+        $modx->sendRedirect($url);
+        return true;
+    }
 }
 
 /* if provided a redirect id, will redirect to that resource, with the

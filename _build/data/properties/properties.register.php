@@ -185,6 +185,15 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'moderatedResourceId',
+        'desc' => 'prop_register.moderatedresourceid_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+
+    array(
         'name' => 'placeholderPrefix',
         'desc' => 'prop_register.placeholderprefix_desc',
         'type' => 'textfield',

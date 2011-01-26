@@ -60,6 +60,7 @@ $_lang['prop_register.activationemail_desc'] = 'If set, will sent activation ema
 $_lang['prop_register.activationemailsubject_desc'] = 'The subject of the activation email.';
 $_lang['prop_register.activationemailtpltype_desc'] = 'The type of tpls being provided for the activation email.';
 $_lang['prop_register.activationemailtpl_desc'] = 'The activation email tpl.';
+$_lang['prop_register.moderatedresourceid_desc'] = 'If a prehook sets the user as moderated, then send to this Resource instead of the submittedResourceId. Leave blank to bypass.';
 $_lang['prop_register.placeholderprefix_desc'] = 'The prefix to use for all placeholders set by this snippet.';
 $_lang['prop_register.recaptchaheight_desc'] = 'If `recaptcha` is set as a preHook, this will select the height for the reCaptcha widget.';
 $_lang['prop_register.recaptchatheme_desc'] = 'If `recaptcha` is set as a preHook, this will select a theme for the reCaptcha widget.';
