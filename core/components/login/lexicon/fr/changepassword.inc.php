@@ -25,12 +25,12 @@
  * @package login
  * @subpackage lexicon
  */
-$_lang['login.change_password'] = 'Change Password';
-$_lang['login.password_new_confirm'] = 'Confirm New Password';
-$_lang['login.password_err'] = 'Incorrect password.';
-$_lang['login.password_err_change'] = 'An error occurred while attempting to change the password. Please review your fields.';
-$_lang['login.password_invalid_old'] = 'Invalid old password.';
-$_lang['login.password_too_short'] = 'Password is too short! Please specify a password of at least [[+length]] characters.';
-$_lang['login.password_new'] = 'New Password';
-$_lang['login.password_no_match'] = 'Passwords do not match.';
-$_lang['login.password_old'] = 'Old Password';
+$_lang['login.change_password'] = 'Changer de mot de passe';
+$_lang['login.password_new_confirm'] = 'Confirmez le nouveau mot de passe';
+$_lang['login.password_err'] = 'Mot de passe incorrecte.';
+$_lang['login.password_err_change'] = 'Une erreur est survenue lors du changement de mot de passe. Veuillez vérifier vos champs.';
+$_lang['login.password_invalid_old'] = 'Ancien mot de passe invalide.';
+$_lang['login.password_too_short'] = 'Le mot de passe est trop court! Veuillez choisir un mot de passe d\'au moins [[+length]] caractères.';
+$_lang['login.password_new'] = 'Nouveau mot de passe';
+$_lang['login.password_no_match'] = 'Les mots de passe ne correspondent pas.';
+$_lang['login.password_old'] = 'Ancien mot de passe';
