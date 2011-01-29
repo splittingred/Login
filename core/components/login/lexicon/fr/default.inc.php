@@ -21,7 +21,7 @@
  * @package login
  */
 /**
- * Default English language strings for Login
+ * Default French language strings for Login
  * @package login
  * @subpackage lexicon
  */

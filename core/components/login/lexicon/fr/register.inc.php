@@ -21,7 +21,7 @@
  * @package login
  */
 /**
- * Register English lexicon for Login
+ * Register French lexicon for Login
  *
  * @package login
  * @subpackage lexicon
@@ -32,7 +32,7 @@ $_lang['register.email_invalid'] = 'Veuillez entrer une adresse email valide.';
 $_lang['register.email_invalid_domain'] = 'Nom de domaine de votre adresse email invalide.';
 $_lang['register.email_no_recipient'] = 'Aucun destinataire n\'est indiqué.';
 $_lang['register.email_not_sent'] = 'Une erreur est survenue lors de l\'envoi de l\'email.';
-$_lang['register.email_taken'] = 'L\'adresse "[[+email]]" est déjà utilisée. Veuillez vous assurer de n\'être pas déjà inscrit. Si ce n\'est pas le cas, veuillez indiquer une adresse différente.';
+$_lang['register.email_taken'] = 'L\'adresse "[[+email]]" est déjà utilisée. Veuillez vous assurer de ne pas être déjà inscrit. Si ce n\'est pas le cas, veuillez indiquer une adresse différente.';
 $_lang['register.field_not_empty'] = 'Ce champ doit être vide.';
 $_lang['register.field_required'] = 'Ce champ n\'est pas renseigné.';
 $_lang['register.fullname'] = 'Nom complet';

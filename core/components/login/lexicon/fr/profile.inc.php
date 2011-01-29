@@ -20,9 +20,9 @@
  * @package login
  */
 /**
- * Profile English lexicon for Login
+ * Profile French lexicon for Login
  *
  * @package login
  * @subpackage lexicon
  */
-$_lang['profile'] = 'Profile';
+$_lang['profile'] = 'Profil';
