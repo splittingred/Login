@@ -25,6 +25,11 @@
  * @package login
  */
 class Login {
+    const FORGOT_PASSWORD_EXTERNAL_USER = 'forgotpassword.external_user';
+    const MODE_FORGOT_PASSWORD = 'forgot-password';
+    const MODE_LOGIN = 'login';
+    const REGISTER_MODERATE = 'register.moderate';
+    
     /**
      * Creates an instance of the Login class.
      *

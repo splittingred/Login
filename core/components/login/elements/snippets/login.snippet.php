@@ -86,7 +86,7 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
             $fields = $_REQUEST;
             $login->loadHooks('loginPrehooks');
             $login->loginPrehooks->loadMultiple($preHooks,$fields,array(
-                'mode' => 'login',
+                'mode' => Login::MODE_LOGIN,
             ));
 
             /* process prehooks */

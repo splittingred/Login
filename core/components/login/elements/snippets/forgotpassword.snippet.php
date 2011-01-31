@@ -27,7 +27,7 @@
  * @package login
  */
 $model_path = $modx->getOption('core_path').'components/login/model/login/';
-$Login = $modx->getService('login','Login',$model_path,$scriptProperties);
+$login = $modx->getService('login','Login',$model_path,$scriptProperties);
 
 $modx->lexicon->load('login:forgotpassword');
 
@@ -42,10 +42,11 @@ $emailSubject = !empty($emailSubject) ? $emailSubject : '';
 $resetResourceId = !empty($resetResourceId) ? $resetResourceId : 1;
 $redirectTo = $modx->getOption('redirectTo',$scriptProperties,false);
 $redirectParams = $modx->getOption('redirectParams',$scriptProperties,'');
+$preHooks = $modx->getOption('preHooks',$scriptProperties,'');
 
 /* get the request URI */
 $phs = array(
-    'loginfp.request_uri' => empty($_POST['request_uri']) ? $Login->getRequestURI() : $_POST['request_uri'],
+    'loginfp.request_uri' => empty($_POST['request_uri']) ? $login->getRequestURI() : $_POST['request_uri'],
 );
 
 if (!empty($_POST['login_fp_service'])) {
@@ -56,39 +57,70 @@ if (!empty($_POST['login_fp_service'])) {
         $field = 'email';
         $alias = 'Profile';
     }
+    foreach ($_REQUEST as $k => $v) {
+        $fields[$k] = str_replace(array('[',']'),array('&#91;','&#93'),$v);
+    }
+    $login->loadHooks('fpPreHooks');
+    $login->fpPreHooks->loadMultiple($preHooks,$fields,array(
+        'mode' => Login::MODE_FORGOT_PASSWORD,
+    ));
+    /* process prehooks */
+    if (!empty($login->fpPreHooks->errors)) {
+        $modx->toPlaceholders($login->fpPreHooks->errors,$errorPrefix);
 
-    /* get the user dependent on the retrieval method */
-    $user = $Login->getUserByField($field,$_POST[$field],$alias);
-    if ($user == null) {
-        $phs['loginfp.errors'] = $modx->lexicon('login.user_err_nf_'.$field);
+        $errorMsg = $login->fpPreHooks->getErrorMessage();
+        $errorOutput = $modx->parseChunk($errTpl, array('msg' => $errorMsg));
+        $modx->setPlaceholder('errors',$errorOutput);
+
     } else {
-        $phs['email'] = $user->get('email');
+        if (!empty($login->fpPreHooks->fields)) {
+            $fields = $login->fpPreHooks->fields;
+        }
 
-        /* generate a password and encode it and the username into the url */
-        $pword = $Login->generatePassword();
-        $confirmParams = 'lp='.urlencode(base64_encode($pword));
-        $confirmParams .= '&lu='.urlencode(base64_encode($user->get('username')));
-        $confirmUrl = $modx->makeUrl($resetResourceId,'',$confirmParams,'full');
+        /* if the prehook didn't set the user info, find it by email/username */
+        if (empty($fields[Login::FORGOT_PASSWORD_EXTERNAL_USER])) {
+            /* get the user dependent on the retrieval method */
+            $user = $login->getUserByField($field,$fields[$field],$alias);
+            $fields = array_merge($fields,$user->toArray());
+            $profile = $user->getOne('Profile');
+            if ($profile) { /* merge in profile */
+                $fields = array_merge($profile->toArray(),$fields);
+            }
+        }
+        
+        if ($user == null) {
+            $phs['loginfp.errors'] = $modx->lexicon('login.user_err_nf_'.$field);
+        } else {
+            $phs['email'] = $fields['email'];
 
-        /* set the email properties */
-        $emailProperties = $user->toArray();
-        $emailProperties['confirmUrl'] = $confirmUrl;
-        $emailProperties['password'] = $pword;
-        $emailProperties['tpl'] = $emailTpl;
-        $emailProperties['tplType'] = $emailTplType;
+            /* generate a password and encode it and the username into the url */
+            $pword = $login->generatePassword();
+            $confirmParams = array(
+                'lp' => urlencode(base64_encode($pword)),
+                'lu' => urlencode(base64_encode($fields['username']))
+            );
+            $confirmUrl = $modx->makeUrl($resetResourceId,'',$confirmParams,'full');
 
-        /* now set new password to cache to prevent middleman attacks */
-        $modx->cacheManager->set('login/resetpassword/'.$user->get('username'),$pword);
+            /* set the email properties */
+            $emailProperties = $fields;
+            $emailProperties['confirmUrl'] = $confirmUrl;
+            $emailProperties['password'] = $pword;
+            $emailProperties['tpl'] = $emailTpl;
+            $emailProperties['tplType'] = $emailTplType;
 
-        $subject = !empty($emailSubject) ? $emailSubject : $modx->getOption('login.forgot_password_email_subject',$scriptProperties,$modx->lexicon('login.forgot_password_email_subject'));
-        $Login->sendEmail($user->get('email'),$user->get('username'),$subject,$emailProperties);
-        $tpl = $sentTpl;
+            /* now set new password to cache to prevent middleman attacks */
+            $modx->cacheManager->set('login/resetpassword/'.$fields['username'],$pword);
 
-        /* if redirecting, do so here */
-        if (!empty($redirectTo)) {
-            if (!empty($redirectParams)) $redirectParams = $modx->fromJSON($redirectParams);
-            $url = $modx->makeUrl($redirectTo,'',$redirectParams,'full');
-            $modx->sendRedirect($url);
+            $subject = !empty($emailSubject) ? $emailSubject : $modx->getOption('login.forgot_password_email_subject',$scriptProperties,$modx->lexicon('login.forgot_password_email_subject'));
+            $login->sendEmail($fields['email'],$fields['username'],$subject,$emailProperties);
+            $tpl = $sentTpl;
+
+            /* if redirecting, do so here */
+            if (!empty($redirectTo)) {
+                if (!empty($redirectParams)) $redirectParams = $modx->fromJSON($redirectParams);
+                $url = $modx->makeUrl($redirectTo,'',$redirectParams,'full');
+                $modx->sendRedirect($url);
+            }
         }
     }
 }
@@ -98,6 +130,6 @@ if (!empty($_POST)) {
     }
 }
 
-$output = $Login->getChunk($tpl,$phs,$tplType);
+$output = $login->getChunk($tpl,$phs,$tplType);
 
 return $output;

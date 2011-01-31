@@ -191,7 +191,7 @@ if (!empty($login->posthooks->errors)) {
 /* if a prehook set the user as moderated, if set, send to an optional other
  * moderation resource id
  */
-if (!empty($fields['register.moderate'])) {
+if (!empty($fields[Login::REGISTER_MODERATE])) {
     $moderatedResourceId = $modx->getOption('moderatedResourceId',$scriptProperties,'');
     if (!empty($moderatedResourceId)) {
         $persistParams = array_merge($persistParams,array(

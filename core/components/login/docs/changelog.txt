@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.5.3
 ====================================
+- Add preHooks to ForgotPassword snippet
 - Fix issue that occurs when Login and Register forms are on same page with math register hook
 
 Login 1.5.2
