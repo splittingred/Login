@@ -1,5 +1,9 @@
 Changelog file for Login component.
 
+Login 1.5.3
+====================================
+- Fix issue that occurs when Login and Register forms are on same page with math register hook
+
 Login 1.5.2
 ====================================
 - [#3330] Add sanity checks to prevent possible submitVar data adding in UpdateProfile

@@ -34,6 +34,9 @@ $errTpl = $modx->getOption('errTpl',$scriptProperties,'<span class="error">[[+er
 $validate = $modx->getOption('validate',$scriptProperties,'');
 $placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'');
 
+/* see if form has submitted */
+$hasPosted = !empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]));
+
 /* if using recaptcha, load recaptcha html */
 if (strpos($preHooks,'recaptcha') !== false) {
     $recaptcha = $modx->getService('recaptcha','reCaptcha',$login->config['modelPath'].'recaptcha/');
@@ -50,7 +53,7 @@ if (strpos($preHooks,'recaptcha') !== false) {
 }
 
 /* if using math hook, load default placeholders */
-if (strpos($preHooks,'math') !== false && empty($_POST)) {
+if (strpos($preHooks,'math') !== false && !$hasPosted) {
     $mathMaxRange = $modx->getOption('mathMaxRange',$scriptProperties,100);
     $mathMinRange = $modx->getOption('mathMinRange',$scriptProperties,10);
     $op1 = rand($mathMinRange,$mathMaxRange);
@@ -66,7 +69,7 @@ if (strpos($preHooks,'math') !== false && empty($_POST)) {
 }
 
 /* check for POST */
-if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
+if ($hasPosted) {
     $modx->lexicon->load('login:register');
 
     /* set default properties */
