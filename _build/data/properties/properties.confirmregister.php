@@ -59,6 +59,14 @@ $properties = array(
         'value' => '',
         'lexicon' => 'login:properties',
     ),
+    array(
+        'name' => 'errorPage',
+        'desc' => 'prop_confirmregister.errorpage_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
 );
 
 return $properties;

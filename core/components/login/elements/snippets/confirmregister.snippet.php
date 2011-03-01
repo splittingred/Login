@@ -30,15 +30,31 @@ $model_path = $modx->getOption('core_path').'components/login/model/login/';
 $Login = $modx->getService('login','Login',$model_path,$scriptProperties);
 $modx->lexicon->load('login:register');
 
+/* get default properties */
+$errorPage = $modx->getOption('errorPage',$scriptProperties,false);
+
 /* get user from query params */
-if (empty($_REQUEST['lp']) || empty($_REQUEST['lu'])) $modx->sendErrorPage();
+if (empty($_REQUEST['lp']) || empty($_REQUEST['lu'])) {
+    if (!empty($errorPage)) {
+        $url = $modx->makeUrl($errorPage,'','','full');
+        $modx->sendRedirect($url);
+    } else {
+        $modx->sendErrorPage();
+    }
+}
 $username = base64_decode(urldecode($_REQUEST['lu']));
 $password = base64_decode(urldecode($_REQUEST['lp']));
 
 /* validate we have correct user */
 $user = $modx->getObject('modUser',array('username' => $username));
-if ($user == null) { $modx->sendErrorPage(); }
-if ($user->get('active')) { $modx->sendErrorPage(); }
+if ($user == null || $user->get('active')) { 
+    if (!empty($errorPage)) {
+        $url = $modx->makeUrl($errorPage,'','','full');
+        $modx->sendRedirect($url);
+    } else {
+        $modx->sendErrorPage();
+    }
+}
 
 /* validate password to prevent middleman attacks */
 $modx->getService('registry', 'registry.modRegistry');
@@ -51,7 +67,14 @@ $found = false;
 foreach ($msgs as $msg) {
     if ($msg == $password) $found = true;
 }
-if (!$found) $modx->sendErrorPage();
+if (!$found) {
+    if (!empty($errorPage)) {
+        $url = $modx->makeUrl($errorPage,'','','full');
+        $modx->sendRedirect($url);
+    } else {
+        $modx->sendErrorPage();
+    }
+}
 
 /* invoke OnBeforeUserActivateEvent, if result returns anything, do not proceed */
 $result = $modx->invokeEvent('OnBeforeUserActivate',array(
@@ -59,7 +82,12 @@ $result = $modx->invokeEvent('OnBeforeUserActivate',array(
 ));
 if (!empty($result)) {
     $modx->log(modX::LOG_LEVEL_ERROR,'[Register] OnBeforeUserActivate event prevented activation for "'.$user->get('username').'" by returning false.');
-    $modx->sendErrorPage();
+    if (!empty($errorPage)) {
+        $url = $modx->makeUrl($errorPage,'','','full');
+        $modx->sendRedirect($url);
+    } else {
+        $modx->sendErrorPage();
+    }
 }
 
 /* activate user */

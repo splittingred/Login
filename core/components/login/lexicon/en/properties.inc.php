@@ -85,6 +85,7 @@ $_lang['prop_confirmregister.redirectto_desc'] = 'Optional. After a successful c
 $_lang['prop_confirmregister.redirectparams_desc'] = 'Optional. A JSON object of parameters to pass when redirecting using redirectTo.';
 $_lang['prop_confirmregister.authenticate_desc'] = 'Authenticate and login the user to the current context after confirming registration. Defaults to true.';
 $_lang['prop_confirmregister.authenticatecontexts_desc'] = 'Optional. A comma-separated list of contexts to authenticate to. Defaults to the current context.';
+$_lang['prop_confirmregister.errorpage_desc'] = 'Optional. If set, will redirect user to a custom error page if they try to access this page after activating their account.';
 
 /* ResetPassword snippet */
 $_lang['prop_resetpassword.tpl_desc'] = 'The reset password message tpl.';
