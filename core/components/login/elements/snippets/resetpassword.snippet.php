@@ -53,7 +53,7 @@ if ($cachePass != $password) return '';
 $modx->cacheManager->delete($cacheKey);
 
 /* change password */
-$user->set('password',md5($password));
+$user->set('password',$password);
 if (!$debug) {
     if ($user->save() == false) return '';
 }

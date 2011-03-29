@@ -58,7 +58,7 @@ if (empty($fields['class_key'])) $fields['class_key'] = 'modUser';
 $user->fromArray($fields);
 $user->set('username',$fields[$usernameField]);
 $user->set('active',0);
-$user->set('password',md5($fields['password']));
+$user->set('password',$fields['password']);
 $profile->fromArray($fields);
 $profile->set('internalKey',0);
 $user->addOne($profile,'Profile');

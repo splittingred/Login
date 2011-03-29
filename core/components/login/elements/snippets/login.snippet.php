@@ -99,21 +99,21 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
 
             } else {
                 /* send to login processor and handle response */
-                $response = $login->executeProcessor(array(
-                    'action' => 'login',
-                    'location' => 'security',
+                $response = $modx->runProcessor('security/login',array(
                     'login_context' => $loginContext,
                     'add_contexts' => $contexts,
                     'rememberme' => !empty($_REQUEST[$rememberMeKey]) ? true : false,
                 ));
 
                 /* if we've got a good response, proceed */
-                if (!empty($response) && !empty($response['success'])) {
+                if (!empty($response) && !$response->isError()) {
+                    $responseArray = $response->getObject();
+                    
                     /* do post hooks */
                     $postHooks = $modx->getOption('postHooks',$scriptProperties,'');
                     $login->loadHooks('posthooks');
                     $fields = $_POST;
-                    $fields['response'] =& $response;
+                    $fields['response'] =& $responseArray;
                     $fields['contexts'] =& $contexts;
                     $fields['loginContext'] =& $loginContext;
                     $fields['loginResourceId'] =& $loginResourceId;
@@ -145,8 +145,8 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                             }
                             $url = $modx->makeUrl($loginResourceId,'',$loginResourceParams,'full');
                             $modx->sendRedirect($url);
-                        } elseif (!empty($response['object']) && !empty($response['object']['url'])) {
-                            $modx->sendRedirect($response['object']['url']);
+                        } elseif (!empty($responseArray) && !empty($responseArray['url'])) {
+                            $modx->sendRedirect($responseArray['url']);
                         } else {
                             $modx->sendRedirect($modx->getOption('site_url'));
                         }
@@ -155,12 +155,14 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                 /* logout failed, output error */
                 } else {
                     $errorOutput = '';
-                    if (isset($response['errors']) && !empty($response['errors'])) {
-                        foreach ($response['errors'] as $error) {
+                    $errors = $response->getFieldErrors();
+                    $message = $response->getMessage();
+                    if (!empty($errors)) {
+                        foreach ($errors as $error) {
                             $errorOutput .= $modx->parseChunk($errTpl, $error);
                         }
-                    } elseif (isset($response['message']) && !empty($response['message'])) {
-                        $errorOutput = $modx->parseChunk($errTpl, array('msg' => $response['message']));
+                    } elseif (!empty($message)) {
+                        $errorOutput = $modx->parseChunk($errTpl, array('msg' => $message));
                     } else {
                         $errorOutput = $modx->parseChunk($errTpl, array('msg' => $modx->lexicon('login.login_err')));
                     }
@@ -196,20 +198,20 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
         /* prehooks successful, move on */
         } else {
             /* send to logout processor and handle response for each context */
-            $response = $login->executeProcessor(array(
-                'action' => 'logout',
-                'location' => 'security',
+            $response = $modx->runProcessor('security/logout',array(
                 'login_context' => $loginContext,
                 'add_contexts' => $contexts
             ));
-
+            
             /* if successful logout */
-            if (!empty($response) && !empty($response['success'])) {
+            if (!empty($response) && !$response->isError()) {
+                $responseArray = $response->getObject();
+                
                 /* do post hooks for logout */
                 $postHooks = $modx->getOption('postHooks',$scriptProperties,'');
                 $login->loadHooks('posthooks');
                 $fields = $_POST;
-                $fields['response'] =& $response;
+                $fields['response'] =& $responseArray;
                 $fields['contexts'] =& $contexts;
                 $fields['loginContext'] =& $loginContext;
                 $fields['logoutResourceId'] =& $logoutResourceId;
@@ -229,8 +231,8 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
 
                 /* redirect */
                 $logoutResourceId = $modx->getOption('logoutResourceId',$scriptProperties,0);
-                if (!empty($response['object']) && !empty($response['object']['url'])) {
-                    $modx->sendRedirect($response['object']['url']);
+                if (!empty($responseArray) && !empty($responseArray['url'])) {
+                    $modx->sendRedirect($responseArray['url']);
                 } elseif (!empty($logoutResourceId)) {
                     $logoutResourceParams = $modx->getOption('logoutResourceParams',$scriptProperties,'');
                     if (!empty($logoutResourceParams)) {
@@ -245,12 +247,14 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
             /* logout failed, output error */
             } else {
                 $errorOutput = '';
-                if (isset($response['errors']) && !empty($response['errors'])) {
-                    foreach ($response['errors'] as $error) {
+                $errors = $response->getFieldErrors();
+                $message = $response->getMessage();
+                if (!empty($errors)) {
+                    foreach ($errors as $error) {
                         $errorOutput .= $modx->parseChunk($errTpl, $error);
                     }
-                } elseif (isset($response['message']) && !empty($response['message'])) {
-                    $errorOutput = $modx->parseChunk($errTpl, array('msg' => $response['message']));
+                } elseif (!empty($message)) {
+                    $errorOutput = $modx->parseChunk($errTpl, array('msg' => $message));
                 } else {
                     $errorOutput = $modx->parseChunk($errTpl, array('msg' => $modx->lexicon('login.logout_err')));
                 }
