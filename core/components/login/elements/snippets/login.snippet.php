@@ -99,11 +99,15 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
 
             } else {
                 /* send to login processor and handle response */
-                $response = $modx->runProcessor('security/login',array(
+                $c = array(
                     'login_context' => $loginContext,
                     'add_contexts' => $contexts,
-                    'rememberme' => !empty($_REQUEST[$rememberMeKey]) ? true : false,
-                ));
+                    'username' => $fields['username'],
+                    'password' => $fields['password'],
+                    'returnUrl' => $fields['returnUrl'],
+                    'rememberme' => !empty($fields[$rememberMeKey]) ? true : false,
+                );
+                $response = $modx->runProcessor('security/login',$c);
 
                 /* if we've got a good response, proceed */
                 if (!empty($response) && !$response->isError()) {
