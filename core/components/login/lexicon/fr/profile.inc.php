@@ -2,8 +2,7 @@
 /**
  * Login
  *
- * Copyright 2010 by Jason Coward <jason@modxcms.com> and Shaun McCormick
- * <shaun@modxcms.com>
+ * Copyright 2010 by Shaun McCormick <shaun@modx.com>
  *
  * Login is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -21,16 +20,9 @@
  * @package login
  */
 /**
- * Forgot Password French lexicon for Login
+ * Profile French lexicon for Login
  *
  * @package login
  * @subpackage lexicon
  */
-$_lang['login.email'] = 'Adresse email';
-$_lang['login.forgot_password'] = 'Mot de passe oublié';
-$_lang['login.forgot_password_email_subject'] = 'Email de récupération de mot de passe';
-$_lang['login.or_forgot_username'] = 'Oublié votre identifiant ?';
-$_lang['login.reset_password'] = 'Réinitialiser le mot de passe';
-$_lang['login.username'] = 'Identifiant';
-$_lang['login.user_err_nf_email'] = 'Aucun utilisateur n\'a été trouvé avec cette adresse email.';
-$_lang['login.user_err_nf_username'] = 'Aucun utilisateur n\'a été trouvé avec cet identifiant.';
+$_lang['profile'] = 'Profil';
