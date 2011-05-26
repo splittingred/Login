@@ -80,8 +80,9 @@ if (!$found) {
 $result = $modx->invokeEvent('OnBeforeUserActivate',array(
     'user' => &$user,
 ));
-if (!empty($result)) {
-    $modx->log(modX::LOG_LEVEL_ERROR,'[Register] OnBeforeUserActivate event prevented activation for "'.$user->get('username').'" by returning false.');
+$preventActivation = $Login->getEventResult($result);
+if (!empty($preventActivation)) {
+    $modx->log(modX::LOG_LEVEL_ERROR,'[Register] OnBeforeUserActivate event prevented activation for "'.$user->get('username').'" by returning false: '.$preventActivation);
     if (!empty($errorPage)) {
         $url = $modx->makeUrl($errorPage,'','','full');
         $modx->sendRedirect($url);
@@ -103,6 +104,7 @@ $modx->invokeEvent('OnUserActivate',array(
     'user' => &$user,
 ));
 
+/* authenticate user to contexts */
 if ($modx->getOption('authenticate',$scriptProperties,true)) {
     $modx->user =& $user;
     $modx->getUser();

@@ -52,17 +52,18 @@ class Login {
      * Loads the Validator class.
      *
      * @access public
-     * @param $config array An array of configuration parameters for the
+     * @param string $type The name to give the service on the login object
+     * @param array $config An array of configuration parameters for the
      * lgnValidator class
      * @return lgnValidator An instance of the lgnValidator class.
      */
-    public function loadValidator($config = array()) {
+    public function loadValidator($type = 'validator',$config = array()) {
         if (!$this->modx->loadClass('login.lgnValidator',$this->config['modelPath'],true,true)) {
             $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not load Validator class.');
             return false;
         }
-        $this->validator = new lgnValidator($this,$config);
-        return $this->validator;
+        $this->{$$type} = new lgnValidator($this,$config);
+        return $this->{$$type};
     }
 
     /**
@@ -236,5 +237,24 @@ class Login {
      */
     public function decodeParams($params) {
         return unserialize(base64_decode(strtr($params, '-_,', '+/=')));
+    }
+    
+    /**
+     * Process MODx event results
+     * @param array $rs
+     * @return string
+     */
+    public function getEventResult($rs) {
+        $success = '';
+        if (is_array($rs)) {
+            foreach ($rs as $msg) {
+                if (!empty($msg)) {
+                    $success .= $msg."\n";
+                }
+            }
+        } else {
+            $success = $rs;
+        }
+        return $success;
     }
 }
