@@ -194,12 +194,13 @@ class Login {
         }
         return $output;
     }
-    
+
     /**
      * Loads the Hooks class.
      *
      * @access public
-     * @param $config array An array of configuration parameters for the
+     * @param string $type The name of the Hooks service to load
+     * @param array $config array An array of configuration parameters for the
      * hooks class
      * @return fiHooks An instance of the fiHooks class.
      */
@@ -214,8 +215,8 @@ class Login {
 
     /**
      * Encodes an array/string of params for URL transmission
-     * 
-     * @param array/string $params
+     *
+     * @param array|string $params
      * @return string
      */
     public function encodeParams($params) {
@@ -228,7 +229,7 @@ class Login {
     }
 
     /**
-     * Unencode a serialized, encoded param string
+     * Decode a serialized, encoded param string
      * 
      * @param string $params
      * @return array

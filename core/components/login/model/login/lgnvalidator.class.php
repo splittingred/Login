@@ -72,11 +72,12 @@ class lgnValidator {
      * name:validator=param:anotherValidator:oneMoreValidator=`param`
      *
      * @access public
-     * @param array $keys The fields to validate.
+     * @param array $keys The field data to validate.
+     * @param string $validationFields A comma-separated list of fields that will be validated
      * @return array An array of field name => value pairs.
      */
     public function validateFields(array $keys = array(),$validationFields = '') {
-        $this->fields = array();
+        $this->fields = $keys;
 
         /* process the list of fields that will be validated */
         $validationFields = explode(',',$validationFields);
@@ -135,6 +136,9 @@ class lgnValidator {
 
     /**
      * Strips validators from an array of fields
+     *
+     * @param array $keys The data to strip
+     * @return array
      */
     public function stripValidators(array $keys = array()) {
         $fields = array();
@@ -173,7 +177,7 @@ class lgnValidator {
             $type = $this->config['use_multibyte'] ? mb_substr($type,0,$hasParams,$this->config['encoding']) : substr($type,0,$hasParams);
         }
 
-        $invNames = array('validate','validateFields','addError','__construct');
+        $invNames = array('validate','validateFields','addError','stripValidators','__construct');
         if (method_exists($this,$type) && !in_array($type,$invNames)) {
             /* built-in validator */
             $validated = $this->$type($key,$value,$param);
@@ -194,12 +198,12 @@ class lgnValidator {
                 $validated = $snippet->process($props);
             } else {
                 /* no validator found */
-                $this->modx->log(modX::LOG_LEVEL_ERROR,'[Register] Could not find validator "'.$type.'" for field "'.$key.'".');
+                $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not find validator "'.$type.'" for field "'.$key.'".');
                 $validated = true;
             }
         } else {
             /* no validator found */
-            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Register] Validator "'.$type.'" for field "'.$key.'" was not specified in the customValidators property.');
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Validator "'.$type.'" for field "'.$key.'" was not specified in the customValidators property.');
             $validated = true;
         }
 
@@ -231,6 +235,10 @@ class lgnValidator {
 
     /**
      * Checks to see if field is required.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @return boolean True if the validator succeeds
      */
     public function required($key,$value) {
         $success = false;
@@ -244,6 +252,10 @@ class lgnValidator {
 
     /**
      * Checks to see if field is blank.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @return boolean True if the validator succeeds
      */
     public function blank($key,$value) {
         return empty($value) ? true : $this->modx->lexicon('register.field_not_empty',array('field' => $key, 'value' => $value));
@@ -251,6 +263,11 @@ class lgnValidator {
 
     /**
      * Checks to see if passwords match.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @param string $param The name of the other field
+     * @return boolean True if the validator succeeds
      */
     public function password_confirm($key,$value,$param = 'password_confirm') {
         if (empty($value)) return $this->modx->lexicon('register.password_not_confirmed');
@@ -262,6 +279,10 @@ class lgnValidator {
 
     /**
      * Checks to see if field value is an actual email address.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @return boolean True if the validator succeeds
      */
     public function email($key,$value) {
         /* validate length and @ */
@@ -301,6 +322,11 @@ class lgnValidator {
 
     /**
      * Checks to see if field value is shorter than $param.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @param int $param The minimum length of the field
+     * @return boolean True if the validator succeeds
      */
     public function minLength($key,$value,$param = 0) {
         $v = $this->config['use_multibyte'] ? mb_strlen($value,$this->config['encoding']) : strlen($value);
@@ -312,6 +338,11 @@ class lgnValidator {
 
     /**
      * Checks to see if field value is longer than $param.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @param int $param The maximum length of the field
+     * @return boolean True if the validator succeeds
      */
     public function maxLength($key,$value,$param = 999) {
         $v = $this->config['use_multibyte'] ? mb_strlen($value,$this->config['encoding']) : strlen($value);
@@ -323,6 +354,11 @@ class lgnValidator {
 
     /**
      * Checks to see if field value is less than $param.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @param int $param The minimum value of the field
+     * @return boolean True if the validator succeeds
      */
     public function minValue($key,$value,$param = 0) {
         if ((float)$value < (float)$param) {
@@ -333,6 +369,11 @@ class lgnValidator {
 
     /**
      * Checks to see if field value is greater than $param.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @param int $param The maximum value of the field
+     * @return boolean True if the validator succeeds
      */
     public function maxValue($key,$value,$param = 0) {
         if ((float)$value > (float)$param) {
@@ -343,6 +384,11 @@ class lgnValidator {
 
     /**
      * See if field contains a certain value.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @param string $expr The regexp to run against the value
+     * @return boolean True if the validator succeeds
      */
     public function contains($key,$value,$expr = '') {
         if (!preg_match('/'.$expr.'/i',$value)) {
@@ -353,12 +399,23 @@ class lgnValidator {
 
     /**
      * Strip a string from the value.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @param string $param The string to strip from the value
+     * @return boolean True if the validator succeeds
      */
     public function strip($key,$value,$param = '') {
         $this->fields[$key] = str_replace($param,'',$value);
     }
+    
     /**
      * Strip all tags in the field. The parameter can be a string of allowed
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @param string $allowedTags A comma-separated list of tags to allow
+     * @return boolean True if the validator succeeds
      * tags.
      */
     public function stripTags($key,$value,$allowedTags = '') {
@@ -369,15 +426,25 @@ class lgnValidator {
     /**
      * Strip all tags in the field. The parameter can be a string of allowed
      * tags.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @param string $allowedTags A list of tags to allow in this field
+     * @return boolean True if the validator succeeds
      */
-    public function allowTags($key,$value,$allowedTags = '<strong><em><b><i><li><ul><a>') {
-        if (empty($allowedTags)) $allowedTags = '<strong><em><b><i><li><ul><a>';
+    public function allowTags($key,$value,$allowedTags = '') {
+        if (empty($allowedTags)) return true;
         $this->fields[$key] = strip_tags($value,$allowedTags);
         return true;
     }
 
     /**
      * Validates value between a range, specified by min-max.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @param string $ranges The range to validate between
+     * @return boolean True if the validator succeeds
      */
     public function range($key,$value,$ranges = '0-1') {
         $range = explode('-',$ranges);
@@ -397,6 +464,10 @@ class lgnValidator {
 
     /**
      * Checks to see if the field is a number.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @return boolean True if the validator succeeds
      */
      public function isNumber($key,$value) {
          if (!is_numeric($value)) {
@@ -408,6 +479,11 @@ class lgnValidator {
     /**
      * Checks to see if the field is a valid date. Allows for date formatting as
      * well.
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @param string $format The value to format the field to
+     * @return boolean True if the validator succeeds
      */
     public function isDate($key,$value,$format = '%m/%d/%Y') {
         $ts = strtotime($value);
@@ -422,6 +498,10 @@ class lgnValidator {
 
     /**
      * Checks to see if a string is all lowercase
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @return boolean True if the validator succeeds
      */
     public function islowercase($key,$value) {
         $v = $this->config['use_multibyte'] ? mb_strtolower($value,$this->config['encoding']) : strtolower($value);
@@ -430,6 +510,10 @@ class lgnValidator {
 
     /**
      * Checks to see if a string is all uppercase
+     *
+     * @param string $key The key of the field
+     * @param mixed $value The value of the field
+     * @return boolean True if the validator succeeds
      */
     public function isuppercase($key,$value) {
         $v = $this->config['use_multibyte'] ? mb_strtoupper($value,$this->config['encoding']) : strtoupper($value);
