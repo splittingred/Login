@@ -189,8 +189,10 @@ class Login {
             case 'inline':
             default:
                 /* default is inline, meaning the tpl content was provided directly in the property */
-                $output .= $name;
-                $this->modx->setPlaceholders($properties);
+                $chunk = $this->modx->newObject('modChunk');
+                $chunk->setContent($name);
+                $chunk->setCacheable(false);
+                $output .= $chunk->process($properties);
                 break;
         }
         return $output;
