@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.6.0
 ====================================
+- [#4487] Prevent usage of mb_ereg if not installed
 - [#3500] Fix issues with inline tplType params in Login snippets
 - [#4545] Fix issue with OnBeforeUserActivate event
 - Revolution 2.1 support, specifically with the password changes

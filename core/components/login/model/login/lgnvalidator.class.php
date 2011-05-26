@@ -287,7 +287,8 @@ class lgnValidator {
     public function email($key,$value) {
         /* validate length and @ */
         $pattern = "^[^@]{1,64}\@[^\@]{1,255}$";
-        $condition = $this->config['use_multibyte'] ? @mb_ereg($pattern,$value) : @ereg($pattern, $value);
+        $useMb = $this->config['use_multibyte'] && function_exists('mb_ereg');
+        $condition = $useMb ? @mb_ereg($pattern,$value) : @ereg($pattern, $value);
         if (!$condition || empty($value)) {
             return $this->modx->lexicon('register.email_invalid',array('field' => $key, 'value' => $value));
         }
@@ -296,14 +297,14 @@ class lgnValidator {
         $local_array = explode(".", $email_array[0]);
         for ($i = 0; $i < sizeof($local_array); $i++) {
             $pattern = "^(([A-Za-z0-9!#$%&'*+/=?^_`{|}~-][A-Za-z0-9!#$%&'*+/=?^_`{|}~\.-]{0,63})|(\"[^(\\|\")]{0,62}\"))$";
-            $condition = $this->config['use_multibyte'] ? @mb_ereg($pattern,$local_array[$i]) : @ereg($pattern,$local_array[$i]);
+            $condition = $useMb ? @mb_ereg($pattern,$local_array[$i]) : @ereg($pattern,$local_array[$i]);
             if (!$condition) {
                 return $this->modx->lexicon('register.email_invalid',array('field' => $key, 'value' => $value));
             }
         }
         /* validate domain */
         $pattern = "^\[?[0-9\.]+\]?$";
-        $condition = $this->config['use_multibyte'] ? @mb_ereg($pattern, $email_array[1]) : @ereg($pattern, $email_array[1]);
+        $condition = $useMb ? @mb_ereg($pattern, $email_array[1]) : @ereg($pattern, $email_array[1]);
         if (!$condition) {
             $domain_array = explode(".", $email_array[1]);
             if (sizeof($domain_array) < 2) {
@@ -311,7 +312,7 @@ class lgnValidator {
             }
             for ($i = 0; $i < sizeof($domain_array); $i++) {
                 $pattern = "^(([A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9])|([A-Za-z0-9]+))$";
-                $condition = $this->config['use_multibyte'] ? @mb_ereg($pattern,$domain_array[$i]) : @ereg($pattern,$domain_array[$i]);
+                $condition = $useMb ? @mb_ereg($pattern,$domain_array[$i]) : @ereg($pattern,$domain_array[$i]);
                 if (!$condition) {
                     return $this->modx->lexicon('register.email_invalid_domain',array('field' => $key, 'value' => $value));
                 }
