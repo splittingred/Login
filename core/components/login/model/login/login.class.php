@@ -212,8 +212,8 @@ class Login {
             $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not load Hooks class.');
             return false;
         }
-        $this->{$type} = new lgnHooks($this,$config);
-        return $this->hooks;
+        $this->$type = new lgnHooks($this,$config);
+        return $this->$type;
     }
 
     /**
