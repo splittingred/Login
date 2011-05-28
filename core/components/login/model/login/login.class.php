@@ -62,8 +62,8 @@ class Login {
             $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not load Validator class.');
             return false;
         }
-        $this->{$$type} = new lgnValidator($this,$config);
-        return $this->{$$type};
+        $this->$type = new lgnValidator($this,$config);
+        return $this->$type;
     }
 
     /**

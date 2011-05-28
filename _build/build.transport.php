@@ -35,7 +35,7 @@ set_time_limit(0);
 /* define version */
 define('PKG_NAME','Login');
 define('PKG_NAME_LOWER','login');
-define('PKG_VERSION','1.6.0');
+define('PKG_VERSION','1.6.1');
 define('PKG_RELEASE','pl');
 
 /* define sources */
