@@ -305,7 +305,7 @@ if (strpos($preHooks,'recaptcha') !== false && !$authenticated) {
         $html = $recaptcha->getHtml($recaptchaTheme,$recaptchaWidth,$recaptchaHeight);
         $modx->setPlaceholder('login.recaptcha_html',$html);
     } else {
-        $modx->log(modX::LOG_LEVEL_ERROR,'[Login] '.$this->modx->lexicon('login.recaptcha_err_load'));
+        $modx->log(modX::LOG_LEVEL_ERROR,'[Login] '.$modx->lexicon('login.recaptcha_err_load'));
     }
 }
 

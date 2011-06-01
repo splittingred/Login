@@ -1,5 +1,7 @@
 Changelog file for Login component.
 
+- Fix reference to $this->modx->lexicon in Login Snippet
+
 Login 1.6.0/1
 ====================================
 - [#4886] Fix issue with variable variable in main login class when loading hooks
