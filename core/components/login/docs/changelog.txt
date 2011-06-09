@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.6.2
 ====================================
+- [#4843] Fix issue with sentTplType not being respected in ForgotPassword
 - [#4936] Fix issue in ForgotPassword that occurred if no user was found with that username
 - [#5019] Add backwards compatibility for Revo 2.0.x users in ResetPassword
 - Fix reference to $this->modx->lexicon in Login Snippet

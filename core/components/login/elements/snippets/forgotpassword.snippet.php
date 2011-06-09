@@ -116,6 +116,7 @@ if (!empty($_POST['login_fp_service'])) {
             $subject = !empty($emailSubject) ? $emailSubject : $modx->getOption('login.forgot_password_email_subject',$scriptProperties,$modx->lexicon('login.forgot_password_email_subject'));
             $login->sendEmail($fields['email'],$fields['username'],$subject,$emailProperties);
             $tpl = $sentTpl;
+            $tplType = $sentTplType;
 
             /* if redirecting, do so here */
             if (!empty($redirectTo)) {
