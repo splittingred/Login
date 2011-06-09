@@ -24,8 +24,8 @@
  *
  * @package login
  */
-$login = $modx->getService('login','Login',$modx->getOption('login.core_path',null,$modx->getOption('core_path').'components/login/').'model/login/',$scriptProperties);
-if (!($login instanceof Login)) return '';
+require_once $modx->getOption('login.core_path',null,$modx->getOption('core_path').'components/login/').'model/login/login.class.php';
+$login = new Login($modx,$scriptProperties);
 $modx->lexicon->load('login:profile');
 
 /* setup default properties */

@@ -49,8 +49,8 @@
  * @property string logoutMsg The string to use for the logout action. Defaults
  * to the lexicon string "login.logout"
  */
-$corePath = $modx->getOption('login.core_path',$scriptProperties,$modx->getOption('core_path',null,MODX_CORE_PATH).'components/login/');
-$login = $modx->getService('login','Login',$corePath.'model/login/',$scriptProperties);
+require_once $modx->getOption('login.core_path',null,$modx->getOption('core_path').'components/login/').'model/login/login.class.php';
+$login = new Login($modx,$scriptProperties);
 if (!is_object($login) || !($login instanceof Login)) return '';
 
 $output = '';
