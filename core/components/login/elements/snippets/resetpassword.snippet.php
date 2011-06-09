@@ -29,8 +29,8 @@
 if (empty($_REQUEST['lp']) || empty($_REQUEST['lu'])) {
     return '';
 }
-$model_path = $modx->getOption('core_path').'components/login/model/login/';
-$Login = $modx->getService('login','Login',$model_path,$scriptProperties);
+require_once $modx->getOption('login.core_path',null,$modx->getOption('core_path').'components/login/').'model/login/login.class.php';
+$login = new Login($modx,$scriptProperties);
 
 /* setup default properties */
 $tpl = !empty($tpl) ? $tpl : 'lgnResetPassTpl';
@@ -53,7 +53,12 @@ if ($cachePass != $password) return '';
 $modx->cacheManager->delete($cacheKey);
 
 /* change password */
-$user->set('password',$password);
+$version = $modx->getVersionData();
+if (version_compare($version['full_version'],'2.1.0-rc1') >= 0) {
+    $user->set('password',$password);
+} else {
+    $user->set('password',md5($password));
+}
 if (!$debug) {
     if ($user->save() == false) return '';
 }
@@ -78,6 +83,6 @@ $phs = array(
     'loginUrl' => $modx->makeUrl($loginResourceId),
 );
 
-$output = $Login->getChunk($tpl,$phs,$tplType);
+$output = $login->getChunk($tpl,$phs,$tplType);
 
 return $output;

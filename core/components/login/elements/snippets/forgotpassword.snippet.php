@@ -26,8 +26,8 @@
  *
  * @package login
  */
-$model_path = $modx->getOption('core_path').'components/login/model/login/';
-$login = $modx->getService('login','Login',$model_path,$scriptProperties);
+require_once $modx->getOption('login.core_path',null,$modx->getOption('core_path').'components/login/').'model/login/login.class.php';
+$login = new Login($modx,$scriptProperties);
 
 $modx->lexicon->load('login:forgotpassword');
 
