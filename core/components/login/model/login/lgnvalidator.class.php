@@ -176,6 +176,7 @@ class lgnValidator {
             $param = str_replace(array('`','^'),'',$s);
             $type = $this->config['use_multibyte'] ? mb_substr($type,0,$hasParams,$this->config['encoding']) : substr($type,0,$hasParams);
         }
+        $type = str_replace(array("\n","\r"," "),'',trim($type));
 
         $invNames = array('validate','validateFields','addError','stripValidators','__construct');
         if (method_exists($this,$type) && !in_array($type,$invNames)) {
