@@ -81,10 +81,12 @@ if (!empty($_POST['login_fp_service'])) {
         if (empty($fields[Login::FORGOT_PASSWORD_EXTERNAL_USER])) {
             /* get the user dependent on the retrieval method */
             $user = $login->getUserByField($field,$fields[$field],$alias);
-            $fields = array_merge($fields,$user->toArray());
-            $profile = $user->getOne('Profile');
-            if ($profile) { /* merge in profile */
-                $fields = array_merge($profile->toArray(),$fields);
+            if ($user) {
+                $fields = array_merge($fields,$user->toArray());
+                $profile = $user->getOne('Profile');
+                if ($profile) { /* merge in profile */
+                    $fields = array_merge($profile->toArray(),$fields);
+                }
             }
         }
         
