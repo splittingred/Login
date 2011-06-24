@@ -404,7 +404,7 @@ class lgnHooks {
      */
     public function recaptcha(array $fields = array()) {
         $passed = false;
-        if ($this->modx->user && $this->modx->user->isAuthenticated($this->modx->context->get('key'))) return true;
+        if ($this->modx->user && $this->modx->user->hasSessionContext($this->modx->context->get('key'))) return true;
         $this->modx->lexicon->load('login:recaptcha');
         $recaptcha = $this->modx->getService('recaptcha','reCaptcha',$this->login->config['modelPath'].'recaptcha/');
         if (!($recaptcha instanceof reCaptcha)) return $passed;

@@ -31,6 +31,11 @@ class lgnValidator {
      */
     public $errors = array();
     /**
+     * @var array $errorsRaw A collection of all the non-processed errors so far.
+     * @access public
+     */
+    public $errorsRaw = array();
+    /**
      * @var array $fields A collection of all the validated fields so far.
      * @access public
      */
@@ -72,8 +77,8 @@ class lgnValidator {
      * name:validator=param:anotherValidator:oneMoreValidator=`param`
      *
      * @access public
-     * @param array $keys The field data to validate.
-     * @param string $validationFields A comma-separated list of fields that will be validated
+     * @param array $keys The fields to validate.
+     * @param string $validationFields
      * @return array An array of field name => value pairs.
      */
     public function validateFields(array $keys = array(),$validationFields = '') {
@@ -89,49 +94,77 @@ class lgnValidator {
                 $field = $key[0];
                 array_splice($key,0,1); /* remove the field name from validator list */
                 $fieldValidators[$field] = $key;
+                if (!isset($this->fields[$field]) && strpos($field,'.') === false) { /* prevent someone from bypassing a required field by removing it from the form */
+                    $keys[$field] = '';
+                }
             }
         }
 
         /* do it the old way, through name:validator on the POST */
         foreach ($keys as $k => $v) {
-            $key = explode(':',$k);
-
-            $stripTags = strpos($k,'allowTags') === false;
-            if (isset($fieldValidators[$k])) {
-                foreach ($fieldValidators[$k] as $fv) {
-                    if (strpos($fv,'allowTags') !== false) {
-                        $stripTags = false;
-                    }
+            /* is a array field, ie contact[name] */
+            if (is_array($v) && !isset($_FILES[$k]) && is_string($k) && intval($k) == 0 && $k !== 0) {
+                $isCheckbox = false;
+                foreach ($v as $key => $val) {
+                    if (!is_string($key)) { $isCheckbox = true; continue; }
+                    $subKey = $k.'.'.$key;
+                    $this->_validate($subKey,$val,$fieldValidators);
                 }
-            }
-
-            /* strip tags by default */
-            if ($stripTags && !is_array($v)) {
-                $v = strip_tags($v);
-            }
-
-            /* handle checkboxes/radios with empty hiddens before that are field[] names */
-            if (is_array($v) && !isset($_FILES[$key[0]]) && empty($v[0])) array_splice($v,0,1);
-
-            /* loop through validators and execute the old way, for backwards compatibility */
-            $validators = count($key);
-            if ($validators > 1) {
-                $this->fields[$key[0]] = $v;
-                for ($i=1;$i<$validators;$i++) {
-                    $this->validate($key[0],$v,$key[$i]);
+                if ($isCheckbox) {
+                    $this->_validate($k,$v,$fieldValidators);
                 }
             } else {
-                $this->fields[$k] = $v;
+                $this->_validate($k,$v,$fieldValidators);
             }
+        }
 
-            /* do new way of validation, which is more secure */
-            if (!empty($fieldValidators[$k])) {
-                foreach ($fieldValidators[$k] as $validator) {
-                    $this->validate($k,$v,$validator);
+        return $this->fields;
+    }
+
+    /**
+     * Helper method for validating fields
+     * @param string $k
+     * @param string $v
+     * @param array $fieldValidators
+     * @return void
+     */
+    private function _validate($k,$v,array $fieldValidators = array()) {
+        $key = explode(':',$k);
+
+        $stripTags = strpos($k,'allowTags') === false;
+        if (isset($fieldValidators[$k])) {
+            foreach ($fieldValidators[$k] as $fv) {
+                if (strpos($fv,'allowTags') !== false) {
+                    $stripTags = false;
                 }
             }
         }
-        return $this->fields;
+
+        /* strip tags by default */
+        if ($stripTags && !is_array($v)) {
+            $v = strip_tags($v);
+        }
+
+        /* handle checkboxes/radios with empty hiddens before that are field[] names */
+        if (is_array($v) && !isset($_FILES[$key[0]]) && empty($v[0])) array_splice($v,0,1);
+
+        /* loop through validators and execute the old way, for backwards compatibility */
+        $validators = count($key);
+        if ($validators > 1) {
+            $this->fields[$key[0]] = $v;
+            for ($i=1;$i<$validators;$i++) {
+                $this->validate($key[0],$v,$key[$i]);
+            }
+        } else {
+            $this->fields[$k] = $v;
+        }
+
+        /* do new way of validation, which is more secure */
+        if (!empty($fieldValidators[$k])) {
+            foreach ($fieldValidators[$k] as $validator) {
+                $this->validate($k,$v,$validator);
+            }
+        }
     }
 
     /**
@@ -230,6 +263,10 @@ class lgnValidator {
      */
     public function addError($key,$value) {
         $errTpl = $this->modx->getOption('errTpl',$this->login->config,'<span class="error">[[+error]]</span>');
+        $this->errorsRaw[$key] = $value;
+        if (!isset($this->errors[$key])) {
+            $this->errors[$key] = '';
+        }
         $this->errors[$key] .= ' '.str_replace('[[+error]]',$value,$errTpl);
         return $this->errors[$key];
     }
