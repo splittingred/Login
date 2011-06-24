@@ -75,6 +75,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'redirectToLogin',
+        'desc' => 'prop_changepassword.redirecttologin_desc',
+        'type' => 'combo-boolean',
+        'options' => '',
+        'value' => true,
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'reloadOnSuccess',
         'desc' => 'prop_changepassword.reloadonsuccess_desc',
         'type' => 'combo-boolean',

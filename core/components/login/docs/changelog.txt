@@ -1,5 +1,10 @@
 Changelog file for Login component.
 
+Login 1.6.3
+====================================
+- [#5088] Fix issue with ChangePassword &validateOldPassword and Revo 2.1.1
+
+
 Login 1.6.2
 ====================================
 - [#4844] Automatically trim trailing whitespace/newlines in validator calls

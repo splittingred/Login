@@ -15,6 +15,7 @@ $preHooks = $modx->getOption('preHooks',$scriptProperties,'');
 $validate = $modx->getOption('validate',$scriptProperties,'');
 $successMessage = $modx->getOption('successMessage',$scriptProperties,'');
 $reloadOnSuccess = $modx->getOption('reloadOnSuccess',$scriptProperties,true);
+$redirectToLogin = $modx->getOption('redirectToLogin',$scriptProperties,true);
 $placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'logcp.');
 
 $fieldOldPassword = $modx->getOption('fieldOldPassword',$scriptProperties,'password_old');
@@ -77,8 +78,15 @@ if (!empty($_POST) && isset($_POST[$submitVar])) {
         } else {
             /* if changing the password */
             if ($validateOldPassword) {
-                if (empty($fields[$fieldOldPassword]) || md5($fields[$fieldOldPassword]) != $modx->user->get('password')) {
-                    $errors[$fieldOldPassword] = $modx->lexicon('login.password_invalid_old');
+                $version = $modx->getVersionData();
+                if (version_compare($version['full_version'],'2.1.0','>=')) {
+                    if (empty($fields[$fieldOldPassword]) || !$modx->user->passwordMatches($fields[$fieldOldPassword])) {
+                        $errors[$fieldOldPassword] = $modx->lexicon('login.password_invalid_old');
+                    }
+                } else {
+                    if (empty($fields[$fieldOldPassword]) || md5($fields[$fieldOldPassword]) != $modx->user->get('password')) {
+                        $errors[$fieldOldPassword] = $modx->lexicon('login.password_invalid_old');
+                    }
                 }
             }
             $minLength = $modx->getOption('password_min_length',null,8);

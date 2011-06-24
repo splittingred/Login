@@ -111,6 +111,7 @@ $_lang['prop_changepassword.fieldnewpassword_desc'] = 'The field name of the new
 $_lang['prop_changepassword.fieldconfirmnewpassword_desc'] = 'Optional. If set, the field name of the confirm password field, and will be checked against the new password field during submission.';
 $_lang['prop_changepassword.prehooks_desc'] = 'What scripts to fire, if any, after the form passes validation but before save. This can be a comma-separated list of hooks, and if the first fails, the proceeding ones will not fire. A hook can also be a Snippet name that will execute that Snippet.';
 $_lang['prop_changepassword.posthooks_desc'] = 'What scripts to fire, if any, after the user has been registered. This can be a comma-separated list of hooks, and if the first fails, the proceeding ones will not fire. A hook can also be a Snippet name that will execute that Snippet.';
+$_lang['prop_changepassword.redirecttologin_desc'] = 'If a user is not logged in and accesses this Resource, redirect them to the Unauthorized Page.';
 $_lang['prop_changepassword.reloadonsuccess_desc'] = 'If true, the page will redirect to itself with a GET parameter to prevent double-postbacks. If false, it will simply set a success placeholder.';
 $_lang['prop_changepassword.successmessage_desc'] = 'If reloadOnSuccess is set to false, output this message in the [prefix].successMessage placeholder.';
 $_lang['prop_changepassword.placeholderprefix_desc'] = 'The prefix to use for all placeholders set by this snippet.';
