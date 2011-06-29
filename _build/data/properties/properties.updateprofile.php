@@ -84,6 +84,22 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'allowedFields',
+        'desc' => 'prop_updateprofile.allowedfields_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'allowedExtendedFields',
+        'desc' => 'prop_updateprofile.allowedextendedfields_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'preHooks',
         'desc' => 'prop_updateprofile.prehooks_desc',
         'type' => 'textfield',

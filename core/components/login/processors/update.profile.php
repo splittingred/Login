@@ -35,6 +35,8 @@ if (!empty($submitVar)) unset($fields[$submitVar]);
 
 /* set extended data if any */
 if ($modx->getOption('useExtended',$scriptProperties,true)) {
+    $allowedExtendedFields = $modx->getOption('allowedExtendedFields',$scriptProperties,'');
+    $allowedExtendedFields = !empty($allowedExtendedFields) ? explode(',',$allowedExtendedFields) : array();
     /* first cut out regular fields */
     $excludeExtended = $modx->getOption('excludeExtended',$scriptProperties,'');
     $excludeExtended = explode(',',$excludeExtended);
@@ -42,7 +44,17 @@ if ($modx->getOption('useExtended',$scriptProperties,true)) {
     $userFields = $modx->user->toArray();
     $newExtended = array();
     foreach ($fields as $field => $value) {
-        if (!isset($profileFields[$field]) && !isset($userFields[$field]) && $field != 'password_confirm' && $field != 'passwordconfirm' && !in_array($field,$excludeExtended)) {
+        $isValidExtended = true;
+        if (!empty($allowedExtendedFields)) {
+            if (!in_array($field,$allowedExtendedFields)) {
+                $isValidExtended = false;
+            }
+        }
+        if (isset($profileFields[$field]) || isset($userFields[$field]) || $field == 'password_confirm' || $field == 'passwordconfirm' || in_array($field,$excludeExtended) || $field == 'nospam' || $field == 'nospam:blank') {
+            $isValidExtended = false;
+        }
+        
+        if ($isValidExtended) {
             $newExtended[$field] = $value;
         }
     }
@@ -53,7 +65,19 @@ if ($modx->getOption('useExtended',$scriptProperties,true)) {
 }
 
 /* set fields */
-$profile->fromArray($fields);
+$allowedFields = $modx->getOption('allowedFields',$scriptProperties,'');
+$allowedFields = !empty($allowedFields) ? explode(',',$allowedFields) : array();
+foreach ($fields as $key => $value) {
+    $isValidField = true;
+    if (!empty($allowedFields)) {
+        if (!in_array($key,$allowedFields)) {
+            $isValidField = false;
+        }
+    }
+    if ($isValidField) {
+        $profile->set($key,$value);
+    }
+}
 
 /* sync username with specified field if setting is set */
 $syncUsername = $modx->getOption('syncUsername',$scriptProperties,false);
