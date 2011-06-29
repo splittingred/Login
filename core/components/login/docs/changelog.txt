@@ -9,7 +9,6 @@ Login 1.6.3
 - Better support for checkboxes/radios/bracketed fields in login validator
 - [#5088] Fix issue with ChangePassword &validateOldPassword and Revo 2.1.1
 
-
 Login 1.6.2
 ====================================
 - [#4844] Automatically trim trailing whitespace/newlines in validator calls

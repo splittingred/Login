@@ -133,7 +133,7 @@ if ($activation && !empty($email) && !empty($activateResourceId) && empty($field
     $confirmUrl = $modx->makeUrl($activateResourceId,'',$confirmParams,'full');
 
     /* set confirmation email properties */
-    $emailTpl = $modx->getOption('activationEmailTpl',$scriptProperties,'lgnActivateEmail');
+    $emailTpl = $modx->getOption('activationEmailTpl',$scriptProperties,'lgnActivateEmailTpl');
     $emailTplType = $modx->getOption('activationEmailTplType',$scriptProperties,'modChunk');
     $emailProperties = $user->toArray();
     $emailProperties['confirmUrl'] = $confirmUrl;
