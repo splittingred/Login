@@ -161,6 +161,15 @@ if (isset($_REQUEST[$actionKey]) && !empty($_REQUEST[$actionKey])) {
                     $errorOutput = '';
                     $errors = $response->getFieldErrors();
                     $message = $response->getMessage();
+                    $redirectToOnFailedAuth = $modx->getOption('redirectToOnFailedAuth',$scriptProperties,false);
+                    if ($redirectToOnFailedAuth && $redirectToOnFailedAuth != $modx->resource->get('id')) {
+                        $p = array(
+                            'u' => $fields['username'],
+                        );
+                        if (!empty($message)) $params['m'] = $message;
+                        $url = $modx->makeUrl($redirectToOnFailedAuth,'',$p,'full');
+                        $modx->sendRedirect($url);
+                    }
                     if (!empty($errors)) {
                         foreach ($errors as $error) {
                             $errorOutput .= $modx->parseChunk($errTpl, $error);

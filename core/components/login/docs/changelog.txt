@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.6.4
 ====================================
+- [#4744] Added &redirectToOnFailedAuth parameter for redirecting to a separate page on failed logins
 - [#3263] Remove duplicate error spans in validator output
 
 Login 1.6.3

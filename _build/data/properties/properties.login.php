@@ -174,6 +174,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'redirectToOnFailedAuth',
+        'desc' => 'prop_login.redirecttoonfailedauth_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'rememberMeKey',
         'desc' => 'prop_login.remembermekey_desc',
         'type' => 'textfield',
