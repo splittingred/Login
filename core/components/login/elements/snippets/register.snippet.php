@@ -135,11 +135,7 @@ if ($hasPosted) {
 
         /* process hooks */
         if (!empty($login->preHooks->errors)) {
-            $errors = array();
-            foreach ($login->preHooks->errors as $key => $error) {
-                $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
-            }
-            $modx->toPlaceholders($errors,$placeholderPrefix.'error');
+            $modx->toPlaceholders($login->preHooks->errors,$placeholderPrefix.'error');
 
             $errorMsg = $login->preHooks->getErrorMessage();
             $modx->setPlaceholder($placeholderPrefix.'error.message',$errorMsg);
@@ -151,11 +147,7 @@ if ($hasPosted) {
             }
         }
     } else {
-        $errors = array();
-        foreach ($login->validator->errors as $key => $error) {
-            $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
-        }
-        $modx->toPlaceholders($errors,$placeholderPrefix.'error');
+        $modx->toPlaceholders($login->validator->errors,$placeholderPrefix.'error');
         $modx->setPlaceholder($placeholderPrefix.'validation_error',true);
     }
     $modx->setPlaceholders($fields,$placeholderPrefix);

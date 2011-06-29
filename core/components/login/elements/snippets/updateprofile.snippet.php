@@ -127,11 +127,7 @@ if (!empty($_POST) && (empty($submitVar) || !empty($_POST[$submitVar]))) {
             }
         }
     }
-    $errors = array();
-    foreach ($login->validator->errors as $key => $error) {
-      $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
-    }
-    $modx->toPlaceholders($errors,$placeholderPrefix.'error');
+    $modx->toPlaceholders($login->validator->errors,$placeholderPrefix.'error');
     $modx->toPlaceholders($fields,$placeholderPrefix);
 }
 

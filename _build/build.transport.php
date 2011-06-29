@@ -35,8 +35,8 @@ set_time_limit(0);
 /* define version */
 define('PKG_NAME','Login');
 define('PKG_NAME_LOWER','login');
-define('PKG_VERSION','1.6.3');
-define('PKG_RELEASE','pl');
+define('PKG_VERSION','1.6.4');
+define('PKG_RELEASE','rc1');
 
 /* define sources */
 $root = dirname(dirname(__FILE__)).'/';

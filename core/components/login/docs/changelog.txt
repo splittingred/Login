@@ -1,5 +1,9 @@
 Changelog file for Login component.
 
+Login 1.6.4
+====================================
+- [#3263] Remove duplicate error spans in validator output
+
 Login 1.6.3
 ====================================
 - Better support for checkboxes/radios/bracketed fields in login validator
