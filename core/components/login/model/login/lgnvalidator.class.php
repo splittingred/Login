@@ -95,11 +95,11 @@ class lgnValidator {
                 array_splice($key,0,1); /* remove the field name from validator list */
                 $fieldValidators[$field] = $key;
                 if (!isset($this->fields[$field]) && strpos($field,'.') === false) { /* prevent someone from bypassing a required field by removing it from the form */
-                    $keys[$field] = '';
+                    $keys[$field] = !empty($this->fields[$v]) ? $this->fields[$v] : '';
                 }
             }
         }
-
+        
         /* do it the old way, through name:validator on the POST */
         foreach ($keys as $k => $v) {
             /* is a array field, ie contact[name] */
@@ -118,6 +118,7 @@ class lgnValidator {
             }
         }
 
+        $this->fields = $keys;
         return $this->fields;
     }
 
