@@ -117,8 +117,6 @@ class lgnValidator {
                 $this->_validate($k,$v,$fieldValidators);
             }
         }
-
-        $this->fields = $keys;
         return $this->fields;
     }
 

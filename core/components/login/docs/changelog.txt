@@ -1,5 +1,9 @@
 Changelog file for Login component.
 
+Login 1.6.5
+====================================
+- [#5176] Fix issue with Registration in Revo 2.0 installations
+
 Login 1.6.4
 ====================================
 - [#3588] Add &allowedFields and &allowedExtendedFields to UpdateProfile to restrict fields that are updated

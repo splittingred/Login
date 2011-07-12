@@ -58,7 +58,13 @@ if (empty($fields['class_key'])) $fields['class_key'] = 'modUser';
 $user->fromArray($fields);
 $user->set('username',$fields[$usernameField]);
 $user->set('active',0);
-$user->set('password',$fields['password']);
+$version = $modx->getVersionData();
+/* 2.1.x+ */
+if (version_compare($version['full_version'],'2.1.0-rc1') >= 0) {
+    $user->set('password',$fields['password']);
+} else { /* 2.0.x */
+    $user->set('password',md5($fields['password']));
+}
 $profile->fromArray($fields);
 $profile->set('internalKey',0);
 $user->addOne($profile,'Profile');
