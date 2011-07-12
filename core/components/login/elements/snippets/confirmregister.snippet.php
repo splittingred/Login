@@ -42,8 +42,8 @@ if (empty($_REQUEST['lp']) || empty($_REQUEST['lu'])) {
         $modx->sendErrorPage();
     }
 }
-$username = base64_decode(urldecode($_REQUEST['lu']));
-$password = base64_decode(urldecode($_REQUEST['lp']));
+$username = base64_decode(urldecode(rawurldecode($_REQUEST['lu'])));
+$password = base64_decode(urldecode(rawurldecode($_REQUEST['lp'])));
 
 /* validate we have correct user */
 $user = $modx->getObject('modUser',array('username' => $username));

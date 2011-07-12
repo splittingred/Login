@@ -5,6 +5,7 @@ Login 1.6.5
 - [#5176] Fix issue with Registration in Revo 2.0 installations
 - Fix issue with some error messages not being wrapped with errTpl
 - Email validator now only checks for email validation, not required status
+- [#5166] Add additional sanity decoding to ConfirmRegister processing
 
 Login 1.6.4
 ====================================
