@@ -87,7 +87,7 @@ if ($hasPosted) {
 
     /* ensure username field exists and isn't empty */
     if (empty($fields[$usernameField])) {
-        $login->validator->errors[$usernameField] = $modx->lexicon('register.field_required');
+        $login->validator->addError($usernameField,$modx->lexicon('register.field_required'));
     } else {
         /* make sure username isnt taken */
         $alreadyExists = $modx->getObject('modUser',array('username' => $fields[$usernameField]));
@@ -102,23 +102,23 @@ if ($hasPosted) {
                     $modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not remove old, deactive user with cachepwd.');
                 }
             } else {
-                $login->validator->errors[$usernameField] = $modx->lexicon('register.username_taken');
+                $login->validator->addError($usernameField,$modx->lexicon('register.username_taken'));
             }
         }
     }
 
     /* ensure password field isn't empty */
     if (empty($fields[$passwordField])) {
-        $login->validator->errors[$passwordField] = $modx->lexicon('register.field_required');
+        $login->validator->addError($passwordField,$modx->lexicon('register.field_required'));
     }
     /* ensure email field isn't empty */
     if (empty($fields[$emailField])) {
-        $login->validator->errors[$emailField] = $modx->lexicon('register.field_required');
+        $login->validator->addError($emailField,$modx->lexicon('register.field_required'));
     /* ensure if allow_multiple_emails setting is false, prevent duplicate emails */
     } else if (!$modx->getOption('allow_multiple_emails',null,false)) {
         $emailTaken = $modx->getObject('modUserProfile',array('email' => $fields[$emailField]));
         if ($emailTaken) {
-            $login->validator->errors[$emailField] = $modx->lexicon('register.email_taken',array('email' => $fields[$emailField]));
+            $login->validator->addError($emailField,$modx->lexicon('register.email_taken',array('email' => $fields[$emailField])));
         }
     }
 

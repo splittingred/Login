@@ -322,6 +322,7 @@ class lgnValidator {
      * @return boolean True if the validator succeeds
      */
     public function email($key,$value) {
+        if (empty($value)) return true;
         /* validate length and @ */
         $pattern = "^[^@]{1,64}\@[^\@]{1,255}$";
         $useMb = $this->config['use_multibyte'] && function_exists('mb_ereg');
