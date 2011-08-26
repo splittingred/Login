@@ -26,203 +26,312 @@
  * @package login
  * @subpackage processors
  */
-/* get rid of spam fields, submitVar field */
-unset($fields['nospam'],$fields['blank']);
-if (!empty($submitVar)) unset($fields[$submitVar]);
+class LoginRegisterProcessor extends LoginProcessor {
+    /** @var modUser $user */
+    public $user;
+    /** @var modUserProfile $profile */
+    public $profile;
+    /** @var array $userGroups */
+    public $userGroups = array();
 
-/* create user and profile */
-$user = $modx->newObject('modUser');
-$profile = $modx->newObject('modUserProfile');
+    public $persistParams = array();
 
-/* set extended data if any */
-if ($modx->getOption('useExtended',$scriptProperties,true)) {
-    /* first cut out regular and unwanted fields */
-    $excludeExtended = $modx->getOption('excludeExtended',$scriptProperties,'');
-    $excludeExtended = explode(',',$excludeExtended);
-    $profileFields = $profile->toArray();
-    $userFields = $user->toArray();
-    $extended = array();
-    foreach ($fields as $field => $value) {
-        if (!isset($profileFields[$field]) && !isset($userFields[$field]) && $field != 'password_confirm' && $field != 'passwordconfirm' && !in_array($field,$excludeExtended)) {
-            $extended[$field] = $value;
-        }
-    }
-    /* now set extended data */
-    $profile->set('extended',$extended);
-}
-
-/* allow overriding of class key */
-if (empty($fields['class_key'])) $fields['class_key'] = 'modUser';
-
-/* set user and profile */
-$user->fromArray($fields);
-$user->set('username',$fields[$usernameField]);
-$user->set('active',0);
-$version = $modx->getVersionData();
-/* 2.1.x+ */
-if (version_compare($version['full_version'],'2.1.0-rc1') >= 0) {
-    $user->set('password',$fields['password']);
-} else { /* 2.0.x */
-    $user->set('password',md5($fields['password']));
-}
-$profile->fromArray($fields);
-$profile->set('internalKey',0);
-$user->addOne($profile,'Profile');
-
-/* if usergroups set */
-$usergroups = $modx->getOption('usergroups',$scriptProperties,'');
-if (!empty($usergroups)) {
-    $usergroups = explode(',',$usergroups);
-
-    foreach ($usergroups as $usergroupMeta) {
-        $usergroupMeta = explode(':',$usergroupMeta);
-        if (empty($usergroupMeta[0])) continue;
-
-        /* get usergroup */
-        $pk = array();
-        $pk[intval($usergroupMeta[0]) > 0 ? 'id' : 'name'] = $usergroupMeta[0];
-        $usergroup = $modx->getObject('modUserGroup',$pk);
-        if (!$usergroup) continue;
-
-        /* get role */
-        $rolePk = !empty($usergroupMeta[1]) ? $usergroupMeta[1] : 'Member';
-        $role = $modx->getObject('modUserGroupRole',array('name' => $rolePk));
-
-        /* create membership */
-        $member = $modx->newObject('modUserGroupMember');
-        $member->set('member',0);
-        $member->set('user_group',$usergroup->get('id'));
-        if (!empty($role)) {
-            $member->set('role',$role->get('id'));
-        } else {
-            $member->set('role',1);
-        }
-        $user->addMany($member,'UserGroupMembers');
-    }
-}
-
-/* save user */
-if (!$user->save()) {
-    $modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not save newly registered user: '.$user->get('id').' with username: '.$user->get('username'));
-    return $modx->lexicon('register.user_err_save');
-}
-
-/* setup persisting parameters */
-$persistParams = $modx->getOption('persistParams',$scriptProperties,'');
-if (!empty($persistParams)) $persistParams = $modx->fromJSON($persistParams);
-if (empty($persistParams) || !is_array($persistParams)) $persistParams = array();
-
-/* send activation email (if chosen) */
-$email = $user->get('email');
-$activation = $modx->getOption('activation',$scriptProperties,true);
-$activateResourceId = $modx->getOption('activationResourceId',$scriptProperties,'');
-if ($activation && !empty($email) && !empty($activateResourceId) && empty($fields['register.moderate'])) {
-    /* generate a password and encode it and the username into the url */
-    $pword = $login->generatePassword();
-    $confirmParams['lp'] = urlencode(base64_encode($pword));
-    $confirmParams['lu'] = urlencode(base64_encode($user->get('username')));
-    $confirmParams = array_merge($persistParams,$confirmParams);
-
-    /* if using redirectBack param, set here to allow dynamic redirection
-     * handling from other forms.
+    /**
+     * @return mixed
      */
-    $redirectBack = $modx->getOption('redirectBack',$_REQUEST,$modx->getOption('redirectBack',$scriptProperties,''));
-    if (!empty($redirectBack)) {
-        $confirmParams['redirectBack'] = $redirectBack;
-    }
-    $redirectBackParams = $modx->getOption('redirectBackParams',$_REQUEST,$modx->getOption('redirectBackParams',$scriptProperties,''));
-    if (!empty($redirectBackParams)) {
-        $confirmParams['redirectBackParams'] = $redirectBackParams;
-    }
+    public function process() {
+        $this->cleanseFields();
 
-    /* generate confirmation url */
-    $confirmUrl = $modx->makeUrl($activateResourceId,'',$confirmParams,'full');
+        /* create user and profile */
+        $this->user = $this->modx->newObject('modUser');
+        $this->profile = $this->modx->newObject('modUserProfile');
 
-    /* set confirmation email properties */
-    $emailTpl = $modx->getOption('activationEmailTpl',$scriptProperties,'lgnActivateEmailTpl');
-    $emailTplType = $modx->getOption('activationEmailTplType',$scriptProperties,'modChunk');
-    $emailProperties = $user->toArray();
-    $emailProperties['confirmUrl'] = $confirmUrl;
-    $emailProperties['tpl'] = $emailTpl;
-    $emailProperties['tplType'] = $emailTplType;
-    $emailProperties['password'] = $fields['password'];
+        if ($this->controller->getProperty('useExtended',true)) {
+            $this->setExtended();
+        }
 
-    /* now set new password to registry to prevent middleman attacks.
-     * Will read from the registry on the confirmation page. */
+        $this->setUserFields();
 
-    $modx->getService('registry', 'registry.modRegistry');
-    $modx->registry->addRegister('login','registry.modFileRegister');
-    $modx->registry->login->connect();
-    $modx->registry->login->subscribe('/useractivation/');
-    $modx->registry->login->send('/useractivation/',array($user->get('username') => $pword),array(
-        'ttl' => ($modx->getOption('activationttl',$scriptProperties,180)*60),
-    ));
-    /* set cachepwd here to prevent re-registration of inactive users */
-    $user->set('cachepwd',md5($pword));
-    if (!$user->save()) {
-        $modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not update cachepwd for activation for User: '.$user->get('username'));
-    }
+        $this->setUserGroups();
 
-    /* send either to user's email or a specified activation email */
-    $activationEmail = !empty($scriptProperties['activationEmail']) ? $scriptProperties['activationEmail'] : $user->get('email');
-    $subject = $modx->getOption('activationEmailSubject',$scriptProperties,$modx->lexicon('register.activation_email_subject'));
-    $login->sendEmail($activationEmail,$user->get('username'),$subject,$emailProperties);
+        /* save user */
+        if (!$this->user->save()) {
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not save newly registered user: '.$this->user->get('id').' with username: '.$this->user->get('username'));
+            return $this->modx->lexicon('register.user_err_save');
+        }
 
-} else if (empty($fields['register.moderate'])) {
-    $user->set('active',1);
-    $user->save();
-}
+        $this->preparePersistentParameters();
 
+        /* send activation email (if chosen) */
+        $email = $this->user->get('email');
+        $activation = $this->controller->getProperty('activation',true);
+        $activateResourceId = $this->controller->getProperty('activationResourceId','');
+        $moderated = $this->checkForModeration();
+        if ($activation && !empty($email) && !empty($activateResourceId) && !$moderated) {
+            $this->sendActivationEmail();
 
-/* do post-register hooks */
-$postHooks = $modx->getOption('postHooks',$scriptProperties,'');
-$login->loadHooks('posthooks');
-$fields['register.user'] = &$user;
-$fields['register.profile'] =& $profile;
-$fields['register.usergroups'] = $usergroups;
-$login->posthooks->loadMultiple($postHooks,$fields);
+        } else if (!$moderated) {
+            $this->user->set('active',true);
+            $this->user->save();
+        }
 
-/* process hooks */
-if (!empty($login->posthooks->errors)) {
-    $errors = array();
-    foreach ($login->posthooks->errors as $key => $error) {
-        $errors[$key] = str_replace('[[+error]]',$error,$errTpl);
-    }
-    $modx->toPlaceholders($errors,'error');
+        $this->runPostHooks();
 
-    $errorMsg = $login->posthooks->getErrorMessage();
-    $modx->toPlaceholder('message',$errorMsg,'error');
-}
+        $this->checkForModerationRedirect();
 
-/* if a prehook set the user as moderated, if set, send to an optional other
- * moderation resource id
- */
-if (!empty($fields[Login::REGISTER_MODERATE])) {
-    $moderatedResourceId = $modx->getOption('moderatedResourceId',$scriptProperties,'');
-    if (!empty($moderatedResourceId)) {
-        $persistParams = array_merge($persistParams,array(
-            'username' => $user->get('username'),
-            'email' => $profile->get('email'),
-        ));
-        $url = $modx->makeUrl($moderatedResourceId,'',$persistParams,'full');
-        $modx->sendRedirect($url);
+        $this->checkForRegisteredRedirect();
+        
+        $successMsg = $this->controller->getProperty('successMsg','');
+        $this->modx->toPlaceholder('error.message',$successMsg);
         return true;
     }
-}
 
-/* if provided a redirect id, will redirect to that resource, with the
- * GET params `username` and `email` for you to use */
-$submittedResourceId = $modx->getOption('submittedResourceId',$scriptProperties,'');
-if (!empty($submittedResourceId)) {
-    $persistParams = array_merge($persistParams,array(
-        'username' => $user->get('username'),
-        'email' => $profile->get('email'),
-    ));
-    $url = $modx->makeUrl($submittedResourceId,'',$persistParams,'full');
-    $modx->sendRedirect($url);
-} else {
-    $successMsg = $modx->getOption('successMsg',$scriptProperties,'');
-    $modx->toPlaceholder('error.message',$successMsg);
-}
+    /**
+     * Remove any fields used for anti-spam, submission or moderation from the submission returns
+     * @return void
+     */
+    public function cleanseFields() {
+        $this->dictionary->remove('nospam');
+        $this->dictionary->remove('blank');
+        $submitVar = $this->controller->getProperty('submitVar');
+        if (!empty($submitVar)) {
+            $this->dictionary->remove($submitVar);
+        }
+    }
 
-return true;
+    /**
+     * If wanted, set extra values in the form to profile extended field
+     * @return void
+     */
+    public function setExtended() {
+        /* first cut out regular and unwanted fields */
+        $excludeExtended = $this->controller->getProperty('excludeExtended','');
+        $excludeExtended = explode(',',$excludeExtended);
+        $profileFields = $this->profile->toArray();
+        $userFields = $this->user->toArray();
+        $extended = array();
+        $fields = $this->dictionary->toArray();
+        foreach ($fields as $field => $value) {
+            if (!isset($profileFields[$field]) && !isset($userFields[$field]) && $field != 'password_confirm' && $field != 'passwordconfirm' && !in_array($field,$excludeExtended)) {
+                $extended[$field] = $value;
+            }
+        }
+        /* now set extended data */
+        $this->profile->set('extended',$extended);
+    }
+
+    /**
+     * Setup the user data and create the user/profile objects
+     * 
+     * @return void
+     */
+    public function setUserFields() {
+        $fields = $this->dictionary->toArray();
+        /* allow overriding of class key */
+        if (empty($fields['class_key'])) $fields['class_key'] = 'modUser';
+
+        /* set user and profile */
+        $this->user->fromArray($fields);
+        $this->user->set('username',$fields[$this->controller->getProperty('usernameField','username')]);
+        $this->user->set('active',0);
+        $version = $this->modx->getVersionData();
+        /* 2.1.x+ */
+        if (version_compare($version['full_version'],'2.1.0-rc1') >= 0) {
+            $this->user->set('password',$fields['password']);
+        } else { /* 2.0.x */
+            $this->user->set('password',md5($fields['password']));
+        }
+        $this->profile->fromArray($fields);
+        $this->profile->set('internalKey',0);
+        $this->user->addOne($profile,'Profile');
+    }
+
+    /**
+     * If user groups were passed, set them here
+     * @return void
+     */
+    public function setUserGroups() {
+        /* if usergroups set */
+        $this->userGroups = $this->controller->getProperty('usergroups','');
+        if (!empty($this->userGroups)) {
+            $this->userGroups = explode(',',$this->userGroups);
+
+            foreach ($this->userGroups as $userGroupMeta) {
+                $userGroupMeta = explode(':',$userGroupMeta);
+                if (empty($userGroupMeta[0])) continue;
+
+                /* get usergroup */
+                $pk = array();
+                $pk[intval($userGroupMeta[0]) > 0 ? 'id' : 'name'] = $userGroupMeta[0];
+                /** @var modUserGroup $userGroup */
+                $userGroup = $this->modx->getObject('modUserGroup',$pk);
+                if (!$userGroup) continue;
+
+                /* get role */
+                $rolePk = !empty($userGroupMeta[1]) ? $userGroupMeta[1] : 'Member';
+                /** @var modUserGroupRole $role */
+                $role = $this->modx->getObject('modUserGroupRole',array('name' => $rolePk));
+
+                /* create membership */
+                /** @var modUserGroupMember $member */
+                $member = $this->modx->newObject('modUserGroupMember');
+                $member->set('member',0);
+                $member->set('user_group',$userGroup->get('id'));
+                if (!empty($role)) {
+                    $member->set('role',$role->get('id'));
+                } else {
+                    $member->set('role',1);
+                }
+                $this->user->addMany($member,'UserGroupMembers');
+            }
+        }
+    }
+
+    /**
+     * Setup persistent parameters to go through the request cycle
+     * @return array
+     */
+    public function preparePersistentParameters() {
+        $this->persistParams = $this->controller->getProperty('persistParams','');
+        if (!empty($this->persistParams)) $this->persistParams = $this->modx->fromJSON($this->persistParams);
+        if (empty($this->persistParams) || !is_array($this->persistParams)) $this->persistParams = array();
+        return $this->persistParams;
+    }
+
+    /**
+     * Send an activation email to the user with an encrypted username and password hash, to allow for secure
+     * activation processes that are not vulnerable to middle-man attacks.
+     * 
+     * @return void
+     */
+    public function sendActivationEmail() {
+        /* generate a password and encode it and the username into the url */
+        $pword = $this->login->generatePassword();
+        $confirmParams['lp'] = urlencode(base64_encode($pword));
+        $confirmParams['lu'] = urlencode(base64_encode($this->user->get('username')));
+        $confirmParams = array_merge($this->persistParams,$confirmParams);
+
+        /* if using redirectBack param, set here to allow dynamic redirection
+         * handling from other forms.
+         */
+        $redirectBack = $this->modx->getOption('redirectBack',$_REQUEST,$this->controller->getProperty('redirectBack',''));
+        if (!empty($redirectBack)) {
+            $confirmParams['redirectBack'] = $redirectBack;
+        }
+        $redirectBackParams = $this->modx->getOption('redirectBackParams',$_REQUEST,$this->controller->getProperty('redirectBackParams',''));
+        if (!empty($redirectBackParams)) {
+            $confirmParams['redirectBackParams'] = $redirectBackParams;
+        }
+
+        /* generate confirmation url */
+        $confirmUrl = $this->modx->makeUrl($this->controller->getProperty('activateResourceId',1),'',$confirmParams,'full');
+
+        /* set confirmation email properties */
+        $emailTpl = $this->controller->getProperty('activationEmailTpl','lgnActivateEmailTpl');
+        $emailTplType = $this->controller->getProperty('activationEmailTplType','modChunk');
+        $emailProperties = $this->user->toArray();
+        $emailProperties['confirmUrl'] = $confirmUrl;
+        $emailProperties['tpl'] = $emailTpl;
+        $emailProperties['tplType'] = $emailTplType;
+        $emailProperties['password'] = $this->dictionary->get('password');
+
+        /* now set new password to registry to prevent middleman attacks.
+         * Will read from the registry on the confirmation page. */
+        $this->modx->getService('registry', 'registry.modRegistry');
+        $this->modx->registry->addRegister('login','registry.modFileRegister');
+        $this->modx->registry->login->connect();
+        $this->modx->registry->login->subscribe('/useractivation/');
+        $this->modx->registry->login->send('/useractivation/',array($this->user->get('username') => $pword),array(
+            'ttl' => ($this->controller->getProperty('activationttl',180)*60),
+        ));
+        /* set cachepwd here to prevent re-registration of inactive users */
+        $this->user->set('cachepwd',md5($pword));
+        if (!$this->user->save()) {
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not update cachepwd for activation for User: '.$this->user->get('username'));
+        }
+
+        /* send either to user's email or a specified activation email */
+        $activationEmail = $this->controller->getProperty('activationEmail',$this->user->get('email'));
+        $subject = $this->controller->getProperty('activationEmailSubject',$this->modx->lexicon('register.activation_email_subject'));
+        $this->login->sendEmail($activationEmail,$this->user->get('username'),$subject,$emailProperties);
+    }
+
+    /**
+     * Check to see if a pre/post hook told Login to set the user to moderated (inactive) status
+     * @return boolean
+     */
+    public function checkForModeration() {
+        $moderate = $this->dictionary->get('register.moderate');
+        return !empty($moderate);
+    }
+
+    /**
+     * Run any post-registration hooks
+     * 
+     * @return void
+     */
+    public function runPostHooks() {
+        $postHooks = $this->controller->getProperty('postHooks','');
+        $this->controller->loadHooks('postHooks');
+        $fields['register.user'] =& $user;
+        $fields['register.profile'] =& $profile;
+        $fields['register.usergroups'] = $this->userGroups;
+        $this->controller->postHooks->loadMultiple($postHooks,$fields);
+
+        /* process hooks */
+        if ($this->controller->postHooks->hasErrors()) {
+            $errors = array();
+            $hookErrors = $this->controller->postHooks->getErrors();
+            foreach ($hookErrors as $key => $error) {
+                $errors[$key] = str_replace('[[+error]]',$error,$this->controller->getProperty('errTpl'));
+            }
+            $this->modx->toPlaceholders($errors,'error');
+
+            $errorMsg = $this->controller->postHooks->getErrorMessage();
+            $this->modx->toPlaceholder('message',$errorMsg,'error');
+        }
+    }
+
+    /**
+     * if a hook set the user as moderated, if set, send to an optional other moderation resource id
+     * @return boolean
+     */
+    public function checkForModerationRedirect() {
+        $moderated = $this->dictionary->get(Login::REGISTER_MODERATE);
+        if (!empty($moderated)) {
+            $moderatedResourceId = $this->controller->getProperty('moderatedResourceId','');
+            if (!empty($moderatedResourceId)) {
+                $persistParams = array_merge($this->persistParams,array(
+                    'username' => $this->user->get('username'),
+                    'email' => $this->profile->get('email'),
+                ));
+                $url = $this->modx->makeUrl($moderatedResourceId,'',$persistParams,'full');
+                $this->modx->sendRedirect($url);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check for a redirect if the user was successfully registered. If one found, redirect.
+     * 
+     * @return boolean
+     */
+    public function checkForRegisteredRedirect() {
+        /* if provided a redirect id, will redirect to that resource, with the
+         * GET params `username` and `email` for you to use */
+        $submittedResourceId = $this->controller->getProperty('submittedResourceId','');
+        if (!empty($submittedResourceId)) {
+            $persistParams = array_merge($this->persistParams,array(
+                'username' => $this->user->get('username'),
+                'email' => $this->profile->get('email'),
+            ));
+            $url = $this->modx->makeUrl($submittedResourceId,'',$persistParams,'full');
+            $this->modx->sendRedirect($url);
+            return true;
+        }
+        return false;
+    }
+}
+return 'LoginRegisterProcessor';

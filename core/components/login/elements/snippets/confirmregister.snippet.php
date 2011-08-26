@@ -24,10 +24,14 @@
  * page that the user using the Register snippet would be sent to via the
  * activation email.
  *
+ * @var modX $modx
+ * @var array $scriptProperties
+ * 
  * @package login
  */
 $model_path = $modx->getOption('core_path').'components/login/model/login/';
-$Login = $modx->getService('login','Login',$model_path,$scriptProperties);
+/** @var Login $login */
+$login = $modx->getService('login','Login',$model_path,$scriptProperties);
 $modx->lexicon->load('login:register');
 
 /* get default properties */
@@ -46,6 +50,7 @@ $username = base64_decode(urldecode(rawurldecode($_REQUEST['lu'])));
 $password = base64_decode(urldecode(rawurldecode($_REQUEST['lp'])));
 
 /* validate we have correct user */
+/** @var modUser $user */
 $user = $modx->getObject('modUser',array('username' => $username));
 if ($user == null || $user->get('active')) { 
     if (!empty($errorPage)) {
@@ -80,7 +85,7 @@ if (!$found) {
 $result = $modx->invokeEvent('OnBeforeUserActivate',array(
     'user' => &$user,
 ));
-$preventActivation = $Login->getEventResult($result);
+$preventActivation = $login->getEventResult($result);
 if (!empty($preventActivation)) {
     $modx->log(modX::LOG_LEVEL_ERROR,'[Register] OnBeforeUserActivate event prevented activation for "'.$user->get('username').'" by returning false: '.$preventActivation);
     if (!empty($errorPage)) {
@@ -122,7 +127,7 @@ if ($modx->getOption('authenticate',$scriptProperties,true)) {
 $redirectBack = $modx->getOption('redirectBack',$_REQUEST,$modx->getOption('redirectBack',$scriptProperties,''));
 $redirectBackParams = $redirectBackParams = $modx->getOption('redirectBackParams',$_REQUEST,$modx->getOption('redirectBackParams',$scriptProperties,''));
 if (!empty($redirectBackParams)) {
-    $redirectBackParams = $Login->decodeParams($redirectBackParams);
+    $redirectBackParams = $login->decodeParams($redirectBackParams);
 }
 $redirectTo = !empty($scriptProperties['redirectTo']) ? $scriptProperties['redirectTo'] : $redirectBack;
 if (!empty($redirectTo)) {

@@ -44,6 +44,7 @@ $_lang['register.min_length'] = 'This field must be at least [[+length]] charact
 $_lang['register.min_value'] = 'This field cannot be smaller than [[+value]].';
 $_lang['register.not_date'] = 'This field must be a valid date.';
 $_lang['register.not_number'] = 'This field must be a valid number.';
+$_lang['register.not_regexp'] = 'This field has an invalid value.';
 $_lang['register.password'] = 'Password';
 $_lang['register.password_confirm'] = 'Confirm Password';
 $_lang['register.password_dont_match'] = 'Your passwords do not match.';

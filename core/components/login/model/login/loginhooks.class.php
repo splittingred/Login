@@ -24,7 +24,7 @@
  *
  * @package login
  */
-class lgnHooks {
+class LoginHooks {
     /**
      * @var array $errors A collection of all the processed errors so far.
      * @access public
@@ -35,6 +35,7 @@ class lgnHooks {
      * @access public
      */
     public $hooks = array();
+    public $fields = array();
     /**
      * @var modX $modx A reference to the modX instance.
      * @access public
@@ -45,17 +46,20 @@ class lgnHooks {
      * @access public
      */
     public $login = null;
+    /** @var LoginController $controller */
+    public $controller;
 
     /**
-     * The constructor for the lgnHooks class
+     * The constructor for the LoginHooks class
      *
      * @param Login &$login A reference to the Login class instance.
+     * @param LoginController &$controller A reference to the current controller.
      * @param array $config Optional. An array of configuration parameters.
-     * @return lgnHooks
      */
-    function __construct(Login &$login,array $config = array()) {
+    function __construct(Login &$login,LoginController &$controller,array $config = array()) {
         $this->login =& $login;
         $this->modx =& $login->modx;
+        $this->controller =& $controller;
         $this->config = array_merge(array(
         ),$config);
     }
@@ -150,6 +154,25 @@ class lgnHooks {
         $this->errors[$key] .= $value;
         return $this->errors[$key];
     }
+
+    /**
+     * See if there are any errors in the stack.
+     *
+     * @return boolean
+     */
+    public function hasErrors() {
+        return !empty($this->errors);
+    }
+
+    /**
+     * Get all errors for this current request
+     *
+     * @return array
+     */
+    public function getErrors() {
+        return $this->errors;
+    }
+
 
     /**
      * Sets the value of a field.

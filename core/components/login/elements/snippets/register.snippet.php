@@ -27,6 +27,10 @@
 require_once $modx->getOption('login.core_path',null,$modx->getOption('core_path').'components/login/').'model/login/login.class.php';
 $login = new Login($modx,$scriptProperties);
 
+$controller = $login->loadController('Register');
+$output = $controller->run($scriptProperties);
+return $output;
+
 /* setup default properties */
 $preHooks = $modx->getOption('preHooks',$scriptProperties,'');
 $submitVar = $modx->getOption('submitVar',$scriptProperties,'login-register-btn');
@@ -79,8 +83,10 @@ if ($hasPosted) {
     $properties = array();
 
     /* handle validation */
+    $modx->loadClass('lgnDictionary',$login->config['modelPath'].'model/login/',true,true);
+    $dictionary = new lgnDictionary($login,$_POST);
     $login->loadValidator();
-    $fields = $login->validator->validateFields($_POST,$validate);
+    $fields = $login->validator->validateFields($dictionary,$validate);
     foreach ($fields as $k => $v) {
         $fields[$k] = str_replace(array('[',']'),array('&#91;','&#93;'),$v);
     }

@@ -29,6 +29,9 @@ class Login {
     const MODE_FORGOT_PASSWORD = 'forgot-password';
     const MODE_LOGIN = 'login';
     const REGISTER_MODERATE = 'register.moderate';
+
+    /** @var LoginController $controller */
+    public $controller;
     
     /**
      * Creates an instance of the Login class.
@@ -41,11 +44,39 @@ class Login {
         $this->modx =& $modx;
         $corePath = $modx->getOption('login.core_path',$config,$modx->getOption('core_path',null,MODX_CORE_PATH).'components/login/');
         $this->config = array_merge(array(
+            'chunksPath' => $corePath.'chunks/',
+            'controllersPath' => $corePath.'controllers/',
             'corePath' => $corePath,
             'modelPath' => $corePath.'model/',
-            'chunksPath' => $corePath.'chunks/',
             'processorsPath' => $corePath.'processors/',
         ),$config);
+    }
+
+    /**
+     * Load the appropriate controller
+     * @param string $controller
+     * @return null|LoginController
+     */
+    public function loadController($controller) {
+        if ($this->modx->loadClass('LoginController',$this->config['modelPath'].'login/',true,true)) {
+            $classPath = $this->config['controllersPath'].'web/'.$controller.'.php';
+            $className = 'Login'.$controller.'Controller';
+            if (file_exists($classPath)) {
+                if (!class_exists($className)) {
+                    $className = require_once $classPath;
+                }
+                if (class_exists($className)) {
+                    $this->controller = new $className($this,$this->config);
+                } else {
+                    $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not load controller: '.$className.' at '.$classPath);
+                }
+            } else {
+                $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not load controller file: '.$classPath);
+            }
+        } else {
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not load LoginController class.');
+        }
+        return $this->controller;
     }
 
     /**
