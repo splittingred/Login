@@ -26,52 +26,6 @@
  */
 require_once $modx->getOption('login.core_path',null,$modx->getOption('core_path').'components/login/').'model/login/login.class.php';
 $login = new Login($modx,$scriptProperties);
-$modx->lexicon->load('login:profile');
 
-/* setup default properties */
-$prefix = $modx->getOption('prefix',$scriptProperties,'');
-$user = $modx->getOption('user',$scriptProperties,'');
-
-/* verify authenticated status if no user specified */
-if (empty($user) && !$modx->user->hasSessionContext($modx->context->get('key'))) {
-    return '';
-/* specifying a specific user, so try and get it */
-} else if (!empty($user)) {
-    $username = $user;
-    $userNum = (int)$user;
-    $c = array();
-    if (!empty($userNum)) {
-        $c['id'] = $userNum;
-    } else {
-        $c['username'] = $username;
-    }
-    $user = $modx->getObject('modUser',$c);
-    if (!$user) {
-        $modx->log(modX::LOG_LEVEL_ERROR,'Could not find user: '.$username);
-        return '';
-    }
-/* just use current user */
-} else {
-    $user =& $modx->user;
-}
-
-
-/* get profile */
-$profile = $user->getOne('Profile');
-if (empty($profile)) {
-    $modx->log(modX::LOG_LEVEL_ERROR,'Could not find profile for user: '.$modx->user->get('username'));
-    return '';
-}
-
-$placeholders = array_merge($profile->toArray(),$user->toArray());
-/* add extended fields to placeholders */
-if ($modx->getOption('useExtended',$scriptProperties,true)) {
-    $extended = $profile->get('extended');
-    if (!empty($extended) && is_array($extended)) {
-        $placeholders = array_merge($extended,$placeholders);
-    }
-}
-unset($placeholders['password'],$placeholders['cachepwd']);
-/* now set placeholders */
-$modx->toPlaceholders($placeholders,$prefix,'');
-return '';
+$controller = $login->loadController('Profile');
+return $controller->run($scriptProperties);

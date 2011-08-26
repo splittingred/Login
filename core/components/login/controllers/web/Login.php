@@ -66,7 +66,6 @@ class LoginLoginController extends LoginController {
         if (!empty($_REQUEST[$this->getProperty('actionKey','service')])) {
             $this->handleRequest();
         }
-
         $content = $this->renderForm();
         return $this->output($content);
     }
