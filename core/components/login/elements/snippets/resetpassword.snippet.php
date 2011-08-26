@@ -32,57 +32,6 @@ if (empty($_REQUEST['lp']) || empty($_REQUEST['lu'])) {
 require_once $modx->getOption('login.core_path',null,$modx->getOption('core_path').'components/login/').'model/login/login.class.php';
 $login = new Login($modx,$scriptProperties);
 
-/* setup default properties */
-$tpl = !empty($tpl) ? $tpl : 'lgnResetPassTpl';
-$tplType = !empty($tplType) ? $tplType : 'modChunk';
-$loginResourceId = !empty($loginResourceId) ? $loginResourceId : 1;
-$debug = isset($debug) ? $debug : false;
-
-/* get user from query params */
-$username = base64_decode(urldecode($_REQUEST['lu']));
-$password = base64_decode(urldecode($_REQUEST['lp']));
-
-/* validate we have correct user */
-$user = $modx->getObject('modUser',array('username' => $username));
-if ($user == null) return '';
-
-/* validate password to prevent middleman attacks */
-$cacheKey = 'login/resetpassword/'.$user->get('username');
-$cachePass = $modx->cacheManager->get($cacheKey);
-if ($cachePass != $password) return '';
-$modx->cacheManager->delete($cacheKey);
-
-/* change password */
-$version = $modx->getVersionData();
-if (version_compare($version['full_version'],'2.1.0-rc1') >= 0) {
-    $user->set('password',$password);
-} else {
-    $user->set('password',md5($password));
-}
-if (!$debug) {
-    if ($user->save() == false) return '';
-}
-
-$modx->invokeEvent('OnWebChangePassword', array (
-    'userid' => $user->get('id'),
-    'username' => $user->get('username'),
-    'userpassword' => $password,
-    'user' => &$user,
-    'newpassword' => $password,
-));
-$modx->invokeEvent('OnUserChangePassword', array (
-    'userid' => $user->get('id'),
-    'username' => $user->get('username'),
-    'userpassword' => $password,
-    'user' => &$user,
-    'newpassword' => $password,
-));
-
-$phs = array(
-    'username' => $user->get('username'),
-    'loginUrl' => $modx->makeUrl($loginResourceId),
-);
-
-$output = $login->getChunk($tpl,$phs,$tplType);
-
+$controller = $login->loadController('ResetPassword');
+$output = $controller->run($scriptProperties);
 return $output;
