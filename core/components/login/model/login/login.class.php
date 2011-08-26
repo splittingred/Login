@@ -28,6 +28,7 @@ class Login {
     const FORGOT_PASSWORD_EXTERNAL_USER = 'forgotpassword.external_user';
     const MODE_FORGOT_PASSWORD = 'forgot-password';
     const MODE_LOGIN = 'login';
+    const MODE_LOGOUT = 'logout';
     const REGISTER_MODERATE = 'register.moderate';
 
     /** @var LoginController $controller */
@@ -50,6 +51,7 @@ class Login {
             'modelPath' => $corePath.'model/',
             'processorsPath' => $corePath.'processors/',
         ),$config);
+        $this->modx->lexicon->load('login:default');
     }
 
     /**
