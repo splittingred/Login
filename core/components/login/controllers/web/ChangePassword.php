@@ -93,7 +93,7 @@ class LoginChangePasswordController extends LoginController {
         $verified = true;
         /* verify authenticated status */
         if (!$this->modx->user->hasSessionContext($this->modx->context->get('key'))) {
-            if ($this->getProperty('redirectToLogin',true)) {
+            if ($this->getProperty('redirectToLogin',true,'isset')) {
                 $this->modx->sendUnauthorizedPage();
             }
             $verified = false;
@@ -225,7 +225,7 @@ class LoginChangePasswordController extends LoginController {
     public function validateOldPassword() {
         $validated = true;
         /* if changing the password */
-        if ($this->getProperty('validateOldPassword',true)) {
+        if ($this->getProperty('validateOldPassword',true,'isset')) {
             $fields = $this->dictionary->toArray();
             $fieldOldPassword = $this->getProperty('fieldOldPassword','password_old');
             
@@ -314,7 +314,7 @@ class LoginChangePasswordController extends LoginController {
      * @return mixed
      */
     public function reloadOnSuccess() {
-        $reloadOnSuccess = $this->getProperty('reloadOnSuccess',true);
+        $reloadOnSuccess = $this->getProperty('reloadOnSuccess',true,'isset');
         if ($reloadOnSuccess) {
             /* if reloading the page after success */
             $url = $this->modx->makeUrl($this->modx->resource->get('id'),'',array(

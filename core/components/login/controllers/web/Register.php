@@ -70,7 +70,7 @@ class LoginRegisterController extends LoginController {
 
         $placeholderPrefix = $this->getProperty('placeholderPrefix','');
         if ($this->validator->hasErrors()) {
-            $this->modx->toPlaceholders($this->validator->errors,$placeholderPrefix.'error');
+            $this->modx->toPlaceholders($this->validator->getErrors(),$placeholderPrefix.'error');
             $this->modx->setPlaceholder($placeholderPrefix.'validation_error',true);
         } else {
 
@@ -83,7 +83,7 @@ class LoginRegisterController extends LoginController {
                 $this->modx->setPlaceholder($placeholderPrefix.'error.message',$errorMsg);
             } else {
                 /* everything good, go ahead and register */
-                $result = $this->runProcessor('register');
+                $result = $this->runProcessor('Register');
                 if ($result !== true) {
                     $this->modx->setPlaceholder($placeholderPrefix.'error.message',$result);
                 }

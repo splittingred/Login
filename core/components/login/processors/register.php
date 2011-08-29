@@ -46,7 +46,7 @@ class LoginRegisterProcessor extends LoginProcessor {
         $this->user = $this->modx->newObject('modUser');
         $this->profile = $this->modx->newObject('modUserProfile');
 
-        if ($this->controller->getProperty('useExtended',true)) {
+        if ($this->controller->getProperty('useExtended',true,'isset')) {
             $this->setExtended();
         }
 
