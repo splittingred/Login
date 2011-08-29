@@ -81,6 +81,8 @@ class ProfileTest extends LoginTestCase {
      *
      * @param string $prefix
      * @dataProvider providerSetToPlaceholders
+     * @depends testGetProfile
+     * @depends testGetUser
      */
     public function testSetToPlaceholders($prefix = '') {
         $this->controller->setProperty('prefix',$prefix);
@@ -98,6 +100,35 @@ class ProfileTest extends LoginTestCase {
         return array(
             array(''),
             array('up.'),
+        );
+    }
+
+    /**
+     * Test the getExtended method, ensuring it properly loads or does not load values
+     *
+     * @param boolean $shouldNotBeEmpty
+     * @dataProvider providerGetExtended
+     * @depends testGetProfile
+     * @depends testGetUser
+     */
+    public function testGetExtended($shouldNotBeEmpty) {
+        $this->controller->getUser();
+        $this->controller->getProfile();
+        $this->controller->profile->set('extended',array('test' => 1));
+        $extended = $this->controller->getExtended();
+        if ($shouldNotBeEmpty) {
+            $this->assertInternalType('array',$extended);
+            $this->assertNotEmpty($extended);
+        } else {
+            $this->assertEmpty($extended);
+        }
+    }
+    /**
+     * @return array
+     */
+    public function providerGetExtended() {
+        return array(
+            array(true),
         );
     }
 }
