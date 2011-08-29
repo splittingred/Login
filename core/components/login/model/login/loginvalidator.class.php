@@ -363,11 +363,12 @@ class LoginValidator {
      */
     public function password_confirm($key,$value,$param = 'password_confirm') {
         if (empty($value)) return $this->modx->lexicon('register.password_not_confirmed');
-        if ($this->fields[$param] != $value) {
+        $confirm = !empty($this->fields[$param]) ? $this->fields[$param] : '';
+        if ($confirm != $value) {
             return $this->_getErrorMessage($key,'vTextPasswordConfirm','register.password_dont_match',array(
                 'field' => $key,
                 'password' => $value,
-                'password_confirm' => $this->fields[$param],
+                'password_confirm' => $confirm,
             ));
         }
         return true;

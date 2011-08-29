@@ -13,6 +13,9 @@
       <testsuite name="Core">
           <directory>Tests/Core/</directory>
       </testsuite>
+      <testsuite name="Processors">
+          <directory>Tests/Processors/</directory>
+      </testsuite>
       <testsuite name="Cases">
       </testsuite>
     </testsuites>

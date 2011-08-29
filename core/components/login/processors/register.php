@@ -202,9 +202,22 @@ class LoginRegisterProcessor extends LoginProcessor {
      * Send an activation email to the user with an encrypted username and password hash, to allow for secure
      * activation processes that are not vulnerable to middle-man attacks.
      * 
-     * @return void
+     * @return boolean
      */
     public function sendActivationEmail() {
+        $emailProperties = $this->gatherActivationEmailProperties();
+
+        /* send either to user's email or a specified activation email */
+        $activationEmail = $this->controller->getProperty('activationEmail',$this->user->get('email'));
+        $subject = $this->controller->getProperty('activationEmailSubject',$this->modx->lexicon('register.activation_email_subject'));
+        return $this->login->sendEmail($activationEmail,$this->user->get('username'),$subject,$emailProperties);
+    }
+
+    /**
+     * Get all the properties for the activation email
+     * @return array
+     */
+    public function gatherActivationEmailProperties() {
         /* generate a password and encode it and the username into the url */
         $pword = $this->login->generatePassword();
         $confirmParams['lp'] = urlencode(base64_encode($pword));
@@ -224,7 +237,11 @@ class LoginRegisterProcessor extends LoginProcessor {
         }
 
         /* generate confirmation url */
-        $confirmUrl = $this->modx->makeUrl($this->controller->getProperty('activateResourceId',1),'',$confirmParams,'full');
+        if ($this->login->inTestMode) {
+            $confirmUrl = $this->modx->makeUrl(1,'',$confirmParams,'full');
+        } else {
+            $confirmUrl = $this->modx->makeUrl($this->controller->getProperty('activationResourceId',1),'',$confirmParams,'full');
+        }
 
         /* set confirmation email properties */
         $emailTpl = $this->controller->getProperty('activationEmailTpl','lgnActivateEmailTpl');
@@ -235,25 +252,27 @@ class LoginRegisterProcessor extends LoginProcessor {
         $emailProperties['tplType'] = $emailTplType;
         $emailProperties['password'] = $this->dictionary->get('password');
 
+        $this->setCachePassword($pword);
+        return $emailProperties;
+    }
+
+    public function setCachePassword($password) {
         /* now set new password to registry to prevent middleman attacks.
          * Will read from the registry on the confirmation page. */
         $this->modx->getService('registry', 'registry.modRegistry');
         $this->modx->registry->addRegister('login','registry.modFileRegister');
         $this->modx->registry->login->connect();
         $this->modx->registry->login->subscribe('/useractivation/');
-        $this->modx->registry->login->send('/useractivation/',array($this->user->get('username') => $pword),array(
+        $this->modx->registry->login->send('/useractivation/',array($this->user->get('username') => $password),array(
             'ttl' => ($this->controller->getProperty('activationttl',180)*60),
         ));
         /* set cachepwd here to prevent re-registration of inactive users */
-        $this->user->set('cachepwd',md5($pword));
-        if (!$this->user->save()) {
+        $this->user->set('cachepwd',md5($password));
+        $success = $this->user->save();
+        if (!$success) {
             $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not update cachepwd for activation for User: '.$this->user->get('username'));
         }
-
-        /* send either to user's email or a specified activation email */
-        $activationEmail = $this->controller->getProperty('activationEmail',$this->user->get('email'));
-        $subject = $this->controller->getProperty('activationEmailSubject',$this->modx->lexicon('register.activation_email_subject'));
-        $this->login->sendEmail($activationEmail,$this->user->get('username'),$subject,$emailProperties);
+        return $success;
     }
 
     /**
@@ -297,7 +316,7 @@ class LoginRegisterProcessor extends LoginProcessor {
      * @return boolean
      */
     public function checkForModerationRedirect() {
-        $moderated = $this->dictionary->get(Login::REGISTER_MODERATE);
+        $moderated = $this->checkForModeration();
         if (!empty($moderated)) {
             $moderatedResourceId = $this->controller->getProperty('moderatedResourceId','');
             if (!empty($moderatedResourceId)) {
@@ -306,7 +325,9 @@ class LoginRegisterProcessor extends LoginProcessor {
                     'email' => $this->profile->get('email'),
                 ));
                 $url = $this->modx->makeUrl($moderatedResourceId,'',$persistParams,'full');
-                $this->modx->sendRedirect($url);
+                if (!$this->login->inTestMode) {
+                    $this->modx->sendRedirect($url);
+                }
                 return true;
             }
         }
@@ -328,7 +349,9 @@ class LoginRegisterProcessor extends LoginProcessor {
                 'email' => $this->profile->get('email'),
             ));
             $url = $this->modx->makeUrl($submittedResourceId,'',$persistParams,'full');
-            $this->modx->sendRedirect($url);
+            if (!$this->login->inTestMode) {
+                $this->modx->sendRedirect($url);
+            }
             return true;
         }
         return false;

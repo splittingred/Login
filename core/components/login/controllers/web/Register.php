@@ -34,17 +34,33 @@ class LoginRegisterController extends LoginController {
      * @return void
      */
     public function initialize() {
+        $this->modx->lexicon->load('login:register');
         $this->setDefaultProperties(array(
+            'activation' => true,
+            'activationEmail' => '',
+            'activationEmailSubject' => $this->modx->lexicon('register.activation_email_subject'),
+            'activationEmailTpl' => 'lgnActivateEmailTpl',
+            'activationEmailTplType' => 'modChunk',
+            'activationResourceId' => '',
             'emailField' => 'email',
             'errTpl' => '<span class="error">[[+error]]</span>',
+            'excludeExtended' => '',
+            'moderatedResourceId' => '',
             'passwordField' => 'password',
+            'persistParams' => '',
             'placeholderPrefix' => '',
             'preHooks' => '',
+            'postHooks' => '',
+            'redirectBack' => '',
+            'redirectBackParams' => '',
+            'submittedResourceId' => '',
             'submitVar' => 'login-register-btn',
+            'successMsg' => '',
+            'useExtended' => true,
+            'usergroups' => '',
             'usernameField' => 'username',
             'validate' => '',
         ));
-        $this->modx->lexicon->load('login:register');
     }
 
     /**
@@ -115,6 +131,10 @@ class LoginRegisterController extends LoginController {
         }
     }
 
+    /**
+     * Validate the fields in the form
+     * @return array
+     */
     public function validateFields() {
         $this->loadValidator();
         $fields = $this->validator->validateFields($this->dictionary,$this->getProperty('validate',''));

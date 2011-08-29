@@ -32,6 +32,7 @@ class LoginTestCase extends PHPUnit_Framework_TestCase {
         /* make sure to reset MODX placeholders so as not to keep placeholder data across tests */
         $this->modx->placeholders = array();
         $this->modx->login =& $this->login;
+        error_reporting(E_ALL);
     }
 
     /**

@@ -33,6 +33,8 @@ class Login {
 
     /** @var LoginController $controller */
     public $controller;
+    /** @var boolean $inTestMode */
+    public $inTestMode = false;
     
     /**
      * Creates an instance of the Login class.
@@ -158,8 +160,10 @@ class Login {
         $this->modx->mail->address('to', $email, $name);
         $this->modx->mail->address('reply-to', $this->modx->getOption('emailsender'));
         $this->modx->mail->setHTML(true);
+        if ($this->inTestMode) return true;
         $sent = $this->modx->mail->send();
         $this->modx->mail->reset();
+
 
         return $sent;
     }

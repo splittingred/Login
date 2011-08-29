@@ -198,20 +198,32 @@ abstract class LoginController {
      */
     public function runProcessor($processor) {
         $output = '';
+        $processor = $this->loadProcessor($processor);
+        if (empty($processor)) return $output;
+
+        return $processor->process();
+    }
+
+    /**
+     * @param $processor
+     * @return bool|LoginProcessor
+     */
+    public function loadProcessor($processor) {
         $processorFile = $this->config['processorsPath'].$processor.'.php';
         if (!file_exists($processorFile)) {
-            return $output;
+            return false;
         }
         try {
-            $className = include $processorFile;
+            $className = 'Login'.ucfirst($processor).'Processor';
+            if (!class_exists($className)) {
+                $className = include_once $processorFile;
+            }
             /** @var LoginProcessor $processor */
             $processor = new $className($this->login,$this);
-            $output = $processor->process();
-
         } catch (Exception $e) {
             $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] '.$e->getMessage());
         }
-        return $output;
+        return $processor;
     }
 
 }

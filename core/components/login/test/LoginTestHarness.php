@@ -75,6 +75,7 @@ class LoginTestHarness {
         $modx->request->loadErrorHandler();
         
         LoginTestHarness::$modx = $modx;
+        LoginTestHarness::$properties = $properties;
         return $modx;
     }
 }
