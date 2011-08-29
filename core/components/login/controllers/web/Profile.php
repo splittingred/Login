@@ -51,14 +51,32 @@ class LoginProfileController extends LoginController {
             return '';
         }
 
+        $this->setToPlaceholders();
+        return '';
+    }
+
+    /**
+     * Set the user data to placeholders
+     * 
+     * @return array
+     */
+    public function setToPlaceholders() {
         $placeholders = array_merge($this->profile->toArray(),$this->user->toArray());
         $extended = $this->getExtended();
         $placeholders = array_merge($extended,$placeholders);
+        $placeholders = $this->removePasswordPlaceholders($placeholders);
+        $this->modx->toPlaceholders($placeholders,$this->getProperty('prefix','','isset'),'');
+        return $placeholders;
+    }
 
+    /**
+     * Remove the password fields from the outputted placeholders
+     * @param array $placeholders
+     * @return array
+     */
+    public function removePasswordPlaceholders(array $placeholders = array()) {
         unset($placeholders['password'],$placeholders['cachepwd']);
-        /* now set placeholders */
-        $this->modx->toPlaceholders($placeholders,$this->getProperty('prefix',''),'');
-        return '';
+        return $placeholders;
     }
 
     /**
@@ -97,8 +115,9 @@ class LoginProfileController extends LoginController {
         /* verify authenticated status if no user specified */
         if (empty($user) && !$this->modx->user->hasSessionContext($this->modx->context->get('key'))) {
             $this->user = false;
+        }
         /* specifying a specific user, so try and get it */
-        } else if (!empty($user)) {
+        if (!empty($user)) {
             $username = $user;
             $userNum = (int)$user;
             $c = array();

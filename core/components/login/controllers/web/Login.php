@@ -123,25 +123,28 @@ class LoginLoginController extends LoginController {
 
     /**
      * Check for and load reCaptcha
-     * @return void
+     * @return boolean
      */
     public function loadReCaptcha() {
+        $loaded = false;
         $preHooks = $this->getProperty('preHooks','');
         /* if using recaptcha, load recaptcha html */
         if (strpos($preHooks,'recaptcha') !== false && !$this->isAuthenticated) {
-            /** @var reCaptcha $recaptcha */
-            $recaptcha = $this->modx->getService('recaptcha','reCaptcha',$this->login->config['modelPath'].'recaptcha/');
-            if ($recaptcha instanceof reCaptcha) {
+            /** @var reCaptcha $reCaptcha */
+            $reCaptcha = $this->modx->getService('recaptcha','reCaptcha',$this->login->config['modelPath'].'recaptcha/');
+            if ($reCaptcha instanceof reCaptcha) {
                 $this->modx->lexicon->load('login:recaptcha');
                 $recaptchaTheme = $this->getProperty('recaptchaTheme','clean');
                 $recaptchaWidth = $this->getProperty('recaptchaWidth',500);
                 $recaptchaHeight = $this->getProperty('recaptchaHeight',300);
-                $html = $recaptcha->getHtml($recaptchaTheme,$recaptchaWidth,$recaptchaHeight);
+                $html = $reCaptcha->getHtml($recaptchaTheme,$recaptchaWidth,$recaptchaHeight);
                 $this->modx->setPlaceholder('login.recaptcha_html',$html);
+                $loaded = true;
             } else {
                 $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] '.$this->modx->lexicon('login.recaptcha_err_load'));
             }
         }
+        return $loaded;
     }
 
     /**
