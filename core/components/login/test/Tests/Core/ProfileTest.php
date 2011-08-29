@@ -45,9 +45,6 @@ class ProfileTest extends LoginTestCase {
      * @dataProvider providerGetUser
      */
     public function testGetUser($shouldPass,$user = 1) {
-        if ($shouldPass) {
-            $this->modx->user->addSessionContext('web');
-        }
         $this->controller->setProperty('user',$user);
         $user = $this->controller->getUser();
         if ($shouldPass) {

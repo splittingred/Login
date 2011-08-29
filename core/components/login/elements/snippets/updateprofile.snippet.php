@@ -32,7 +32,4 @@ require_once $modx->getOption('login.core_path',null,$modx->getOption('core_path
 $login = new Login($modx,$scriptProperties);
 
 $controller = $login->loadController('UpdateProfile');
-$output = $controller->run($scriptProperties);
-return $output;
-
-
+return $controller->run($scriptProperties);

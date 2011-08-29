@@ -32,6 +32,8 @@ class LoginChangePasswordController extends LoginController {
     public $errors = array();
 
     public function initialize() {
+        $this->modx->lexicon->load('login:register');
+        $this->modx->lexicon->load('login:changepassword');
         $this->setDefaultProperties(array(
             'fieldConfirmNewPassword' => 'password_new_confirm',
             'fieldNewPassword' => 'password_new',
@@ -42,12 +44,10 @@ class LoginChangePasswordController extends LoginController {
             'reloadOnSuccess' => true,
             'reloadOnSuccessVar' => 'logcp-success',
             'submitVar' => 'logcp-submit',
-            'successMessage' => '',
+            'successMessage' => $this->modx->lexicon('login.password_changed'),
             'validate' => '',
             'validateOldPassword' => true,
         ));
-        $this->modx->lexicon->load('login:register');
-        $this->modx->lexicon->load('login:changepassword');
     }
 
     /**
@@ -191,9 +191,10 @@ class LoginChangePasswordController extends LoginController {
 
     /**
      * Load any pre-password-change preHooks that can stop the event propagation
-     * @return void
+     * @return boolean
      */
     public function loadPreHooks() {
+        $passed = true;
         $this->loadHooks('preHooks');
         $preHooks = $this->getProperty('preHooks','');
         if (!empty($preHooks)) {
@@ -215,7 +216,9 @@ class LoginChangePasswordController extends LoginController {
             $placeholderPrefix = $this->getProperty('placeholderPrefix','logcp.');
             $this->modx->setPlaceholders($this->preHooks->getErrors(),$placeholderPrefix.'error.');
             $this->modx->setPlaceholder($placeholderPrefix.'error_message',$this->preHooks->getErrorMessage());
+            $passed = false;
         }
+        return $passed;
     }
 
     /**

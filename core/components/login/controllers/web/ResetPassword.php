@@ -73,7 +73,7 @@ class LoginResetPasswordController extends LoginController {
     public function verifyIdentity() {
         $cacheKey = 'login/resetpassword/'.$this->user->get('username');
         $cachePass = $this->modx->cacheManager->get($cacheKey);
-        $verified = $cachePass != $this->password;
+        $verified = $cachePass == $this->password;
         if ($verified) {
             $this->eraseCache();
         }
