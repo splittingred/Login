@@ -105,7 +105,7 @@ class LoginConfirmRegisterController extends LoginController {
      * @return void
      */
     public function redirectAfterFailure() {
-        $errorPage = $this->getProperty('errorPage',false);
+        $errorPage = $this->getProperty('errorPage',false,'isset');
         if (!empty($errorPage)) {
             $url = $this->modx->makeUrl($errorPage,'','','full');
             $this->modx->sendRedirect($url);
@@ -178,7 +178,7 @@ class LoginConfirmRegisterController extends LoginController {
      * to a form requiring registration
      */
     public function redirectBack() {
-        $redirectBack = $this->modx->getOption('redirectBack',$_REQUEST,$this->getProperty('redirectBack',false));
+        $redirectBack = $this->modx->getOption('redirectBack',$_REQUEST,$this->getProperty('redirectBack',false,'isset'));
         $redirectBackParams = $this->modx->getOption('redirectBackParams',$_REQUEST,$this->getProperty('redirectBackParams',''));
         if (!empty($redirectBackParams)) {
             $redirectBackParams = $this->login->decodeParams($redirectBackParams);

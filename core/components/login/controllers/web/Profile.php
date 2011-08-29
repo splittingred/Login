@@ -92,7 +92,7 @@ class LoginProfileController extends LoginController {
      * @return boolean|modUser
      */
     public function getUser() {
-        $user = $this->getProperty('user',false);
+        $user = $this->getProperty('user',false,'isset');
 
         /* verify authenticated status if no user specified */
         if (empty($user) && !$this->modx->user->hasSessionContext($this->modx->context->get('key'))) {

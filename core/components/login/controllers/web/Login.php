@@ -75,7 +75,7 @@ class LoginLoginController extends LoginController {
      * @return string
      */
     public function renderForm() {
-        $redirectToPrior = $this->getProperty('redirectToPrior',false);
+        $redirectToPrior = $this->getProperty('redirectToPrior',false,'isset');
         $tpl = $this->isAuthenticated ? $this->getProperty('logoutTpl') : $this->getProperty('loginTpl');
         $actionMsg = $this->isAuthenticated
             ? $this->getProperty('logoutMsg',$this->modx->lexicon('login.logout'))
@@ -273,7 +273,7 @@ class LoginLoginController extends LoginController {
      * @return void
      */
     public function checkForRedirectOnFailedAuth(modProcessorResponse $response) {
-        $redirectToOnFailedAuth = $this->getProperty('redirectToOnFailedAuth',false);
+        $redirectToOnFailedAuth = $this->getProperty('redirectToOnFailedAuth',false,'isset');
         if ($redirectToOnFailedAuth && $redirectToOnFailedAuth != $this->modx->resource->get('id')) {
             $p = array(
                 'u' => $this->dictionary->get('username'),

@@ -220,7 +220,7 @@ class LoginForgotPasswordController extends LoginController {
      * @return boolean
      */
     public function checkForRedirect() {
-        $redirectTo = $this->getProperty('redirectTo',false);
+        $redirectTo = $this->getProperty('redirectTo',false,'isset');
         /* if redirecting, do so here */
         if (!empty($redirectTo)) {
             $redirectParams = $this->getProperty('redirectParams','');
