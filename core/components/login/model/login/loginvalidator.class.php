@@ -56,7 +56,7 @@ class LoginValidator {
      *
      * @param Login &$login A reference to the Login class instance.
      * @param array $config Optional. An array of configuration parameters.
-     * @return lgnValidator
+     * @return LoginValidator
      */
     function __construct(Login &$login,array $config = array()) {
         $this->login =& $login;

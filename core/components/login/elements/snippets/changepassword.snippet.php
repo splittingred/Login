@@ -6,40 +6,11 @@
  **/
 $login = $modx->getService('login','Login',$modx->getOption('login.core_path',null,$modx->getOption('core_path').'components/login/').'model/login/',$scriptProperties);
 if (!($login instanceof Login)) return '';
-$modx->lexicon->load('login:register');
-$modx->lexicon->load('login:changepassword');
 
-/* setup default properties */
-$submitVar = $modx->getOption('submitVar',$scriptProperties,'logcp-submit');
-$preHooks = $modx->getOption('preHooks',$scriptProperties,'');
-$validate = $modx->getOption('validate',$scriptProperties,'');
-$successMessage = $modx->getOption('successMessage',$scriptProperties,'');
-$reloadOnSuccess = $modx->getOption('reloadOnSuccess',$scriptProperties,true);
-$redirectToLogin = $modx->getOption('redirectToLogin',$scriptProperties,true);
-$placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'logcp.');
+$controller = $login->loadController('ResetPassword');
+$output = $controller->run($scriptProperties);
+return $output;
 
-$fieldOldPassword = $modx->getOption('fieldOldPassword',$scriptProperties,'password_old');
-$fieldNewPassword = $modx->getOption('fieldNewPassword',$scriptProperties,'password_new');
-$fieldConfirmNewPassword = $modx->getOption('fieldConfirmNewPassword',$scriptProperties,'password_new_confirm');
-$validateOldPassword = $modx->getOption('validateOldPassword',$scriptProperties,true);
-
-/* verify authenticated status */
-if (!$modx->user->hasSessionContext($modx->context->get('key'))) {
-    if ($redirectToLogin) { $modx->sendUnauthorizedPage(); } else { return '';}
-}
-
-/* get profile */
-$profile = $modx->user->getOne('Profile');
-if (empty($profile)) {
-    $modx->log(modX::LOG_LEVEL_ERROR,'Could not find profile for user: '.$modx->user->get('username'));
-    return '';
-}
-
-$placeholders = array_merge($profile->toArray(),array(
-    'username' => $modx->user->get('username'),
-    'id' => $modx->user->get('id'),
-));
-$modx->setPlaceholders($placeholders,$placeholderPrefix);
 
 $error = false;
 if (!empty($_POST) && isset($_POST[$submitVar])) {
