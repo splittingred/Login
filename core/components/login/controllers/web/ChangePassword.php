@@ -20,7 +20,7 @@
  * @package login
  */
 /**
- * Resets the user's password after a successful identity verification
+ * Handles changing of user's password via a form
  *
  * @package login
  * @subpackage controllers
