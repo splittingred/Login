@@ -1,5 +1,12 @@
 Changelog file for Login component.
 
+Login 1.7.0
+====================================
+- Complete OOP refactoring to provide more stable development and better code isolation
+- Add unit test framework and over 30 tests
+- Add alternative plaintext email option for ability to send both html and plaintext in emails
+- [#5166] Add additional sanity decoding to ConfirmRegister processing
+
 Login 1.6.5
 ====================================
 - [#5176] Fix issue with Registration in Revo 2.0 installations

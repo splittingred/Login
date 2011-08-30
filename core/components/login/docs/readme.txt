@@ -1,10 +1,10 @@
 --------------------
 Snippet: Login
 --------------------
-Version: 1.0
+Version: 1.7
 Since: June 21, 2010
-Author: Jason Coward <jason@modxcms.com>
-        Shaun McCormick <shaun@modxcms.com>
+Author: Jason Coward <jason@modx.com>
+        Shaun McCormick <shaun+login@modx.com>
 
 This component loads a simple login and logout form. It also comes packaged
 with ForgotPassword and ResetPassword snippets, which allow the user to put
@@ -91,4 +91,4 @@ See the Snippet Properties for more options.
 
 Thanks,
 Jason Coward & Shaun McCormick
-MODx, LLC
+MODX, LLC
