@@ -128,4 +128,20 @@ class ProfileTest extends LoginTestCase {
             array(true),
         );
     }
+
+    /**
+     * Ensure the secure placeholders are being removed
+     * 
+     * @depends testGetProfile
+     * @depends testGetUser
+     * @depends testSetToPlaceholders
+     */
+    public function testRemovePasswordPlaceholders() {
+        $this->controller->getUser();
+        $this->controller->getProfile();
+        $phs = array('username' => 'test','password' => 'bad','cachepwd' => 2);
+        $phs = $this->controller->removePasswordPlaceholders($phs);
+        $this->assertArrayNotHasKey('password',$phs,'removePasswordPlaceholders did not remove the password index.');
+        $this->assertArrayNotHasKey('cachepwd',$phs,'removePasswordPlaceholders did not remove the cachepwd index.');
+    }
 }
