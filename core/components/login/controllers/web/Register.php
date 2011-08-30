@@ -126,8 +126,9 @@ class LoginRegisterController extends LoginController {
                 'submitVar' => $this->getProperty('submitVar'),
                 'usernameField' => $this->getProperty('usernameField','username'),
             ));
-            if (!empty($this->preHooks->fields)) {
-                $this->dictionary->fromArray($this->preHooks->fields);
+            $values = $this->preHooks->getValues();
+            if (!empty($values)) {
+                $this->dictionary->fromArray($values);
             }
         }
     }

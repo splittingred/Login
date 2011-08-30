@@ -17,6 +17,8 @@
           <directory>Tests/Processors/</directory>
       </testsuite>
       <testsuite name="Cases">
+          <directory>Tests/Cases/</directory>
+          <directory>Tests/Cases/Register/</directory>
       </testsuite>
     </testsuites>
 </phpunit>

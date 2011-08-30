@@ -52,6 +52,7 @@ class Login {
             'corePath' => $corePath,
             'modelPath' => $corePath.'model/',
             'processorsPath' => $corePath.'processors/',
+            'testsPath' => $corePath.'test/',
         ),$config);
         $this->modx->lexicon->load('login:default');
     }

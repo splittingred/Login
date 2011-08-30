@@ -92,22 +92,24 @@ class LoginHooks {
      * Load a hook. Stores any errors for the hook to $this->errors.
      *
      * @access public
-     * @param string $hook The name of the hook. May be a Snippet name.
+     * @param string $hookName The name of the hook. May be a Snippet name.
      * @param array $fields The fields and values of the form.
      * @param array $options An array of options to pass to the hook.
+     * @param array $customProperties Any other custom properties to load into a custom hook.
      * @return boolean True if hook was successful.
      */
-    public function load($hook,$fields = array(),array $options = array()) {
+    public function load($hookName,$fields = array(),array $options = array(),array $customProperties = array()) {
         $success = false;
         if (!empty($fields)) $this->fields =& $fields;
-        $this->hooks[] = $hook;
+        $this->hooks[] = $hookName;
 
         $reserved = array('load','_process','__construct','getErrorMessage','addError','getValue','getValues','setValue','setValues');
-        if (method_exists($this,$hook) && !in_array($hook,$reserved)) {
+        if (method_exists($this,$hookName) && !in_array($hookName,$reserved)) {
             /* built-in hooks */
-            $success = $this->$hook($this->fields);
+            $success = $this->$hookName($this->fields);
 
-        } else if ($snippet = $this->modx->getObject('modSnippet',array('name' => $hook))) {
+        /* @var modSnippet $snippet */
+        } else if ($snippet = $this->modx->getObject('modSnippet',array('name' => $hookName))) {
             /* custom snippet hook */
             $properties = array_merge($this->login->config,$options);
             $properties['login'] =& $this->login;
@@ -117,20 +119,47 @@ class LoginHooks {
             $success = $snippet->process($properties);
 
         } else {
-            /* no hook found */
-            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not find hook "'.$hook.'".');
-            $success = true;
+            /* search for a file-based hook */
+            $this->modx->parser->processElementTags('',$hookName,true,true);
+            if (file_exists($hookName)) {
+                $success = $this->_loadFileBasedHook($hookName,$customProperties);
+            } else {
+                /* no hook found */
+                $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not find hook "'.$hookName.'".');
+                $success = true;
+            }
         }
 
         if (is_array($success) && !empty($success)) {
             $this->errors = array_merge($this->errors,$success);
             $success = false;
         } else if ($success != true) {
-            $this->errors[$hook] .= ' '.$success;
+            $this->errors[$hookName] .= ' '.$success;
             $success = false;
         }
         return $success;
     }
+
+    /**
+     * Attempt to load a file-based hook given a name
+     * @param string $path The absolute path of the hook file
+     * @param array $customProperties An array of custom properties to run with the hook
+     * @return boolean True if the hook succeeded
+     */
+    private function _loadFileBasedHook($path,array $customProperties = array()) {
+        $scriptProperties = array_merge($this->login->config,$customProperties);
+        $formit =& $this->login;
+        $hook =& $this;
+        $fields = $this->fields;
+        $errors =& $this->errors;
+        try {
+            $success = include $path;
+        } catch (Exception $e) {
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] '.$e->getMessage());
+        }
+        return $success;
+    }
+
 
     /**
      * Gets the error messages compiled into a single string.
