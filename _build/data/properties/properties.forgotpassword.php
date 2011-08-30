@@ -42,6 +42,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'emailTplAlt',
+        'desc' => 'prop_forgotpassword.emailtplalt_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'emailTplType',
         'desc' => 'prop_forgotpassword.emailtpltype_desc',
         'type' => 'list',

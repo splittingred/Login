@@ -11,6 +11,7 @@ $_lang['prop_forgotpassword.senttpltype_desc'] = 'The type of tpl being provided
 $_lang['prop_forgotpassword.tpl_desc'] = 'The forgot password form tpl.';
 $_lang['prop_forgotpassword.tpltype_desc'] = 'The type of tpl being provided for the tpl property. Defaults to a Chunk.';
 $_lang['prop_forgotpassword.emailsubject_desc'] = 'The subject of the forgot password email.';
+$_lang['prop_forgotpassword.emailtplalt_desc'] = '(Optional) Plain-text alternative for the confirmation email message tpl.';
 $_lang['prop_forgotpassword.resetresourceid_desc'] = 'The resource to direct users to in the confirmation email, where the ResetPassword snippet call is.';
 
 /* Login snippet */
@@ -61,6 +62,7 @@ $_lang['prop_register.activationemail_desc'] = 'If set, will sent activation ema
 $_lang['prop_register.activationemailsubject_desc'] = 'The subject of the activation email.';
 $_lang['prop_register.activationemailtpltype_desc'] = 'The type of tpls being provided for the activation email.';
 $_lang['prop_register.activationemailtpl_desc'] = 'The activation email tpl.';
+$_lang['prop_register.activationemailtplalt_desc'] = '(Optional) Plain-text alternative for the activation email tpl.';
 $_lang['prop_register.moderatedresourceid_desc'] = 'If a prehook sets the user as moderated, then send to this Resource instead of the submittedResourceId. Leave blank to bypass.';
 $_lang['prop_register.placeholderprefix_desc'] = 'The prefix to use for all placeholders set by this snippet.';
 $_lang['prop_register.recaptchaheight_desc'] = 'If `recaptcha` is set as a preHook, this will select the height for the reCaptcha widget.';

@@ -185,6 +185,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'activationEmailTplAlt',
+        'desc' => 'prop_register.activationemailtplalt_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'moderatedResourceId',
         'desc' => 'prop_register.moderatedresourceid_desc',
         'type' => 'textfield',

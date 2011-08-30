@@ -41,6 +41,7 @@ class LoginRegisterController extends LoginController {
             'activationEmailSubject' => $this->modx->lexicon('register.activation_email_subject'),
             'activationEmailTpl' => 'lgnActivateEmailTpl',
             'activationEmailTplType' => 'modChunk',
+            'activationEmailTplAlt' => '',
             'activationResourceId' => '',
             'emailField' => 'email',
             'errTpl' => '<span class="error">[[+error]]</span>',
@@ -99,7 +100,7 @@ class LoginRegisterController extends LoginController {
                 $this->modx->setPlaceholder($placeholderPrefix.'error.message',$errorMsg);
             } else {
                 /* everything good, go ahead and register */
-                $result = $this->runProcessor('Register');
+                $result = $this->runProcessor('register');
                 if ($result !== true) {
                     $this->modx->setPlaceholder($placeholderPrefix.'error.message',$result);
                 }

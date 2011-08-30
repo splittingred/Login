@@ -47,6 +47,7 @@ class LoginForgotPasswordController extends LoginController {
             'sentTpl' => 'lgnForgotPassSentTpl',
             'sentTplType' => 'modChunk',
             'emailTpl' => 'lgnForgotPassEmail',
+            'emailTplAlt' => '',
             'emailTplType' => 'modChunk',
             'emailSubject' => '',
             'preHooks' => '',
@@ -205,6 +206,7 @@ class LoginForgotPasswordController extends LoginController {
         $emailProperties['confirmUrl'] = $confirmUrl;
         $emailProperties['password'] = $password;
         $emailProperties['tpl'] = $this->getProperty('emailTpl');
+        $emailProperties['tplAlt'] = $this->getProperty('emailTplAlt','');
         $emailProperties['tplType'] = $this->getProperty('emailTplType');
 
         /* now set new password to cache to prevent middleman attacks */

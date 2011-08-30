@@ -245,10 +245,12 @@ class LoginRegisterProcessor extends LoginProcessor {
 
         /* set confirmation email properties */
         $emailTpl = $this->controller->getProperty('activationEmailTpl','lgnActivateEmailTpl');
+        $emailTplAlt = $this->controller->getProperty('activationEmailTplAlt','');
         $emailTplType = $this->controller->getProperty('activationEmailTplType','modChunk');
         $emailProperties = $this->user->toArray();
         $emailProperties['confirmUrl'] = $confirmUrl;
         $emailProperties['tpl'] = $emailTpl;
+        $emailProperties['tplAlt'] = $emailTplAlt;
         $emailProperties['tplType'] = $emailTplType;
         $emailProperties['password'] = $this->dictionary->get('password');
 
