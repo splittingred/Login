@@ -13,7 +13,7 @@
  * @group Cases.Register.PreHook
  * @group Hooks
  */
-class RegisterPreHooksTest extends LoginTestCase {
+class RegisterPreHookTest extends LoginTestCase {
     /** @var LoginRegisterController */
     public $controller;
     /** @var modUser $user */

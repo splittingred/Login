@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.7.0
 ====================================
+- Add file-based hooks to Login hook calls
 - Complete OOP refactoring to provide more stable development and better code isolation
 - Add unit test framework and over 30 tests
 - Add alternative plaintext email option for ability to send both html and plaintext in emails

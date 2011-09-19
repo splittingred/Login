@@ -26,6 +26,7 @@
  * @package login
  * @subpackage test
  * @group Processors
+ * @group Processors.Register
  * @group Register
  */
 class RegisterProcessorTest extends LoginTestCase {
@@ -61,9 +62,22 @@ class RegisterProcessorTest extends LoginTestCase {
             'blocked' => false,
         ));
 
+        /** @var modUserGroup $userGroup */
+        $userGroup = $this->modx->newObject('modUserGroup');
+        $userGroup->fromArray(array(
+            'name' => 'UnitTest UserGroup 1',
+        ));
+        $userGroup->save();
+        $userGroup = $this->modx->newObject('modUserGroup');
+        $userGroup->fromArray(array(
+            'name' => 'UnitTest UserGroup 2',
+        ));
+        $userGroup->save();
+
         $_POST = array(
             'username' => 'unit.test.user',
             'password' => 'a test password',
+            'email' => 'test@test.com',
             'nospam' => '',
             'submitVar' => 'unit-test-register-btn',
         );
@@ -95,6 +109,13 @@ class RegisterProcessorTest extends LoginTestCase {
         if ($user) {
             $user->remove();
         }
+        $userGroups = $this->modx->getCollection('modUserGroup',array(
+            'name:LIKE' => 'UnitTest%',
+        ));
+        /** @var $userGroup modUserGroup */
+        foreach ($userGroups as $userGroup) {
+            $userGroup->remove();
+        }
         parent::tearDown();
         $this->user = null;
         $this->controller = null;
@@ -109,6 +130,24 @@ class RegisterProcessorTest extends LoginTestCase {
         $this->processor->setUserFields();
         $this->assertEquals($_POST['username'],$this->processor->user->get('username'));
         $this->assertEquals(md5($_POST['password']),$this->processor->user->get('password'));
+    }
+
+    /**
+     * @param string $userGroups
+     * @param array $expected
+     * @dataProvider providerSetUserGroups
+     */
+    public function testSetUserGroups($userGroups = '',array $expected = array()) {
+        $this->controller->setProperty('usergroups',$userGroups);
+        $addedUserGroups = $this->processor->setUserGroups();
+        $this->assertEquals($expected,$addedUserGroups);
+    }
+    public function providerSetUserGroups() {
+        return array(
+            array('UnitTest UserGroup 1',array('UnitTest UserGroup 1')),
+            array('UnitTest UserGroup 1,UnitTest UserGroup 2',array('UnitTest UserGroup 1','UnitTest UserGroup 2')),
+            array('UnitTest UserGroup 1, UnitTest UserGroup 2',array('UnitTest UserGroup 1','UnitTest UserGroup 2')),
+        );
     }
 
     /**
@@ -203,5 +242,28 @@ class RegisterProcessorTest extends LoginTestCase {
             array(true,1),
             array(false,''),
         );
+    }
+
+    /**
+     * Attempt to run a file-based preHook and set the value of a field
+     *
+     * @depends testSetUserFields
+     */
+    public function testPostHooks() {
+        $this->controller->setProperty('postHooks',$this->login->config['testsPath'].'Hooks/Post/posthooktest.register.php');
+        $this->processor->setUserFields();
+        $this->processor->setExtended();
+        $this->processor->runPostHooks();
+        $val = $this->controller->postHooks->getValue('fullname');
+        $success = strcmp($val,'John Doe') == 0;
+        $this->assertTrue($success,'The postHook was not fired or did not set the value of the field.');
+
+        $val = $this->controller->postHooks->getValue('username');
+        $success = strcmp($val,$_POST['username']) == 0;
+        $this->assertTrue($success,'The postHook did not correctly pass register.user.');
+
+        $val = $this->controller->postHooks->getValue('email');
+        $success = strcmp($val,$_POST['email']) == 0;
+        $this->assertTrue($success,'The postHook did not correctly pass register.profile.');
     }
 }

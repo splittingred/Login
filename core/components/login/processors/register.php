@@ -35,6 +35,7 @@ class LoginRegisterProcessor extends LoginProcessor {
     public $userGroups = array();
 
     public $persistParams = array();
+    public $live = false;
 
     /**
      * @return mixed
@@ -55,15 +56,18 @@ class LoginRegisterProcessor extends LoginProcessor {
         $this->setUserGroups();
 
         /* save user */
-        if (!$this->user->save()) {
-            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not save newly registered user: '.$this->user->get('id').' with username: '.$this->user->get('username'));
-            return $this->modx->lexicon('register.user_err_save');
+        if ($this->live) {
+            if (!$this->user->save()) {
+                $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not save newly registered user: '.$this->user->get('id').' with username: '.$this->user->get('username'));
+                return $this->modx->lexicon('register.user_err_save');
+            }
         }
+
 
         $this->preparePersistentParameters();
 
         /* send activation email (if chosen) */
-        $email = $this->user->get('email');
+        $email = $this->profile->get('email');
         $activation = $this->controller->getProperty('activation',true);
         $activateResourceId = $this->controller->getProperty('activationResourceId','');
         $moderated = $this->checkForModeration();
@@ -72,7 +76,9 @@ class LoginRegisterProcessor extends LoginProcessor {
 
         } else if (!$moderated) {
             $this->user->set('active',true);
-            $this->user->save();
+            if ($this->live) {
+                $this->user->save();
+            }
         }
 
         $this->runPostHooks();
@@ -148,9 +154,10 @@ class LoginRegisterProcessor extends LoginProcessor {
 
     /**
      * If user groups were passed, set them here
-     * @return void
+     * @return array
      */
     public function setUserGroups() {
+        $added = array();
         /* if usergroups set */
         $this->userGroups = $this->controller->getProperty('usergroups','');
         if (!empty($this->userGroups)) {
@@ -162,7 +169,7 @@ class LoginRegisterProcessor extends LoginProcessor {
 
                 /* get usergroup */
                 $pk = array();
-                $pk[intval($userGroupMeta[0]) > 0 ? 'id' : 'name'] = $userGroupMeta[0];
+                $pk[intval($userGroupMeta[0]) > 0 ? 'id' : 'name'] = trim($userGroupMeta[0]);
                 /** @var modUserGroup $userGroup */
                 $userGroup = $this->modx->getObject('modUserGroup',$pk);
                 if (!$userGroup) continue;
@@ -183,8 +190,10 @@ class LoginRegisterProcessor extends LoginProcessor {
                     $member->set('role',1);
                 }
                 $this->user->addMany($member,'UserGroupMembers');
+                $added[] = $userGroup->get('name');
             }
         }
+        return $added;
     }
 
     /**
@@ -270,7 +279,11 @@ class LoginRegisterProcessor extends LoginProcessor {
         ));
         /* set cachepwd here to prevent re-registration of inactive users */
         $this->user->set('cachepwd',md5($password));
-        $success = $this->user->save();
+        if ($this->live) {
+            $success = $this->user->save();
+        } else {
+            $success = true;
+        }
         if (!$success) {
             $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not update cachepwd for activation for User: '.$this->user->get('username'));
         }
@@ -294,8 +307,8 @@ class LoginRegisterProcessor extends LoginProcessor {
     public function runPostHooks() {
         $postHooks = $this->controller->getProperty('postHooks','');
         $this->controller->loadHooks('postHooks');
-        $fields['register.user'] =& $user;
-        $fields['register.profile'] =& $profile;
+        $fields['register.user'] =& $this->user;
+        $fields['register.profile'] =& $this->profile;
         $fields['register.usergroups'] = $this->userGroups;
         $this->controller->postHooks->loadMultiple($postHooks,$fields);
 
