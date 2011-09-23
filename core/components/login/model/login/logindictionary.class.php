@@ -81,10 +81,11 @@ class LoginDictionary {
     /**
      * Get a field value
      * @param string $field
+     * @param mixed $default
      * @return mixed
      */
-    public function get($field) {
-        return $this->fields[$field];
+    public function get($field,$default = null) {
+        return isset($this->fields[$field]) ? $this->fields[$field] : $default;
     }
 
     /**

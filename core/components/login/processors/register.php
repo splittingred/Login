@@ -35,7 +35,7 @@ class LoginRegisterProcessor extends LoginProcessor {
     public $userGroups = array();
 
     public $persistParams = array();
-    public $live = false;
+    public $live = true;
 
     /**
      * @return mixed
@@ -148,8 +148,7 @@ class LoginRegisterProcessor extends LoginProcessor {
             $this->user->set('password',md5($fields['password']));
         }
         $this->profile->fromArray($fields);
-        $this->profile->set('internalKey',0);
-        $this->user->addOne($profile,'Profile');
+        $this->user->addOne($this->profile,'Profile');
     }
 
     /**

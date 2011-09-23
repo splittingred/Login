@@ -28,6 +28,7 @@
 class LoginRegisterController extends LoginController {
     /** @var boolean $hasPosted */
     public $hasPosted = false;
+    public $success = false;
 
     /**
      * Load default properties for this controller
@@ -103,6 +104,8 @@ class LoginRegisterController extends LoginController {
                 $result = $this->runProcessor('register');
                 if ($result !== true) {
                     $this->modx->setPlaceholder($placeholderPrefix.'error.message',$result);
+                } else {
+                    $this->success = true;
                 }
             }
         }
