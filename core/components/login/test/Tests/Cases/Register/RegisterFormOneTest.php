@@ -63,15 +63,9 @@ class RegisterFormOneTest extends LoginTestCase {
      */
     public function testForm() {
         $this->controller->process();
-        var_dump($this->controller->success);
         $exists = $this->modx->getCount('modUser',array(
             'username' => 'shaun+test@modx.com',
         ));
         $this->assertTrue($exists > 0);
-        //$this->controller->setProperty('preHooks',$this->login->config['testsPath'].'Hooks/Pre/prehooktest.setvalue.php');
-        //$this->controller->loadPreHooks();
-        //$val = $this->controller->preHooks->getValue('fullname');
-        //$success = strcmp($val,'TestPreValue') == 0;
-        //$this->assertTrue($success,'The preHook was not fired or did not set the value of the field.');
     }
 }
