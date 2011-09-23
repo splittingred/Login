@@ -108,4 +108,13 @@ $chunks[9]->fromArray(array(
     'properties' => '',
 ),'',true,true);
 
+$chunks[10]= $modx->newObject('modChunk');
+$chunks[10]->fromArray(array(
+    'id' => 10,
+    'name' => 'lgnActiveUser',
+    'description' => '',
+    'snippet' => file_get_contents($sources['source_core'].'/elements/chunks/lgnactiveuser.chunk.tpl'),
+    'properties' => '',
+),'',true,true);
+
 return $chunks;

@@ -82,6 +82,8 @@ $_lang['opt_register.blackglass'] = 'Black Glass';
 $_lang['opt_register.clean'] = 'Clean';
 $_lang['opt_register.red'] = 'Red';
 $_lang['opt_register.white'] = 'White';
+$_lang['opt_register.asc'] = 'Ascending';
+$_lang['opt_register.desc'] = 'Descending';
 
 /* ConfirmRegister snippet */
 $_lang['prop_confirmregister.redirectto_desc'] = 'Optional. After a successful confirmation, redirect to this Resource.';
@@ -125,3 +127,14 @@ $_lang['prop_changepassword.placeholderprefix_desc'] = 'The prefix to use for al
 $_lang['prop_isloggedin.contexts_desc'] = 'A comma-separated list of contexts to check authenticated status for. If not set, will default to current context.';
 $_lang['prop_isloggedin.redirectto_desc'] = 'The ID of a Resource to redirect to should the user not be logged in. Will default to the unauthorized_page.';
 $_lang['prop_isloggedin.redirectparams_desc'] = 'If using redirectTo, a JSON object of REQUEST params to send with the redirect.';
+
+/* ActiveUsers snippet */
+$_lang['prop_activeusers.tpl'] = 'The Chunk to use for outputting each active user.';
+$_lang['prop_activeusers.tplType'] = 'The type of tpl being provided. Defaults to a Chunk.';
+$_lang['prop_activeusers.sortBy'] = 'The field to sort by for the users.';
+$_lang['prop_activeusers.sortDir'] = 'The direction to sort by for the users.';
+$_lang['prop_activeusers.limit'] = 'The number of users to limit displaying.';
+$_lang['prop_activeusers.offset'] = 'The start index of the limited number of users to show.';
+$_lang['prop_activeusers.classKey'] = 'The class key to use when grabbing the users. Defaults to modUser. You can set this to a class name that extends modUser, if you wish.';
+$_lang['prop_activeusers.placeholderprefix_desc'] = 'The prefix to use for all placeholders set by this snippet.';
+$_lang['prop_activeusers.toplaceholder_desc'] = 'If set, will set the output of the snippet to a placeholder of this name rather than directly outputting the return contents.';

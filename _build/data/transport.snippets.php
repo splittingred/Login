@@ -114,4 +114,15 @@ $properties = include $sources['data'].'properties/properties.isloggedin.php';
 $snippets[8]->setProperties($properties);
 unset($properties);
 
+$snippets[9]= $modx->newObject('modSnippet');
+$snippets[9]->fromArray(array(
+    'id' => 9,
+    'name' => 'ActiveUsers',
+    'description' => 'Shows a list of active, logged-in users.',
+    'snippet' => getSnippetContent($sources['source_core'].'/elements/snippets/activeusers.snippet.php'),
+),'',true,true);
+$properties = include $sources['data'].'properties/properties.activeusers.php';
+$snippets[9]->setProperties($properties);
+unset($properties);
+
 return $snippets;
