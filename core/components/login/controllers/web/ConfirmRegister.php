@@ -160,7 +160,7 @@ class LoginConfirmRegisterController extends LoginController {
      * @return void
      */
     public function addSessionContexts() {
-        if ($this->getProperty('authenticate',true)) {
+        if ($this->getProperty('authenticate',true,'isset')) {
             $this->modx->user =& $user;
             $this->modx->getUser();
             $contexts = $this->getProperty('authenticateContexts',$this->modx->context->get('key'));
