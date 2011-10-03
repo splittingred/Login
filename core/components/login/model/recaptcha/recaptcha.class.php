@@ -29,9 +29,9 @@
  */
 if (!class_exists('reCaptcha')) {
 class reCaptcha {
-    const API_SERVER = 'http://api.recaptcha.net/';
-    const API_SECURE_SERVER = 'https://api-secure.recaptcha.net/';
-    const VERIFY_SERVER = 'api-verify.recaptcha.net';
+    const API_SERVER = 'http://www.google.com/recaptcha/api/';
+    const API_SECURE_SERVER = 'https://www.google.com/recaptcha/api/';
+    const VERIFY_SERVER = 'www.google.com';
     const OPT_PRIVATE_KEY = 'privateKey';
     const OPT_PUBLIC_KEY = 'publicKey';
     const OPT_USE_SSL = 'use_ssl';
@@ -63,11 +63,11 @@ class reCaptcha {
 
     /**
      * Submits an HTTP POST to a reCAPTCHA server
-     * @param string $host
-     * @param string $path
+     * @param $host
+     * @param $path
      * @param array $data
-     * @param int port
-     * @return array response
+     * @param int $port
+     * @return string
      */
     protected function httpPost($host, $path, array $data = array(), $port = 80) {
         $data['privatekey'] = $this->config[reCaptcha::OPT_PRIVATE_KEY];
@@ -95,16 +95,17 @@ class reCaptcha {
 
         return $response;
     }
-    
+
     /**
      * Gets the challenge HTML (javascript and non-javascript version).
      * This is called from the browser, and the resulting reCAPTCHA HTML widget
      * is embedded within the HTML form it was called from.
-     * @param string $pubkey A public key for reCAPTCHA
-     * @param string $error The error given by reCAPTCHA (optional, default is null)
-     * @param boolean $use_ssl Should the request be made over ssl? (optional, default is false)
-
-     * @return string - The HTML to be embedded in the user's form.
+     *
+     * @param string $theme
+     * @param int $width
+     * @param int $height
+     * @param null $error
+     * @return string The HTML to be embedded in the user's form.
      */
     public function getHtml($theme = 'clean',$width = 500,$height = 300,$error = null) {
         if (empty($this->config[reCaptcha::OPT_PUBLIC_KEY])) {
@@ -140,13 +141,13 @@ class reCaptcha {
     }
 
     /**
-      * Calls an HTTP POST function to verify if the user's guess was correct
-      * @param string $remoteip
-      * @param string $challenge
-      * @param string $response
-      * @param array $extra_params an array of extra variables to post to the server
-      * @return ReCaptchaResponse
-      */
+     * Calls an HTTP POST function to verify if the user's guess was correct
+     * @param $remoteIp
+     * @param $challenge
+     * @param $responseField
+     * @param array $extraParams
+     * @return ReCaptchaResponse
+     */
     public function checkAnswer ($remoteIp, $challenge, $responseField, $extraParams = array()) {
         if (empty($this->config[reCaptcha::OPT_PRIVATE_KEY])) {
             return $this->error($this->modx->lexicon('recaptcha.no_api_key'));
@@ -161,7 +162,7 @@ class reCaptcha {
             return $this->error($this->modx->lexicon('recaptcha.empty_answer'));
         }
 
-        $response = $this->httpPost(reCaptcha::VERIFY_SERVER,"/verify",array (
+        $response = $this->httpPost(reCaptcha::VERIFY_SERVER,"/recaptcha/api/verify",array (
             'remoteip' => $remoteIp,
             'challenge' => $challenge,
             'response' => $responseField,
@@ -183,11 +184,12 @@ class reCaptcha {
      * gets a URL where the user can sign up for reCAPTCHA. If your application
      * has a configuration page where you enter a key, you should provide a link
      * using this function.
-     * @param string $domain The domain where the page is hosted
-     * @param string $appname The name of your application
+     * @param null $domain
+     * @param null $appname
+     * @return string
      */
     public function getSignupUrl ($domain = null, $appname = null) {
-        return "http://recaptcha.net/api/getkey?" .  $this->qsencode(array ('domain' => $domain, 'app' => $appname));
+        return "http://www.google.com/recaptcha/api/getkey?" .  $this->qsencode(array ('domain' => $domain, 'app' => $appname));
     }
 
     protected function aesPad($val) {
@@ -229,8 +231,11 @@ class reCaptcha {
      * gets the parts of the email to expose to the user.
      * eg, given johndoe@example,com return ["john", "example.com"].
      * the email is then displayed as john...@example.com
+     *
+     * @param $email
+     * @return array
      */
-    public function mailhideEmailParts ($email) {
+    public function mailhideEmailParts($email) {
         $arr = preg_split("/@/", $email);
 
         if (strlen($arr[0]) <= 4) {
@@ -248,6 +253,9 @@ class reCaptcha {
      * to get a key, go to:
      *
      * http://mailhide.recaptcha.net/apikey
+     *
+     * @param $email
+     * @return string
      */
     public function mailhideHtml($email) {
         $emailparts = $this->mailhideEmailParts($email);
