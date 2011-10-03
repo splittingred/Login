@@ -109,7 +109,8 @@ class Login {
      * @return string The request URI, with Login-specific code stripped.
      */
     public function getRequestURI() {
-        return str_replace(array('?service=logout','&service=logout'),'',$_SERVER['REQUEST_URI']);
+        $requestUri = php_sapi_name() == 'cli' ? '' : $_SERVER['REQUEST_URI'];
+        return str_replace(array('?service=logout','&service=logout'),'',$requestUri);
     }
 
     /**

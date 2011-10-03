@@ -46,7 +46,7 @@ class RegisterForm5796Test extends LoginTestCase {
         ));
 
         $_POST = array(
-            'username' => 'unit-test-user',
+            'username' => 'unit-test-user-5796',
             'registerbtn' => 1,
             'email' => '',
             'password' => '',
@@ -58,7 +58,7 @@ class RegisterForm5796Test extends LoginTestCase {
     public function tearDown() {
         /** @var modUser $user */
         $user = $this->modx->getObject('modUser',array(
-            'username' => 'unit-test-user',
+            'username' => 'unit-test-user-5796',
         ));
         if ($user) {
             $user->remove();
@@ -73,6 +73,6 @@ class RegisterForm5796Test extends LoginTestCase {
      */
     public function testForm() {
         $this->controller->process();
-        $this->assertTrue($this->login->controller->validator->errors['email'] == 1);
+        $this->assertTrue($this->login->controller->validator->hasErrorsInField('email'));
     }
 }
