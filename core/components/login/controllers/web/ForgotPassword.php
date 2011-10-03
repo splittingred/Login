@@ -96,7 +96,7 @@ class LoginForgotPasswordController extends LoginController {
             $this->fetchUser();
 
             if (empty($this->user)) {
-                $this->placeholders['loginfp.errors'] = $this->modx->lexicon('login.user_err_nf_'.$this->usernameField);
+                $this->placeholders['loginfp.errors'] = $this->formatError($this->modx->lexicon('login.user_err_nf_'.$this->usernameField));
             } else {
                 $this->placeholders['email'] = $this->dictionary->get('email');
 
@@ -107,6 +107,17 @@ class LoginForgotPasswordController extends LoginController {
             }
         }
         return $success;
+    }
+
+    /**
+     * Wrap errors in an error tpl
+     * @param string $message
+     * @return string
+     */
+    public function formatError($message) {
+        $errTpl = $this->getProperty('errTpl','lgnErrTpl');
+        $errTplType = $this->getProperty('errTplType','modChunk');
+        return $this->login->getChunk($errTpl, array('msg' => $message),$errTplType);
     }
 
     /**
@@ -176,7 +187,7 @@ class LoginForgotPasswordController extends LoginController {
                 $this->modx->toPlaceholders($this->preHooks->getErrors(),$this->getProperty('errorPrefix'));
 
                 $errorMsg = $this->preHooks->getErrorMessage();
-                $errorOutput = $this->modx->parseChunk($this->getProperty('errTpl'), array('msg' => $errorMsg));
+                $errorOutput = $this->formatError($errorMsg);
                 $this->modx->setPlaceholder('errors',$errorOutput);
             }
 

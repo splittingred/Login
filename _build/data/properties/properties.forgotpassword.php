@@ -90,6 +90,22 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'errTpl',
+        'desc' => 'prop_forgotpassword.errtpl_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 'lgnErrTpl',
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'errTplType',
+        'desc' => 'prop_forgotpassword.errtpltype_desc',
+        'type' => 'list',
+        'options' => $tplTypeOptions,
+        'value' => 'modChunk',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'emailSubject',
         'desc' => 'prop_forgotpassword.emailsubject_desc',
         'type' => 'textfield',
