@@ -38,6 +38,8 @@ class LoginForgotPasswordController extends LoginController {
     public $placeholders = array();
     /** @var string $usernameField */
     public $usernameField = 'username';
+    /** @var int $emailsSent */
+    public $emailsSent = 0;
 
     public function initialize() {
         $this->modx->lexicon->load('login:forgotpassword');
@@ -215,6 +217,7 @@ class LoginForgotPasswordController extends LoginController {
         $emailSubject = $this->getProperty('emailSubject','');
         $subject = !empty($emailSubject) ? $emailSubject : $this->modx->getOption('login.forgot_password_email_subject',null,$this->modx->lexicon('login.forgot_password_email_subject'));
         $this->login->sendEmail($fields['email'],$fields['username'],$subject,$emailProperties);
+        $this->emailsSent++;
     }
 
     /**

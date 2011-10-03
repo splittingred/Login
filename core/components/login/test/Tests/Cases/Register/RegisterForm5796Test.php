@@ -73,7 +73,6 @@ class RegisterForm5796Test extends LoginTestCase {
      */
     public function testForm() {
         $this->controller->process();
-        var_dump($this->login->controller->validator->errors);
         $this->assertTrue($this->login->controller->validator->errors['email'] == 1);
     }
 }

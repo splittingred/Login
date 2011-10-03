@@ -68,10 +68,10 @@ class LoginRegisterProcessor extends LoginProcessor {
 
         /* send activation email (if chosen) */
         $email = $this->profile->get('email');
-        $activation = $this->controller->getProperty('activation',true);
-        $activateResourceId = $this->controller->getProperty('activationResourceId','');
+        $activation = $this->controller->getProperty('activation',true,'isset');
+        $activationResourceId = $this->controller->getProperty('activationResourceId','','isset');
         $moderated = $this->checkForModeration();
-        if ($activation && !empty($email) && !empty($activateResourceId) && !$moderated) {
+        if ($activation && !empty($email) && !empty($activationResourceId) && !$moderated) {
             $this->sendActivationEmail();
 
         } else if (!$moderated) {
