@@ -300,12 +300,13 @@ class LoginRegisterProcessor extends LoginProcessor {
 
     /**
      * Run any post-registration hooks
-     * 
+     *
      * @return void
      */
     public function runPostHooks() {
         $postHooks = $this->controller->getProperty('postHooks','');
         $this->controller->loadHooks('postHooks');
+        $fields = $this->dictionary->toArray();
         $fields['register.user'] =& $this->user;
         $fields['register.profile'] =& $this->profile;
         $fields['register.usergroups'] = $this->userGroups;
