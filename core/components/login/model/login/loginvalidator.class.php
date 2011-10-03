@@ -297,6 +297,16 @@ class LoginValidator {
     }
 
     /**
+     * Check to see if a field has errors already
+     *
+     * @param string $key
+     * @return boolean
+     */
+    public function hasErrorsInField($key) {
+        return array_key_exists($key,$this->errors) && !empty($this->errors[$key]);
+    }
+
+    /**
      * Check to see if there are any validator errors in the stack
      *
      * @return boolean

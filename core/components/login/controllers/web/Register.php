@@ -161,7 +161,7 @@ class LoginRegisterController extends LoginController {
         $success = true;
         
         /* ensure username field exists and isn't empty */
-        if (empty($username)) {
+        if (empty($username) && !$this->validator->hasErrorsInField($usernameField)) {
             $this->validator->addError($usernameField,$this->modx->lexicon('register.field_required'));
             $success = false;
         } else {
@@ -199,7 +199,7 @@ class LoginRegisterController extends LoginController {
         $success = true;
 
         /* ensure password field isn't empty */
-        if (empty($password)) {
+        if (empty($password) && !$this->validator->hasErrorsInField($passwordField)) {
             $this->validator->addError($passwordField,$this->modx->lexicon('register.field_required'));
             $success = false;
         }
@@ -216,7 +216,7 @@ class LoginRegisterController extends LoginController {
         $success = true;
 
         /* ensure email field isn't empty */
-        if (empty($email)) {
+        if (empty($email) && !$this->validator->hasErrorsInField($emailField)) {
             $this->validator->addError($emailField,$this->modx->lexicon('register.field_required'));
             $success = false;
         /* ensure if allow_multiple_emails setting is false, prevent duplicate emails */

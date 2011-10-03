@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.7.0
 ====================================
+- [#5796] Fix issue where errors could appear twice if user used validators on username/email/password fields
 - Add ActiveUsers snippet that shows a list of active, logged-in users
 - Add file-based hooks to Login hook calls
 - Complete OOP refactoring to provide more stable development and better code isolation
