@@ -29,6 +29,8 @@ class LoginUpdateProfileController extends LoginController {
     /** @var boolean $hasPosted */
     public $hasPosted = false;
 
+    /** @var modUser $user */
+    public $user;
     /** @var modUserProfile $profile */
     public $profile;
 
@@ -55,6 +57,7 @@ class LoginUpdateProfileController extends LoginController {
             'successMsgPlaceholder' => 'error.message',
             'syncUsername' => false,
             'useExtended' => true,
+            'user' => '',
             'validate' => '',
         ));
     }
@@ -65,6 +68,7 @@ class LoginUpdateProfileController extends LoginController {
      */
     public function process() {
         if (!$this->verifyAuthentication()) return '';
+        if (!$this->getUser()) return '';
         if (!$this->getProfile()) return '';
         
         $this->setFieldPlaceholders();
@@ -107,13 +111,31 @@ class LoginUpdateProfileController extends LoginController {
     }
 
     /**
+     * Get the specified or active user
+     * @return modUser
+     */
+    public function getUser() {
+        $user = $this->getProperty('user',false);
+        if (!empty($user)) {
+            $c = intval($user) == 0 ? array('username' => $user) : $user;
+            $this->user = $this->modx->getObject('modUser',$c);
+        } else {
+            $this->user =& $this->modx->user;
+        }
+        if (empty($this->user)) {
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'Could not find user: '.$user);
+        }
+        return $this->user;
+    }
+
+    /**
      * Get the Profile of the active user
      * @return modUserProfile
      */
     public function getProfile() {
-        $this->profile = $this->modx->user->getOne('Profile');
+        $this->profile = $this->user->getOne('Profile');
         if (empty($this->profile)) {
-            $this->modx->log(modX::LOG_LEVEL_ERROR,'Could not find profile for user: '.$this->modx->user->get('username'));
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'Could not find profile for user: '.$this->user->get('username'));
         }
         return $this->profile;
     }
@@ -201,7 +223,7 @@ class LoginUpdateProfileController extends LoginController {
         if (!empty($email) && !$this->modx->getOption('allow_multiple_emails',null,false)) {
             $emailTaken = $this->modx->getObject('modUserProfile',array(
                 'email' => $email,
-                'id:!=' => $this->modx->user->get('id'),
+                'id:!=' => $this->user->get('id'),
             ));
             if ($emailTaken) {
                 $this->validator->addError($emailField,$this->modx->lexicon('login.email_taken',array('email' => $email)));

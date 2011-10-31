@@ -1,5 +1,9 @@
 Changelog file for Login component.
 
+Login 1.7.1
+====================================
+- [#5969] Add &user property to UpdateProfile to allow specifying user to update
+
 Login 1.7.0
 ====================================
 - [#49] Update reCaptcha URLs

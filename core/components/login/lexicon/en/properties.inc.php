@@ -112,6 +112,7 @@ $_lang['prop_updateprofile.reloadonsuccess_desc'] = 'If true, the page will redi
 $_lang['prop_updateprofile.submitvar_desc'] = 'The var to check for to load the UpdateProfile functionality. If empty or set to false, UpdateProfile will process the form on all POST requests.';
 $_lang['prop_updateprofile.syncusername_desc'] = 'If set to a column name in the Profile, UpdateProfile will attempt to sync the username to this field after a successful save.';
 $_lang['prop_updateprofile.useextended_desc'] = 'Whether or not to set any extra fields in the form to the Profiles extended field. This can be useful for storing extra user fields.';
+$_lang['prop_updateprofile.user_desc'] = 'Optional. If specified, will load the user with the specified ID or username instead of the active user.';
 
 /* ChangePassword snippet */
 $_lang['prop_changepassword.submitvar_desc'] = 'The var to check for to load the ChangePassword functionality. If empty or set to false, ChangePassword will process the form on all POST requests.';

@@ -36,6 +36,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'user',
+        'desc' => 'prop_updateprofile.user_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'redirectToLogin',
         'desc' => 'prop_updateprofile.redirecttologin_desc',
         'type' => 'combo-boolean',
