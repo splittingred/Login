@@ -185,10 +185,11 @@ class LoginUpdateProfileProcessor extends LoginProcessor {
     public function runPostHooks() {
         $postHooks = $this->controller->getProperty('postHooks','');
         $this->controller->loadHooks('postHooks');
+        $fields = $this->dictionary->toArray();
         $fields['updateprofile.user'] = &$this->modx->user;
         $fields['updateprofile.profile'] =& $this->profile;
         $fields['updateprofile.usernameChanged'] = $this->usernameChanged;
-        $this->controller->postHooks->loadMultiple($postHooks,$this->dictionary->toArray());
+        $this->controller->postHooks->loadMultiple($postHooks,$fields);
 
         /* process hooks */
         if ($this->controller->postHooks->hasErrors()) {
