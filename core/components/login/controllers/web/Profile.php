@@ -88,7 +88,7 @@ class LoginProfileController extends LoginController {
         if ($this->getProperty('useExtended',true,'isset')) {
             $extended = $this->profile->get('extended');
         }
-        return $extended;
+        return (array) $extended;
     }
 
     /**
