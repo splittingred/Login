@@ -79,6 +79,7 @@ $_lang['prop_register.mathoperatorfield_desc'] = 'If `math` is set as a preHook,
 $_lang['prop_register.validatepassword_desc'] = 'Whether or not to validate the sent password when registering. Recommended to leave this Yes unless you are generating your own password in a hook.';
 $_lang['prop_register.generatepassword_desc'] = 'If set to Yes, Register will generate a random password for the user, overwriting any passed password. Useful for automatic generation of passwords.';
 $_lang['prop_register.trimpassword_desc'] = 'If set to Yes, Register will trim the submitted password for whitespace.';
+$_lang['prop_register.allowedfields_desc'] = 'If set, will limit the fields that are allowed to be set on the newly created user to this comma-separated list. Also restricts extended fields.';
 $_lang['opt_register.chunk'] = 'Chunk';
 $_lang['opt_register.file'] = 'File';
 $_lang['opt_register.inline'] = 'Inline';

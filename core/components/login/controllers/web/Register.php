@@ -81,7 +81,9 @@ class LoginRegisterController extends LoginController {
         if (!$this->loadDictionary()) {
             return '';
         }
-        $this->validateFields();
+        $fields = $this->validateFields();
+        $this->dictionary->reset();
+        $this->dictionary->fromArray($fields);
 
         $this->validateUsername();
         if ($this->getProperty('validatePassword',true,'isset')) {
@@ -225,7 +227,8 @@ class LoginRegisterController extends LoginController {
         /** @var modUser $user */
         $user = $this->modx->newObject($classKey);
         $password = $user->generatePassword();
-        $this->setProperty('password',$password);
+        $this->dictionary->set('password',$password);
+        $this->dictionary->set('password_confirm',$password);
         return $password;
     }
 

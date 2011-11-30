@@ -92,6 +92,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'allowedFields',
+        'desc' => 'prop_register.allowedfields_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'emailField',
         'desc' => 'prop_register.emailfield_desc',
         'type' => 'textfield',

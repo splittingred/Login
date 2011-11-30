@@ -117,6 +117,7 @@ class LoginRegisterProcessor extends LoginProcessor {
         $userFields = $this->user->toArray();
         $extended = array();
         $fields = $this->dictionary->toArray();
+        $fields = $this->filterAllowedFields($fields);
         foreach ($fields as $field => $value) {
             if (!isset($profileFields[$field]) && !isset($userFields[$field]) && $field != 'password_confirm' && $field != 'passwordconfirm' && !in_array($field,$excludeExtended)) {
                 $extended[$field] = $value;
@@ -136,6 +137,8 @@ class LoginRegisterProcessor extends LoginProcessor {
         /* allow overriding of class key */
         if (empty($fields['class_key'])) $fields['class_key'] = 'modUser';
 
+        $fields = $this->filterAllowedFields($fields);
+
         /* set user and profile */
         $this->user->fromArray($fields);
         $this->user->set('username',$fields[$this->controller->getProperty('usernameField','username')]);
@@ -149,6 +152,24 @@ class LoginRegisterProcessor extends LoginProcessor {
         }
         $this->profile->fromArray($fields);
         $this->user->addOne($this->profile,'Profile');
+    }
+
+    /**
+     * Return an array of filtered fields if the allowedFields property is set and prevents setting of certain fields
+     * @param array $fields
+     * @return array
+     */
+    public function filterAllowedFields(array $fields = array()) {
+        $allowedFields = $this->controller->getProperty('allowedFields','');
+        if (!empty($allowedFields)) {
+            $allowedFields = is_array($allowedFields) ? $allowedFields : explode(',',$allowedFields);
+            array_push($allowedFields,'username','password','password_confirm','email','class_key');
+            $allowedFields = array_unique($allowedFields);
+            foreach ($fields as $k => $v) {
+                if (!in_array($k,$allowedFields)) unset($fields[$k]);
+            }
+        }
+        return $fields;
     }
 
     /**
