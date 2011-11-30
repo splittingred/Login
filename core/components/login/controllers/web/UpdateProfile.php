@@ -223,7 +223,7 @@ class LoginUpdateProfileController extends LoginController {
         if (!empty($email) && !$this->modx->getOption('allow_multiple_emails',null,false)) {
             $emailTaken = $this->modx->getObject('modUserProfile',array(
                 'email' => $email,
-                'id:!=' => $this->user->get('id'),
+                'internalKey:!=' => $this->user->get('id'),
             ));
             if ($emailTaken) {
                 $this->validator->addError($emailField,$this->modx->lexicon('login.email_taken',array('email' => $email)));
