@@ -84,6 +84,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'trimPassword',
+        'desc' => 'prop_register.trimpassword_desc',
+        'type' => 'combo-boolean',
+        'options' => '',
+        'value' => true,
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'emailField',
         'desc' => 'prop_register.emailfield_desc',
         'type' => 'textfield',

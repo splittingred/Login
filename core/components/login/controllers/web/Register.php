@@ -195,13 +195,16 @@ class LoginRegisterController extends LoginController {
     }
 
     /**
-     * Validate the password field
+     * Validate the password field and trim it if specified
      *
      * @return boolean
      */
     public function validatePassword() {
         $passwordField = $this->getProperty('passwordField','password');
         $password = $this->dictionary->get($passwordField);
+        if ($this->getProperty('trimPassword',true,'isset')) {
+            $password = trim($password);
+        }
         $success = true;
 
         /* ensure password field isn't empty */
