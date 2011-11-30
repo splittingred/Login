@@ -62,6 +62,7 @@ class LoginRegisterController extends LoginController {
             'usergroups' => '',
             'usernameField' => 'username',
             'validate' => '',
+            'validatePassword' => true,
         ));
     }
 
@@ -83,7 +84,12 @@ class LoginRegisterController extends LoginController {
         $this->validateFields();
 
         $this->validateUsername();
-        $this->validatePassword();
+        if ($this->getProperty('validatePassword',true,'isset')) {
+            $this->validatePassword();
+        }
+        if ($this->getProperty('generatePassword',false,'isset')) {
+            $this->generatePassword();
+        }
         $this->validateEmail();
 
         $placeholderPrefix = $this->getProperty('placeholderPrefix','');
@@ -204,6 +210,20 @@ class LoginRegisterController extends LoginController {
             $success = false;
         }
         return $success;
+    }
+
+    /**
+     * Automatically generate a password for the user
+     * @return string
+     */
+    public function generatePassword() {
+        $classKey = $this->dictionary->get('class_key');
+        if (empty($classKey)) $classKey = 'modUser';
+        /** @var modUser $user */
+        $user = $this->modx->newObject($classKey);
+        $password = $user->generatePassword();
+        $this->setProperty('password',$password);
+        return $password;
     }
 
     /**

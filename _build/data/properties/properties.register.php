@@ -68,6 +68,22 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'validatePassword',
+        'desc' => 'prop_register.validatepassword_desc',
+        'type' => 'combo-boolean',
+        'options' => '',
+        'value' => true,
+        'lexicon' => 'login:properties',
+    ),
+    array(
+        'name' => 'generatePassword',
+        'desc' => 'prop_register.generatepassword_desc',
+        'type' => 'combo-boolean',
+        'options' => '',
+        'value' => false,
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'emailField',
         'desc' => 'prop_register.emailfield_desc',
         'type' => 'textfield',
