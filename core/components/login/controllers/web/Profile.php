@@ -131,9 +131,13 @@ class LoginProfileController extends LoginController {
                 $this->modx->log(modX::LOG_LEVEL_ERROR,'Could not find user: '.$username);
                 $this->user = false;
             }
-        /* just use current user */
+        /* just use current user if user is logged in */
         } else {
-            $this->user =& $this->modx->user;
+            if (!$this->modx->user->hasSessionContext($this->modx->context->get('key'))) {
+                $this->user = false;
+            } else {
+                $this->user =& $this->modx->user;
+            }
         }
         return $this->user;
     }
