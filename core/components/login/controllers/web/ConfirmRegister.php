@@ -56,13 +56,13 @@ class LoginConfirmRegisterController extends LoginController {
         $this->user->set('active',1);
         $this->user->set('cachepwd','');
         if (!$this->user->save()) {
-            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Register] Could not save activated user: '.$user->get('username'));
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'[Register] Could not save activated user: '.$this->user->get('username'));
             return '';
         }
         
         /* invoke OnUserActivate event */
         $this->modx->invokeEvent('OnUserActivate',array(
-            'user' => &$user,
+            'user' => &$this->user,
         ));
 
         $this->addSessionContexts();
@@ -192,7 +192,7 @@ class LoginConfirmRegisterController extends LoginController {
 
             /* handle persist params from Register snippet */
             $persistParams = $_GET;
-            unset($persistParams['lp'],$persistParams['lu']);
+            unset($persistParams['lp'],$persistParams['lu'],$persistParams['id']);
             $persistParams['username'] = $this->user->get('username');
             $persistParams['userid'] = $this->user->get('id');
             $redirectParams = array_merge($redirectParams,$persistParams);

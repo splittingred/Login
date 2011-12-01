@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.7.1
 ====================================
+- [#5979] Fix issue with ConfirmRegister and non-FURL sites
 - [#5734] Add &allowedFields to Register to allow restricting of submitted fields to a specific set
 - [#6010] Fix typo in UpdateProfile mismatching ID of profile to internalKey
 - [#5961] Add &trimPassword to automatically trim whitespace from submitted passwords
