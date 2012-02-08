@@ -178,7 +178,7 @@ class LoginRegisterController extends LoginController {
             $alreadyExists = $this->modx->getObject('modUser',array('username' => $username));
             if ($alreadyExists) {
                 $cachePwd = $alreadyExists->get('cachepwd');
-                if ($alreadyExists->get('active') == 0 && !empty($cachePwd)) {
+                if ($this->getProperty('removeExpiredRegistrations',true,'isset') && $alreadyExists->get('active') == 0 && !empty($cachePwd)) {
                     /* if inactive and has a cachepwd, probably an expired
                      * activation account, so let's remove it
                      * and let user re-register

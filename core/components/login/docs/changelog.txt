@@ -2,6 +2,7 @@ Changelog file for Login component.
 
 Login 1.7.2
 ====================================
+- [#6538] Add removeExpiredRegistrations property to Register snippet for handling expired, unactivated registrations
 - [#6256] Ensure Register respects passwordField and emailField properties
 - [#6288] Fix error message display in ChangePassword
 

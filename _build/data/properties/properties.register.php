@@ -232,7 +232,14 @@ $properties = array(
         'value' => '',
         'lexicon' => 'login:properties',
     ),
-
+    array(
+        'name' => 'removeExpiredRegistrations',
+        'desc' => 'prop_register.removeexpiredregistrations_desc',
+        'type' => 'combo-boolean',
+        'options' => '',
+        'value' => true,
+        'lexicon' => 'login:properties',
+    ),
     array(
         'name' => 'placeholderPrefix',
         'desc' => 'prop_register.placeholderprefix_desc',
