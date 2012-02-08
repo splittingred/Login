@@ -32,6 +32,8 @@ class LoginUpdateProfileProcessor extends LoginProcessor {
     public $usernameChanged = false;
     /** @var string $oldUsername */
     public $oldUsername;
+    /** @var LoginUpdateProfileController $controller */
+    public $controller;
 
     /**
      * @return boolean|string
@@ -62,7 +64,7 @@ class LoginUpdateProfileProcessor extends LoginProcessor {
      * @return modUserProfile
      */
     public function getProfile() {
-        $this->profile = $this->modx->user->getOne('Profile');
+        $this->profile = $this->controller->user->getOne('Profile');
         return $this->profile;
     }
 
@@ -91,7 +93,7 @@ class LoginUpdateProfileProcessor extends LoginProcessor {
             $excludeExtended = $this->controller->getProperty('excludeExtended','');
             $excludeExtended = explode(',',$excludeExtended);
             $profileFields = $this->profile->toArray();
-            $userFields = $this->modx->user->toArray();
+            $userFields = $this->controller->user->toArray();
             $newExtended = array();
             $fields = $this->controller->dictionary->toArray();
             foreach ($fields as $field => $value) {
@@ -144,7 +146,7 @@ class LoginUpdateProfileProcessor extends LoginProcessor {
     public function syncUsername() {
         $synced = true;
         $syncUsername = $this->controller->getProperty('syncUsername',false,'isset');
-        $this->oldUsername = $this->modx->user->get('username');
+        $this->oldUsername = $this->controller->user->get('username');
         if (!empty($syncUsername)) {
             $newUsername = $this->profile->get($syncUsername);
             if (!empty($newUsername) && strcmp($newUsername,$this->oldUsername) != 0) {
@@ -152,9 +154,9 @@ class LoginUpdateProfileProcessor extends LoginProcessor {
                 if (!empty($alreadyExists)) {
                     $synced = false;
                 } else {
-                    $this->modx->user->set('username',$newUsername);
+                    $this->controller->user->set('username',$newUsername);
                     $this->usernameChanged = true;
-                    $synced = $this->modx->user->save();
+                    $synced = $this->controller->user->save();
                 }
             }
         }
@@ -166,13 +168,13 @@ class LoginUpdateProfileProcessor extends LoginProcessor {
      * @return boolean
      */
     public function save() {
-        $this->modx->user->addOne($profile,'Profile');
-        $saved = $this->modx->user->save();
+        $this->controller->user->addOne($profile,'Profile');
+        $saved = $this->controller->user->save();
         if (!$saved) {
             /* revert username change */
             if ($this->usernameChanged) {
-                $this->modx->user->set('username',$this->oldUsername);
-                $this->modx->user->save();
+                $this->controller->user->set('username',$this->oldUsername);
+                $this->controller->user->save();
             }
         }
         return $saved;
@@ -186,7 +188,7 @@ class LoginUpdateProfileProcessor extends LoginProcessor {
         $postHooks = $this->controller->getProperty('postHooks','');
         $this->controller->loadHooks('postHooks');
         $fields = $this->dictionary->toArray();
-        $fields['updateprofile.user'] = &$this->modx->user;
+        $fields['updateprofile.user'] = &$this->controller->user;
         $fields['updateprofile.profile'] =& $this->profile;
         $fields['updateprofile.usernameChanged'] = $this->usernameChanged;
         $this->controller->postHooks->loadMultiple($postHooks,$fields);

@@ -117,7 +117,7 @@ class LoginUpdateProfileController extends LoginController {
     public function getUser() {
         $user = $this->getProperty('user',false);
         if (!empty($user)) {
-            $c = intval($user) == 0 ? array('username' => $user) : $user;
+            $c = intval($user) == 0 ? array('username' => $user) : intval($user);
             $this->user = $this->modx->getObject('modUser',$c);
         } else {
             $this->user =& $this->modx->user;
