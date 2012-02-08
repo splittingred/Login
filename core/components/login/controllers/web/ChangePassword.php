@@ -47,6 +47,7 @@ class LoginChangePasswordController extends LoginController {
             'successMessage' => $this->modx->lexicon('login.password_changed'),
             'validate' => '',
             'validateOldPassword' => true,
+            'errTpl' => 'lgnErrTpl',
         ));
     }
 
@@ -141,9 +142,11 @@ class LoginChangePasswordController extends LoginController {
                 $this->validateOldPassword();
                 $this->validatePasswordLength();
                 $this->confirmMatchedPasswords();
-
                 if (empty($this->errors)) {
                     $this->changePassword();
+                } else {
+                    $errorMsg = $this->prepareFailureMessage();
+                    $this->modx->setPlaceholder($this->getProperty('placeholderPrefix').'error_message',$errorMsg);
                 }
             }
         }
@@ -339,6 +342,24 @@ class LoginChangePasswordController extends LoginController {
         if (!empty($successMessage)) {
             $this->modx->setPlaceholder($placeholderPrefix.'successMessage',$successMessage);
         }
+    }
+
+    /**
+     * @param string $defaultErrorMessage
+     * @return string
+     */
+    public function prepareFailureMessage($defaultErrorMessage = '') {
+        $errorOutput = '';
+        $errTpl = $this->getProperty('errTpl');
+        $errors = $this->errors;
+        if (!empty($errors)) {
+            foreach ($errors as $error) {
+                $errorOutput .= $this->modx->parseChunk($errTpl,  array('msg' => $error));
+            }
+        } else {
+            $errorOutput = $this->modx->parseChunk($errTpl, array('msg' => $defaultErrorMessage));
+        }
+        return $errorOutput;
     }
 }
 return 'LoginChangePasswordController';
