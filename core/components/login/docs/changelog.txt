@@ -1,5 +1,9 @@
 Changelog file for Login component.
 
+Login 1.7.3
+====================================
+- [#7035] Fix regression error with email field in Register snippet
+
 Login 1.7.2
 ====================================
 - [#6194] Fix issue with UpdateProfile when specifying the non-active user to update

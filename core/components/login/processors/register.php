@@ -151,7 +151,7 @@ class LoginRegisterProcessor extends LoginProcessor {
             $this->user->set('password',md5($fields[$this->controller->getProperty('passwordField','password')]));
         }
         $this->profile->fromArray($fields);
-        $this->profile->set('email',$this->controller->getProperty('emailField','email'));
+        $this->profile->set('email',$this->dictionary->get($this->controller->getProperty('emailField','email')));
         $this->user->addOne($this->profile,'Profile');
     }
 
