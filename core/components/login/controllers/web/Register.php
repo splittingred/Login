@@ -227,7 +227,7 @@ class LoginRegisterController extends LoginController {
         /** @var modUser $user */
         $user = $this->modx->newObject($classKey);
         $password = $user->generatePassword();
-        $this->dictionary->set('password',$password);
+        $this->dictionary->set($this->getProperty('passwordField','password'),$password);
         $this->dictionary->set('password_confirm',$password);
         return $password;
     }
@@ -238,7 +238,7 @@ class LoginRegisterController extends LoginController {
      */
     public function validateEmail() {
         $emailField = $this->getProperty('emailField','email');
-        $email = $this->dictionary->get('email');
+        $email = $this->dictionary->get($emailField);
         $success = true;
 
         /* ensure email field isn't empty */
@@ -303,6 +303,7 @@ class LoginRegisterController extends LoginController {
     }
 
     public function loadReCaptcha() {
+        /** @var reCaptcha $recaptcha */
         $recaptcha = $this->modx->getService('recaptcha','reCaptcha',$this->login->config['modelPath'].'recaptcha/');
         if ($recaptcha instanceof reCaptcha) {
             $this->modx->lexicon->load('login:recaptcha');

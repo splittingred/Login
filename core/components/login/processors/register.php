@@ -146,11 +146,12 @@ class LoginRegisterProcessor extends LoginProcessor {
         $version = $this->modx->getVersionData();
         /* 2.1.x+ */
         if (version_compare($version['full_version'],'2.1.0-rc1') >= 0) {
-            $this->user->set('password',$fields['password']);
+            $this->user->set('password',$fields[$this->controller->getProperty('passwordField','password')]);
         } else { /* 2.0.x */
-            $this->user->set('password',md5($fields['password']));
+            $this->user->set('password',md5($fields[$this->controller->getProperty('passwordField','password')]));
         }
         $this->profile->fromArray($fields);
+        $this->profile->set('email',$this->controller->getProperty('emailField','email'));
         $this->user->addOne($this->profile,'Profile');
     }
 
@@ -281,7 +282,7 @@ class LoginRegisterProcessor extends LoginProcessor {
         $emailProperties['tpl'] = $emailTpl;
         $emailProperties['tplAlt'] = $emailTplAlt;
         $emailProperties['tplType'] = $emailTplType;
-        $emailProperties['password'] = $this->dictionary->get('password');
+        $emailProperties['password'] = $this->dictionary->get($this->controller->getProperty('passwordField','password'));
 
         $this->setCachePassword($pword);
         return $emailProperties;
