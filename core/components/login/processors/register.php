@@ -53,8 +53,6 @@ class LoginRegisterProcessor extends LoginProcessor {
 
         $this->setUserFields();
 
-        $this->setUserGroups();
-
         /* save user */
         if ($this->live) {
             if (!$this->user->save()) {
@@ -62,7 +60,6 @@ class LoginRegisterProcessor extends LoginProcessor {
                 return $this->modx->lexicon('register.user_err_save');
             }
         }
-
 
         $this->preparePersistentParameters();
 
@@ -86,7 +83,7 @@ class LoginRegisterProcessor extends LoginProcessor {
         $this->checkForModerationRedirect();
 
         $this->checkForRegisteredRedirect();
-        
+
         $successMsg = $this->controller->getProperty('successMsg','');
         $this->modx->toPlaceholder('error.message',$successMsg);
         return true;
@@ -119,7 +116,13 @@ class LoginRegisterProcessor extends LoginProcessor {
         $fields = $this->dictionary->toArray();
         $fields = $this->filterAllowedFields($fields);
         foreach ($fields as $field => $value) {
-            if (!isset($profileFields[$field]) && !isset($userFields[$field]) && $field != 'password_confirm' && $field != 'passwordconfirm' && !in_array($field,$excludeExtended)) {
+            if (!isset($profileFields[$field])
+                    && !isset($userFields[$field])
+                    && $field != 'password_confirm'
+                    && $field != 'passwordconfirm'
+                    && $field != 'usergroups'
+                    && !in_array($field,$excludeExtended)
+                    ) {
                 $extended[$field] = $value;
             }
         }
@@ -129,7 +132,7 @@ class LoginRegisterProcessor extends LoginProcessor {
 
     /**
      * Setup the user data and create the user/profile objects
-     * 
+     *
      * @return void
      */
     public function setUserFields() {
@@ -153,6 +156,9 @@ class LoginRegisterProcessor extends LoginProcessor {
         $this->profile->fromArray($fields);
         $this->profile->set('email',$this->dictionary->get($this->controller->getProperty('emailField','email')));
         $this->user->addOne($this->profile,'Profile');
+
+        $this->setUserGroups($fields[$this->controller->getProperty('usergroupField','usergroups')]);
+
     }
 
     /**
@@ -164,7 +170,7 @@ class LoginRegisterProcessor extends LoginProcessor {
         $allowedFields = $this->controller->getProperty('allowedFields','');
         if (!empty($allowedFields)) {
             $allowedFields = is_array($allowedFields) ? $allowedFields : explode(',',$allowedFields);
-            array_push($allowedFields,'username','password','password_confirm','email','class_key');
+            array_push($allowedFields,'username','password','password_confirm','email','class_key', 'usergroups');
             $allowedFields = array_unique($allowedFields);
             foreach ($fields as $k => $v) {
                 if (!in_array($k,$allowedFields)) unset($fields[$k]);
@@ -177,10 +183,10 @@ class LoginRegisterProcessor extends LoginProcessor {
      * If user groups were passed, set them here
      * @return array
      */
-    public function setUserGroups() {
+    public function setUserGroups($usergroups) {
         $added = array();
         /* if usergroups set */
-        $this->userGroups = $this->controller->getProperty('usergroups','');
+        $this->userGroups = !empty($usergroups) ? $usergroups : $this->controller->getProperty('usergroups', '');
         if (!empty($this->userGroups)) {
             $this->userGroups = explode(',',$this->userGroups);
 
@@ -231,7 +237,7 @@ class LoginRegisterProcessor extends LoginProcessor {
     /**
      * Send an activation email to the user with an encrypted username and password hash, to allow for secure
      * activation processes that are not vulnerable to middle-man attacks.
-     * 
+     *
      * @return boolean
      */
     public function sendActivationEmail() {
@@ -373,7 +379,7 @@ class LoginRegisterProcessor extends LoginProcessor {
 
     /**
      * Check for a redirect if the user was successfully registered. If one found, redirect.
-     * 
+     *
      * @return boolean
      */
     public function checkForRegisteredRedirect() {
