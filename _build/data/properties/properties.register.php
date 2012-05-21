@@ -44,6 +44,14 @@ $properties = array(
         'lexicon' => 'login:properties',
     ),
     array(
+        'name' => 'usergroupsField',
+        'desc' => 'prop_register.usergroupsfield_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'login:properties',
+    ),
+    array(
         'name' => 'submittedResourceId',
         'desc' => 'prop_register.submittedresourceid_desc',
         'type' => 'textfield',

@@ -126,7 +126,7 @@ class LoginHooks {
             } else {
                 /* no hook found */
                 $this->modx->log(modX::LOG_LEVEL_ERROR,'[Login] Could not find hook "'.$hookName.'".');
-                $success = true;
+                $success = false;
             }
         }
 
@@ -148,7 +148,7 @@ class LoginHooks {
      */
     private function _loadFileBasedHook($path,array $customProperties = array()) {
         $scriptProperties = array_merge($this->login->config,$customProperties);
-        $formit =& $this->login;
+        $login =& $this->login;
         $hook =& $this;
         $fields = $this->fields;
         $errors =& $this->errors;
@@ -449,7 +449,7 @@ class LoginHooks {
 
     /**
      * Adds in reCaptcha support to form
-     * 
+     *
      * @access public
      * @param array $fields An array of cleaned POST fields
      * @return boolean True if email was successfully sent.

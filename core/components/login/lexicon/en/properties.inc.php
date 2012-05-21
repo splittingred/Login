@@ -47,6 +47,7 @@ $_lang['prop_profile.useextended_desc'] = 'Whether or not to set any extra field
 /* Register snippet */
 $_lang['prop_register.submitvar_desc'] = 'The var to check for to load the Register functionality. If empty or set to false, Register will process the form on all POST requests.';
 $_lang['prop_register.usergroups_desc'] = 'Optional. A comma-separated list of User Group names or IDs to add the newly-registered User to.';
+$_lang['prop_register.usergroupsfield_desc'] = 'The name of the field to use to specify the User Group(s) to automatically add the new User to. Only used if this value is not blank.';
 $_lang['prop_register.submittedresourceid_desc'] = 'If set, will redirect to the specified Resource after the User submits the registration form.';
 $_lang['prop_register.usernamefield_desc'] = 'The name of the field to use for the new User&apos;s username.';
 $_lang['prop_register.passwordfield_desc'] = 'The name of the field to use for the new User&apos;s password.';

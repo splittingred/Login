@@ -53,8 +53,6 @@ class LoginRegisterProcessor extends LoginProcessor {
 
         $this->setUserFields();
 
-        $this->setUserGroups();
-
         /* save user */
         if ($this->live) {
             if (!$this->user->save()) {
@@ -62,7 +60,6 @@ class LoginRegisterProcessor extends LoginProcessor {
                 return $this->modx->lexicon('register.user_err_save');
             }
         }
-
 
         $this->preparePersistentParameters();
 
@@ -86,7 +83,7 @@ class LoginRegisterProcessor extends LoginProcessor {
         $this->checkForModerationRedirect();
 
         $this->checkForRegisteredRedirect();
-        
+
         $successMsg = $this->controller->getProperty('successMsg','');
         $this->modx->toPlaceholder('error.message',$successMsg);
         return true;
@@ -118,8 +115,15 @@ class LoginRegisterProcessor extends LoginProcessor {
         $extended = array();
         $fields = $this->dictionary->toArray();
         $fields = $this->filterAllowedFields($fields);
+        $userGroupField = $this->controller->getProperty('usergroupsField','');
         foreach ($fields as $field => $value) {
-            if (!isset($profileFields[$field]) && !isset($userFields[$field]) && $field != 'password_confirm' && $field != 'passwordconfirm' && !in_array($field,$excludeExtended)) {
+            if (!isset($profileFields[$field])
+                    && !isset($userFields[$field])
+                    && $field != 'password_confirm'
+                    && $field != 'passwordconfirm'
+                    && $field != $userGroupField
+                    && !in_array($field,$excludeExtended)
+                    ) {
                 $extended[$field] = $value;
             }
         }
@@ -129,7 +133,7 @@ class LoginRegisterProcessor extends LoginProcessor {
 
     /**
      * Setup the user data and create the user/profile objects
-     * 
+     *
      * @return void
      */
     public function setUserFields() {
@@ -153,6 +157,11 @@ class LoginRegisterProcessor extends LoginProcessor {
         $this->profile->fromArray($fields);
         $this->profile->set('email',$this->dictionary->get($this->controller->getProperty('emailField','email')));
         $this->user->addOne($this->profile,'Profile');
+
+        /* add user groups, if set */
+        $userGroupsField = $this->controller->getProperty('usergroupsField','');
+        $userGroups = !empty($userGroupsField) && array_key_exists($userGroupsField,$fields) ? $fields[$userGroupsField] : array();
+        $this->setUserGroups($userGroups);
     }
 
     /**
@@ -164,7 +173,12 @@ class LoginRegisterProcessor extends LoginProcessor {
         $allowedFields = $this->controller->getProperty('allowedFields','');
         if (!empty($allowedFields)) {
             $allowedFields = is_array($allowedFields) ? $allowedFields : explode(',',$allowedFields);
-            array_push($allowedFields,'username','password','password_confirm','email','class_key');
+            $userGroupField = $this->controller->getProperty('usergroupsField','');
+            $usernameField = $this->controller->getProperty('usernameField','username');
+            $passwordField = $this->controller->getProperty('passwordField','password');
+            $emailField = $this->controller->getProperty('emailField','email');
+            array_push($allowedFields,$usernameField,$passwordField,'password_confirm',$emailField,'class_key');
+            if (!empty($userGroupField)) array_push($allowedFields,$userGroupField);
             $allowedFields = array_unique($allowedFields);
             foreach ($fields as $k => $v) {
                 if (!in_array($k,$allowedFields)) unset($fields[$k]);
@@ -175,14 +189,15 @@ class LoginRegisterProcessor extends LoginProcessor {
 
     /**
      * If user groups were passed, set them here
+     * @param string $userGroups
      * @return array
      */
-    public function setUserGroups() {
+    public function setUserGroups($userGroups) {
         $added = array();
-        /* if usergroups set */
-        $this->userGroups = $this->controller->getProperty('usergroups','');
+        /* if $userGroups set in form, override here; otherwise use snippet property */
+        $this->userGroups = !empty($userGroups) ? $userGroups : $this->controller->getProperty('usergroups', '');
         if (!empty($this->userGroups)) {
-            $this->userGroups = explode(',',$this->userGroups);
+            $this->userGroups = is_array($this->userGroups) ? $this->userGroups : explode(',',$this->userGroups);
 
             foreach ($this->userGroups as $userGroupMeta) {
                 $userGroupMeta = explode(':',$userGroupMeta);
@@ -231,7 +246,7 @@ class LoginRegisterProcessor extends LoginProcessor {
     /**
      * Send an activation email to the user with an encrypted username and password hash, to allow for secure
      * activation processes that are not vulnerable to middle-man attacks.
-     * 
+     *
      * @return boolean
      */
     public function sendActivationEmail() {
@@ -373,7 +388,7 @@ class LoginRegisterProcessor extends LoginProcessor {
 
     /**
      * Check for a redirect if the user was successfully registered. If one found, redirect.
-     * 
+     *
      * @return boolean
      */
     public function checkForRegisteredRedirect() {
