@@ -1,5 +1,9 @@
 Changelog file for Login component.
 
+Login 1.8.1
+====================================
+- Add password strength algorithm and checking properties to Register, via &ensurePasswordStrength property
+
 Login 1.8.0
 ====================================
 - [#5946] Add ability to set User Group for a new user via the &usergroupsField property
