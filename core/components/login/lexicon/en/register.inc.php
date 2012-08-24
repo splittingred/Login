@@ -55,6 +55,7 @@ $_lang['register.recaptcha_err_load'] = 'Could not load reCaptcha service class.
 $_lang['register.register'] = 'Register';
 $_lang['register.spam_blocked'] = 'Your submission was blocked by a spam filter: ';
 $_lang['register.spam_marked'] = ' - marked as spam.';
+$_lang['register.use_stronger_password'] = 'Your password is not strong enough. Perhaps you should strengthen it, by replacing letters with numbers or adding more words to the password (try multiple word passwords). Suggestions: [[+suggestions]]';
 $_lang['register.user_err_save'] = 'An error occurred while trying to save the User.';
 $_lang['register.username'] = 'Username';
 $_lang['register.username_taken'] = 'Username already taken. Please choose another.';

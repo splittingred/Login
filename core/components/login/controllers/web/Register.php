@@ -89,6 +89,9 @@ class LoginRegisterController extends LoginController {
         if ($this->getProperty('validatePassword',true,'isset')) {
             $this->validatePassword();
         }
+        if ($this->getProperty('ensurePasswordStrength',false,'isset')) {
+            $this->ensurePasswordStrength();
+        }
         if ($this->getProperty('generatePassword',false,'isset')) {
             $this->generatePassword();
         }
@@ -196,17 +199,23 @@ class LoginRegisterController extends LoginController {
         return $success;
     }
 
+    public function getPassword() {
+        $passwordField = $this->getProperty('passwordField','password');
+        $password = $this->dictionary->get($passwordField);
+        if ($this->getProperty('trimPassword',true,'isset')) {
+            $password = trim($password);
+        }
+        return $password;
+    }
+
     /**
      * Validate the password field and trim it if specified
      *
      * @return boolean
      */
     public function validatePassword() {
+        $password = $this->getPassword();
         $passwordField = $this->getProperty('passwordField','password');
-        $password = $this->dictionary->get($passwordField);
-        if ($this->getProperty('trimPassword',true,'isset')) {
-            $password = trim($password);
-        }
         $success = true;
 
         /* ensure password field isn't empty */
@@ -317,5 +326,97 @@ class LoginRegisterController extends LoginController {
         }
     }
 
+    /**
+     * Algorithm to ensure and suggest password strength
+     * @return bool
+     */
+    public function ensurePasswordStrength() {
+        $ensured = false;
+        $password = $this->getPassword();
+        $passwordField = $this->getProperty('passwordField','password');
+
+        $passwordWordSeparator = $this->getProperty('passwordWordSeparator',' ','isset');
+        if (strlen($passwordWordSeparator) == 0) $passwordWordSeparator = ' ';
+        $wordCount = $this->getWordsInString($password,$passwordWordSeparator);
+        $minimumStrongPasswordWordCount = $this->getProperty('minimumStrongPasswordWordCount',4,'!empty');
+        if ($wordCount < $minimumStrongPasswordWordCount || $minimumStrongPasswordWordCount == 0) {
+            $passwordStrengthThreshold = $this->getProperty('maximumPossibleStrongerPasswords',25,'!empty');
+            if ($passwordStrengthThreshold > 0) {
+                $possible = $this->getPossibleStrongerPasswords($password);
+
+                if (count($possible) > $passwordStrengthThreshold) {
+                    $ensurePasswordStrengthSuggestions = $this->getProperty('ensurePasswordStrengthSuggestions',5,'!empty');
+                    $suggestionIndexes = array_rand($possible,$ensurePasswordStrengthSuggestions);
+                    $suggestions = array();
+                    foreach ($suggestionIndexes as $idx) {
+                        $suggestions[] = $possible[$idx];
+                    }
+                    $this->validator->addError($passwordField,$this->modx->lexicon('register.use_stronger_password',array(
+                        'suggestions' => implode(', ',$suggestions),
+                    )));
+                }
+            } else {
+                $ensured = true;
+            }
+        } else {
+            $ensured = true;
+        }
+
+        return $ensured;
+    }
+
+    public function getWordsInString($str,$separator) {
+        return count(explode($separator,$str));
+    }
+
+
+    /** @var array $strongPasswordMap */
+    public $strongPasswordMap = array(
+        'a' => array('@','A','4'),
+        'b' => array('8','B'),
+        'c' => array('('),
+        'e' => array('3','E'),
+        'f' => array('ph'),
+        'g' => array('6'),
+        'i' => array('1','!','|'),
+        'l' => array('1','L'),
+        'n' => array('en'),
+        'o' => array('0','O'),
+        's' => array('$','5'),
+        't' => array('7','+'),
+        'x' => array('X'),
+        'z' => array('2'),
+    );
+
+    /**
+     * Given a password, find stronger ones
+     *
+     * @param string $password
+     * @return array
+     */
+    public function getPossibleStrongerPasswords($password) {
+        $passwordLength = strlen($password);
+        if ($passwordLength == 1) return isset($this->strongPasswordMap[$password]) ? $this->strongPasswordMap[$password] : $password;
+
+        $rest = $this->getPossibleStrongerPasswords(substr($password,1));
+        $restLength = count($rest);
+
+        $current = isset($this->strongPasswordMap[$password[0]]) ? $this->strongPasswordMap[$password[0]] : null;
+        $currentLength = count($current);
+        $result = array();
+
+        if ($current) {
+            for ($i=0;$i<$currentLength;$i++) {
+                for ($j=0;$j<$restLength;$j++) {
+                    $result[] = $current[$i].$rest[$j];
+                }
+            }
+        } else {
+            for ($j=0;$j<$restLength;$j++) {
+                $result[] = $password[0].$rest[$j];
+            }
+        }
+        return $result;
+    }
 }
 return 'LoginRegisterController';
